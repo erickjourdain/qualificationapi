@@ -1,0 +1,7 @@
+#configuration globale
+spring:
+  application:
+    name: formsAPI
+  profiles:
+    active: dev
+   
