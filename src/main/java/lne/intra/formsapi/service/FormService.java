@@ -37,7 +37,7 @@ public class FormService {
         .id(createur.getId())
         .prenom(createur.getPrenom())
         .nom(createur.getNom())
-        .role(createur.getRole().name())
+        .role(createur.getRole())
         .createdAt(createur.getCreatedAt())
         .updatedAt(createur.getUpdatedAt())
         .build();
@@ -88,7 +88,7 @@ public class FormService {
     var formsResponse = FormsResponse.builder()
         .nombreFormulaires(forms.getTotalElements())
         .data(formsDto)
-        .page(paging.getPageNumber())
+        .page(paging.getPageNumber()+1)
         .size(paging.getPageSize())
         .build();
 

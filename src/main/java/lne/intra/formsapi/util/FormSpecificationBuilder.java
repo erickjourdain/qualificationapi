@@ -1,4 +1,4 @@
-package lne.intra.formsapi.service;
+package lne.intra.formsapi.util;
 
 import java.util.ArrayList;
 import java.util.List;

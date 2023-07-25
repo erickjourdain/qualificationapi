@@ -2,6 +2,7 @@ package lne.intra.formsapi.model.dto;
 
 import java.util.Date;
 
+import lne.intra.formsapi.model.Role;
 import lombok.Builder;
 import lombok.Data;
 
@@ -12,7 +13,7 @@ public class UserDto {
   private Integer id;
   private String prenom;
   private String nom;
-  private String role;
+  private Role role;
   private Date createdAt;
   private Date updatedAt;
 }

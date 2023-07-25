@@ -9,62 +9,47 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import lne.intra.formsapi.model.dto.FormDto;
 import lne.intra.formsapi.model.dto.SearchCriteriaDto;
 import lne.intra.formsapi.model.dto.SearchDto;
-import lne.intra.formsapi.model.exception.AppException;
-import lne.intra.formsapi.model.request.FormRequest;
-import lne.intra.formsapi.model.response.FormsResponse;
-import lne.intra.formsapi.service.FormService;
-import lne.intra.formsapi.util.FormSpecificationBuilder;
+import lne.intra.formsapi.model.dto.UserDto;
+import lne.intra.formsapi.model.response.UsersResponse;
+import lne.intra.formsapi.service.UserService;
+import lne.intra.formsapi.util.UserSpecificationBuilder;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/data/forms")
-@PreAuthorize("hasAnyRole('ADMIN','USER')")
+@RequestMapping("api/v1/data/users")
+@PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
-public class FormController {
-
-  private final FormService service;
-
-  @PostMapping()
-  @PreAuthorize("hasAnyAuthority('admin:create','user:create')")
-  public ResponseEntity<FormDto> save(
-      @RequestBody FormRequest request) throws AppException {
-    if (service.existingValidForm(request.getTitre())) {
-      throw new AppException(400, "Une formulaire valide avec ce titre existe dans la base de données");
-    }
-    request.setTitre(request.getTitre().trim());
-    request.setDescription(request.getDescription().trim());
-    return ResponseEntity.ok(service.saveForm(request));
-  }
+public class UsersController {
+  
+  private final UserService service;
 
   @GetMapping()
-  @PreAuthorize("hasAnyAuthority('admin:read','user:read')")
-  public ResponseEntity<FormsResponse> getAllForms(
+  @PreAuthorize("hasAuthority('admin:read')")
+  public ResponseEntity<UsersResponse> getAllUsers(
       @RequestParam(defaultValue = "1") Integer page,
       @RequestParam(defaultValue = "10") Integer size,
       @RequestParam(defaultValue = "id") String sortBy) throws NotFoundException {
 
     Pageable paging = PageRequest.of(page-1, size);
-    return ResponseEntity.ok(service.getAllForms(paging));
+    return ResponseEntity.ok(service.getAllUsers(paging));
   }
   
   @GetMapping("/search")
-  @PreAuthorize("hasAnyAuthority('admin:read','user:read')")
-  public ResponseEntity<FormsResponse> getFormsBySearchCriteria(
+  @PreAuthorize("hasAuthority('admin:read')")
+  public ResponseEntity<UsersResponse> getUsersBySearchCriteria(
       @RequestParam(defaultValue = "1") Integer page,
       @RequestParam(defaultValue = "10") Integer size,
       @RequestParam(defaultValue = "id") String sortBy,
       @RequestBody SearchDto searchDto) throws NotFoundException {
 
-    FormSpecificationBuilder builder = new FormSpecificationBuilder();
+    UserSpecificationBuilder builder = new UserSpecificationBuilder();
     List<SearchCriteriaDto> criteriaList = searchDto.getSearchCriteriaList();
     if (criteriaList != null) {
       criteriaList.forEach(x -> {
@@ -74,13 +59,13 @@ public class FormController {
     }
 
     Pageable paging = PageRequest.of(page-1, size);
-    return ResponseEntity.ok(service.findBySearchCriteria(builder.build(), paging));
+    return ResponseEntity.ok(service.getfindBySearchCriteria(builder.build(), paging));
   }
   
   @GetMapping("/{id}")
-  @PreAuthorize("hasAnyAuthority('admin:read','user:read')")
-  public ResponseEntity<FormDto> getForm(
+  @PreAuthorize("hasAuthority('admin:read')")
+  public ResponseEntity<UserDto> getUser(
       @PathVariable Integer id) throws NotFoundException {
-    return ResponseEntity.ok(service.getForm(id));
+    return ResponseEntity.ok(service.getUser(id));
   }
 }

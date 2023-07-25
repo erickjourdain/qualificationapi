@@ -1,4 +1,4 @@
-package lne.intra.formsapi.service;
+package lne.intra.formsapi.util;
 
 import java.util.Objects;
 
@@ -9,22 +9,22 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import lne.intra.formsapi.model.Form;
+import lne.intra.formsapi.model.User;
 import lne.intra.formsapi.model.SearchOperation;
 import lne.intra.formsapi.model.dto.SearchCriteriaDto;
 
-public class FormSpecification implements Specification<Form>{
+public class UserSpecification implements Specification<User>{
   
   private final SearchCriteriaDto searchCriteria;
 
-  public FormSpecification(final SearchCriteriaDto searchCriteria) {
+  public UserSpecification(final SearchCriteriaDto searchCriteria) {
     super();
     this.searchCriteria = searchCriteria;
   }
 
   @Override
   @Nullable
-  public Predicate toPredicate(Root<Form> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+  public Predicate toPredicate(Root<User> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
    
     String strToSearch = searchCriteria.getValue().toString().toLowerCase();
 

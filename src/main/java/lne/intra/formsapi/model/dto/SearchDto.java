@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class FormSearchDto {
+public class SearchDto {
   
   private List<SearchCriteriaDto> searchCriteriaList;
   private String dataOption;
