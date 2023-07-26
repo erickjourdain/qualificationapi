@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -68,4 +69,13 @@ public class UsersController {
       @PathVariable Integer id) throws NotFoundException {
     return ResponseEntity.ok(service.getUser(id));
   }
+
+  @PatchMapping("setAdmin/{id}")
+  @PreAuthorize("hasAuthority('admin:update')")
+  public ResponseEntity<UserDto> setAdmin(
+      @PathVariable Integer id)throws NotFoundException
+  {
+    return ResponseEntity.ok(service.setAdmin(id));
+  }
+
 }

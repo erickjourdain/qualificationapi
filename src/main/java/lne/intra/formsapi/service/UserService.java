@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import lne.intra.formsapi.model.Role;
 import lne.intra.formsapi.model.User;
 import lne.intra.formsapi.model.dto.UserDto;
 import lne.intra.formsapi.model.exception.AppException;
@@ -23,7 +24,7 @@ public class UserService {
 
   public UserDto getUser(Integer id) throws AppException {
     User user = repository.findById(id)
-        .orElseThrow(() -> new AppException(400, "L'utilisateur recherché n'existe pas"));
+        .orElseThrow(() -> new AppException(404, "L'utilisateur recherché n'existe pas"));
     return UserDto.builder()
         .id(user.getId())
         .nom(user.getNom())
@@ -72,12 +73,26 @@ public class UserService {
     var usersResponse = UsersResponse.builder()
         .nombreUsers(users.getTotalElements())
         .data(userDtos)
-        .page(paging.getPageNumber()+1)
+        .page(paging.getPageNumber() + 1)
         .size(paging.getPageSize())
         .build();
 
     return usersResponse;
-
+  }
+  
+  public UserDto setAdmin(Integer id) {
+    User user = repository.findById(id)
+        .orElseThrow(() -> new AppException(404, "L'utilisateur recherché n'existe pas"));
+    user.setRole(Role.ADMIN);
+    repository.save(user);
+    return UserDto.builder()
+        .id(user.getId())
+        .nom(user.getNom())
+        .prenom(user.getPrenom())
+        .role(user.getRole())
+        .createdAt(user.getCreatedAt())
+        .updatedAt(user.getUpdatedAt())
+        .build();
   }
 
 }
