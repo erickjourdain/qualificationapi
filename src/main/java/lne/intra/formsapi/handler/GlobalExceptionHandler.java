@@ -27,10 +27,16 @@ public class GlobalExceptionHandler {
   public ResponseEntity<?> handleException(Exception exception) {
     Map<String, String> body = new HashMap<String, String>() {
       {
-        put("code", "bad request: 400");
+        put("error", exception.toString());
         put("message", exception.getMessage());
       }
     };
+    StackTraceElement[] elements = Thread.currentThread().getStackTrace();
+    for (int i = 1; i < elements.length; i++) {
+      StackTraceElement s = elements[i];
+      System.out.println(
+          "\tat " + s.getClassName() + "." + s.getMethodName() + "(" + s.getFileName() + ":" + s.getLineNumber() + ")");
+    }
     return ResponseEntity
         .badRequest()
         .body(body);

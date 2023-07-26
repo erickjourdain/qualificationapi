@@ -1,4 +1,4 @@
-package lne.intra.formsapi.service;
+package lne.intra.formsapi.util;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,6 +19,17 @@ public class ObjectsValidator<T> {
 
   public void validate(T objectToValidate) {
     Set<ConstraintViolation<T>> violations = validator.validate(objectToValidate);
+    if (!violations.isEmpty()) {
+      var errorMessages = violations
+          .stream()
+          .map(ConstraintViolation::getMessage)
+          .collect(Collectors.toSet());
+      throw new ObjectNotValidException(errorMessages);
+    }
+  }
+
+  public void validateForm(T objectToValidate, Class<?> classValidation) {
+    Set<ConstraintViolation<T>> violations = validator.validate(objectToValidate, classValidation);
     if (!violations.isEmpty()) {
       var errorMessages = violations
           .stream()

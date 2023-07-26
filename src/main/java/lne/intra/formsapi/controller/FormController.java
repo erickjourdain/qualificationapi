@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,16 +35,23 @@ public class FormController {
   private final FormService service;
 
   @PostMapping()
-  @PreAuthorize("hasAnyAuthority('admin:create','user:create')")
+  @PreAuthorize("hasAuthority('admin:create')")
   public ResponseEntity<FormDto> save(
       @RequestBody FormRequest request) throws AppException {
     if (service.existingValidForm(request.getTitre())) {
       throw new AppException(400, "Une formulaire valide avec ce titre existe dans la base de données");
     }
-    request.setTitre(request.getTitre().trim());
-    request.setDescription(request.getDescription().trim());
     return ResponseEntity.ok(service.saveForm(request));
   }
+
+  @PatchMapping("/{id}")
+  @PreAuthorize("hasAuthority('admin:update')")
+  public ResponseEntity<FormDto> update(
+    @PathVariable Integer id,
+    @RequestBody FormRequest request) throws NotFoundException {
+    return ResponseEntity.ok(service.partialUpdateForm(id, request));
+  }
+
 
   @GetMapping()
   @PreAuthorize("hasAnyAuthority('admin:read','user:read')")

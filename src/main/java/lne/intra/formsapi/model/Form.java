@@ -34,7 +34,7 @@ public class Form {
   @Size(min = 5, max = 125, message = "Le titre doit contenir entre 5 et 125 caractères")
   private String titre;
 
-  @Size(min = 25, max = 255, message = "La description doit contenir entre 5 et 255 caractères")
+  @Size(min = 25, max = 255, message = "La description doit contenir entre 25 et 255 caractères")
   private String description;
 
   @Column(nullable = false)

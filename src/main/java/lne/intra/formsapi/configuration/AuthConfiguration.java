@@ -18,51 +18,51 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthConfiguration {
   
-  private final UserRepository repository;
+	private final UserRepository repository;
 
-  /**
-   * Retourne l'utiisateur à partir de son login
-   * 
-   * @return UserDetailsService l'utilisateur via son login
-   */
-  @Bean
-  public UserDetailsService userDetailsService() {
+    /**
+     * Retourne l'utiisateur à partir de son login
+     * 
+     * @return UserDetailsService l'utilisateur via son login
+     */
+    @Bean
+    UserDetailsService userDetailsService() {
     return username -> repository.findByLogin(username)
         .orElseThrow(() -> new UsernameNotFoundException("Utilisateur inconnu"));
   }
 
-  /**
-   * Définition des méthodes d'authentification de l'application
-   * 
-   * @return AuthenticationProvider l'authentification provider
-   */
-  @Bean
-  public AuthenticationProvider authenticationProvider() {
+    /**
+     * Définition des méthodes d'authentification de l'application
+     * 
+     * @return AuthenticationProvider l'authentification provider
+     */
+    @Bean
+    AuthenticationProvider authenticationProvider() {
     DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
     authProvider.setUserDetailsService(userDetailsService());
     authProvider.setPasswordEncoder(passwordEncoder());
     return authProvider;
   }
 
-  /**
-   * Définition de l'authentification manager de l'application
-   * 
-   * @param config AuthenticationConfiguration paramètre de configuration de l'authentification
-   * @return AuthenticationManager l'authenfication manager
-   * @throws Exception
+    /**
+     * Définition de l'authentification manager de l'application
+     * 
+     * @param config AuthenticationConfiguration paramètre de configuration de l'authentification
+     * @return AuthenticationManager l'authenfication manager
+     * @throws Exception
    */
-  @Bean
-  public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    @Bean
+    AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
     return config.getAuthenticationManager();
   }
 
-  /**
-   * Définition du service d'encodage du mot de passe
-   * 
-   * @return PasswordEncoder le service d'encodage du mot de passe
-   */
-  @Bean
-  public PasswordEncoder passwordEncoder() {
+    /**
+     * Définition du service d'encodage du mot de passe
+     * 
+     * @return PasswordEncoder le service d'encodage du mot de passe
+     */
+    @Bean
+    PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
   }
 }

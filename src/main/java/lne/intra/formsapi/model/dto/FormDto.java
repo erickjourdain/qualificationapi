@@ -12,6 +12,7 @@ public class FormDto {
   private Integer id;
   private String titre;
   private String description;
+  private String formulaire;
   private Integer version;
   private Boolean valide;
   private UserDto createur;

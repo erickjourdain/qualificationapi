@@ -2,6 +2,7 @@ package lne.intra.formsapi.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.data.domain.Page;
@@ -18,6 +19,9 @@ import lne.intra.formsapi.model.request.FormRequest;
 import lne.intra.formsapi.model.response.FormsResponse;
 import lne.intra.formsapi.repository.FormRepository;
 import lne.intra.formsapi.repository.UserRepository;
+import lne.intra.formsapi.util.ObjectCreate;
+import lne.intra.formsapi.util.ObjectUpdate;
+import lne.intra.formsapi.util.ObjectsValidator;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -30,7 +34,7 @@ public class FormService {
 
   private FormDto addUserToForm(Form form) throws AppException {
     User createur = userRepository.findById(form.getCreateur().getId())
-      .orElseThrow(() -> new AppException(400, "Createur non trouvé"));
+      .orElseThrow(() -> new AppException(404, "Impossible de trouver le créateur"));
 
     UserDto createurDto = UserDto
         .builder()
@@ -45,6 +49,8 @@ public class FormService {
         .builder()
         .id(form.getId())
         .titre(form.getTitre())
+        .description(form.getDescription())
+        .formulaire(form.getFormulaire())
         .version(form.getVersion())
         .valide(form.getValide())
         .createdAt(form.getCreatedAt())
@@ -56,20 +62,55 @@ public class FormService {
   }
 
   public FormDto saveForm(FormRequest request) throws AppException {
-    // validation des chaps fournis dans la requête
-    formValidator.validate(request);
+    // validation des champs fournis dans la requête
+    formValidator.validateForm(request, ObjectCreate.class);
     // récupération du créateur
-    var createur = userRepository.findById(request.getCreateur())
-        .orElseThrow(() -> new AppException(400, "Impossible de trouver le créateur"));
+    User createur = userRepository.findById(request.getCreateur())
+        .orElseThrow(() -> new AppException(404, "Impossible de trouver le créateur"));
     // création de la nouvelle entrée
-    var form = Form.builder()
-        .titre(request.getTitre())
-        .formulaire(request.getFormulaire())
+    Form form = Form.builder()
+        .titre(request.getTitre().trim())
+        .formulaire(request.getFormulaire().trim())
+        .description((request.getDescription() != null) ? request.getDescription().trim() : null)
         .createur(createur)
         .build();
     // sauvegarde de la nouvelle entrée
-    var newFrom = repository.save(form);
-    return getForm(newFrom.getId());
+    Form newForm = repository.save(form);
+    return getForm(newForm.getId());
+  }
+
+  public FormDto partialUpdateForm(Integer id,FormRequest request) throws AppException {
+    // validation des champs fournis dans la requête
+    formValidator.validateForm(request, ObjectUpdate.class);
+    // récupération du formulaire à mettre à jour
+    Form form = repository.findById(id)
+        .orElseThrow(() -> new AppException(404, "Le formulaire à mettre à jour n'existe pas"));
+    List<Integer> newId = new ArrayList<>();
+    Optional.ofNullable(request.getTitre())
+        .ifPresent(res -> form.setTitre(res));
+    Optional.ofNullable(request.getDescription())
+        .ifPresent(res -> form.setDescription(res));
+    Optional.ofNullable(request.getCreateur())
+        .ifPresent(res -> {
+          var createur = userRepository.findById(request.getCreateur())
+              .orElseThrow(() -> new AppException(404, "Impossible de trouver le créateur"));
+          form.setCreateur(createur);
+        });
+    Optional.ofNullable(request.getFormulaire())
+        .ifPresent(res -> {
+          form.setValide(false);
+          Form newForm = Form.builder()
+              .titre(form.getTitre())
+              .description(form.getDescription())
+              .formulaire(res)
+              .version(form.getVersion() + 1)
+              .createur(form.getCreateur())
+              .build();
+          newId.add(repository.save(newForm).getId());
+        });
+    // mise à jour du formulaire
+    repository.save(form);
+    return getForm(newId.size() > 0 ? newId.get(0) : id);
   }
 
   public FormDto getForm(Integer id) throws AppException {

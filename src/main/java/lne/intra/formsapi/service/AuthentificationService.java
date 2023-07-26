@@ -15,6 +15,7 @@ import lne.intra.formsapi.model.request.RegisterRequest;
 import lne.intra.formsapi.model.response.AuthenticationResponse;
 import lne.intra.formsapi.repository.TokenRepository;
 import lne.intra.formsapi.repository.UserRepository;
+import lne.intra.formsapi.util.ObjectsValidator;
 import lombok.AllArgsConstructor;
 
 @Service
