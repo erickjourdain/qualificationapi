@@ -7,6 +7,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("api/v1/data/users")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasAnyRole('ADMIN', 'USER')")
 @RequiredArgsConstructor
 public class UsersController {
   
@@ -68,6 +70,12 @@ public class UsersController {
   public ResponseEntity<UserDto> getUser(
       @PathVariable Integer id) throws NotFoundException {
     return ResponseEntity.ok(service.getUser(id));
+  }
+
+  @GetMapping("/me")
+  @PreAuthorize("hasAnyAuthority('admin:read','user:read')")
+  public ResponseEntity<UserDto> getMe(@AuthenticationPrincipal UserDetails userDetails) {
+    return ResponseEntity.ok(service.getByLogin(userDetails.getUsername()));
   }
 
   @PatchMapping("setAdmin/{id}")

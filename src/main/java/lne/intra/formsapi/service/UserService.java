@@ -95,4 +95,17 @@ public class UserService {
         .build();
   }
 
+  public UserDto getByLogin(String login) {
+    User user = repository.findByLogin(login)
+        .orElseThrow(() -> new AppException(404, "L'utilisateur recherché n'existe pas"));
+    return UserDto.builder()
+        .id(user.getId())
+        .nom(user.getNom())
+        .prenom(user.getPrenom())
+        .role(user.getRole())
+        .createdAt(user.getCreatedAt())
+        .updatedAt(user.getUpdatedAt())
+        .build();
+  }
+
 }

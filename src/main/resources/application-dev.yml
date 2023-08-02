@@ -22,7 +22,7 @@ spring:
 
 #Tomcat configuration
 server:
-  port: 3000
+  port: 3030
 
 #configuration log
 logging:
