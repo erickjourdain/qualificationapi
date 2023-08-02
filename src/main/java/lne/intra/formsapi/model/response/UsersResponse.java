@@ -21,4 +21,8 @@ public class UsersResponse {
   private Integer size;
 
   private Long nombreUsers;
+
+  private Boolean hasPrevious;
+
+  private Boolean hasNext;
 }

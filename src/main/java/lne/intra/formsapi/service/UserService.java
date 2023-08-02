@@ -54,6 +54,8 @@ public class UserService {
         .data(userDtos)
         .page(paging.getPageNumber()+1)
         .size(paging.getPageSize())
+        .hasPrevious(users.hasPrevious())
+        .hasNext(users.hasNext())
         .build();
 
     return usersResponse;
@@ -75,6 +77,8 @@ public class UserService {
         .data(userDtos)
         .page(paging.getPageNumber() + 1)
         .size(paging.getPageSize())
+        .hasPrevious(users.hasPrevious())
+        .hasNext(users.hasNext())
         .build();
 
     return usersResponse;

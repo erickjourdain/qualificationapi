@@ -22,4 +22,8 @@ public class FormsResponse {
 
   private Long nombreFormulaires;
 
+  private Boolean hasPrevious;
+
+  private Boolean hasNext;
+
 }

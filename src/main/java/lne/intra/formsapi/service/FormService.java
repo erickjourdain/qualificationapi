@@ -131,6 +131,8 @@ public class FormService {
         .data(formsDto)
         .page(paging.getPageNumber()+1)
         .size(paging.getPageSize())
+        .hasPrevious(forms.hasPrevious())
+        .hasNext(forms.hasNext())
         .build();
 
     return formsResponse;
@@ -148,6 +150,8 @@ public class FormService {
         .data(formsDto)
         .page(paging.getPageNumber()+1)
         .size(paging.getPageSize())
+        .hasPrevious(forms.hasPrevious())
+        .hasNext(forms.hasNext())
         .build();
 
     return formsResponse;
