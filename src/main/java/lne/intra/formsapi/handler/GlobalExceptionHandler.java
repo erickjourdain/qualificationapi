@@ -3,7 +3,9 @@ package lne.intra.formsapi.handler;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -43,10 +45,8 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(EntityNotFoundException.class)
-  public ResponseEntity<?> handleException() {
-    return ResponseEntity
-        .notFound()
-        .build();
+  public ResponseEntity<Object> handleException() {
+    return new ResponseEntity<Object>("Entité non trouvée", null, HttpStatus.NOT_FOUND);
   }
 
   @ExceptionHandler(ObjectNotValidException.class)
@@ -57,10 +57,8 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(UsernameNotFoundException.class)
-  public ResponseEntity<?> handleException(UsernameNotFoundException exception) {
-    return ResponseEntity
-        .badRequest()
-        .body(exception.getMessage());
+  public ResponseEntity<Object> handleException(UsernameNotFoundException exception) {
+    return new ResponseEntity<Object>("Utilisateur non trouvé", null, HttpStatus.NOT_FOUND);
   }
 
   @ExceptionHandler(AppException.class)
@@ -73,6 +71,11 @@ public class GlobalExceptionHandler {
     return ResponseEntity
         .badRequest()
         .body(error);
+  }
+
+  @ExceptionHandler(AccessDeniedException.class)
+  public ResponseEntity<Object> handleException(AccessDeniedException exception) {
+    return new ResponseEntity<Object>("Accès interdit", null, HttpStatus.FORBIDDEN);
   }
 
 }
