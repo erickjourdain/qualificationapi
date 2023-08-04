@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.turkraft.springfilter.boot.Filter;
+
 import lne.intra.formsapi.model.Role;
 import lne.intra.formsapi.model.User;
 import lne.intra.formsapi.model.dto.UserDto;
@@ -61,7 +63,7 @@ public class UserService {
     return usersResponse;
   }
 
-  public UsersResponse getfindBySearchCriteria(Specification<User> spec, Pageable paging) {
+  public UsersResponse search(@Filter Specification<User> spec, Pageable paging) {
     Page<User> users = repository.findAll(spec, paging);
     List<UserDto> userDtos = new ArrayList<>();
 

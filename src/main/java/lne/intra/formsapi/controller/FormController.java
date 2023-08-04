@@ -1,7 +1,5 @@
 package lne.intra.formsapi.controller;
 
-import java.util.List;
-
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,14 +14,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.turkraft.springfilter.converter.FilterSpecification;
+
+import lne.intra.formsapi.model.Form;
 import lne.intra.formsapi.model.dto.FormDto;
-import lne.intra.formsapi.model.dto.SearchCriteriaDto;
-import lne.intra.formsapi.model.dto.SearchDto;
 import lne.intra.formsapi.model.exception.AppException;
 import lne.intra.formsapi.model.request.FormRequest;
 import lne.intra.formsapi.model.response.FormsResponse;
 import lne.intra.formsapi.service.FormService;
-import lne.intra.formsapi.util.FormSpecificationBuilder;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -47,44 +45,23 @@ public class FormController {
   @PatchMapping("/{id}")
   @PreAuthorize("hasAuthority('admin:update')")
   public ResponseEntity<FormDto> update(
-    @PathVariable Integer id,
-    @RequestBody FormRequest request) throws NotFoundException {
+      @PathVariable Integer id,
+      @RequestBody FormRequest request) throws NotFoundException {
     return ResponseEntity.ok(service.partialUpdateForm(id, request));
   }
 
-
-  @GetMapping()
+  @GetMapping
   @PreAuthorize("hasAnyAuthority('admin:read','user:read')")
-  public ResponseEntity<FormsResponse> getAllForms(
-      @RequestParam(defaultValue = "1") Integer page,
-      @RequestParam(defaultValue = "10") Integer size,
-      @RequestParam(defaultValue = "id") String sortBy) throws NotFoundException {
-
-    Pageable paging = PageRequest.of(page-1, size);
-    return ResponseEntity.ok(service.getAllForms(paging));
-  }
-  
-  @GetMapping("/search")
-  @PreAuthorize("hasAnyAuthority('admin:read','user:read')")
-  public ResponseEntity<FormsResponse> getFormsBySearchCriteria(
+  public ResponseEntity<FormsResponse> search(
       @RequestParam(defaultValue = "1") Integer page,
       @RequestParam(defaultValue = "10") Integer size,
       @RequestParam(defaultValue = "id") String sortBy,
-      @RequestBody SearchDto searchDto) throws NotFoundException {
+      FilterSpecification<Form> filter) throws NotFoundException {
 
-    FormSpecificationBuilder builder = new FormSpecificationBuilder();
-    List<SearchCriteriaDto> criteriaList = searchDto.getSearchCriteriaList();
-    if (criteriaList != null) {
-      criteriaList.forEach(x -> {
-        x.setDataOption(searchDto.getDataOption());
-        builder.with(x);
-      });
-    }
-
-    Pageable paging = PageRequest.of(page-1, size);
-    return ResponseEntity.ok(service.findBySearchCriteria(builder.build(), paging));
+    Pageable paging = PageRequest.of(page - 1, size);
+    return ResponseEntity.ok(service.search(filter, paging));
   }
-  
+
   @GetMapping("/{id}")
   @PreAuthorize("hasAnyAuthority('admin:read','user:read')")
   public ResponseEntity<FormDto> getForm(

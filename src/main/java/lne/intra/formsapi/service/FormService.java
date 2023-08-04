@@ -10,6 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.turkraft.springfilter.boot.Filter;
+
 import lne.intra.formsapi.model.Form;
 import lne.intra.formsapi.model.User;
 import lne.intra.formsapi.model.dto.FormDto;
@@ -137,8 +139,8 @@ public class FormService {
 
     return formsResponse;
   }
-
-  public FormsResponse findBySearchCriteria(Specification<Form> spec, Pageable paging) throws NotFoundException {
+  
+  public FormsResponse search(@Filter Specification<Form> spec, Pageable paging) {
     Page<Form> forms = repository.findAll(spec, paging);
     List<FormDto> formsDto = new ArrayList<>();
 
@@ -148,13 +150,14 @@ public class FormService {
     var formsResponse = FormsResponse.builder()
         .nombreFormulaires(forms.getTotalElements())
         .data(formsDto)
-        .page(paging.getPageNumber()+1)
+        .page(paging.getPageNumber() + 1)
         .size(paging.getPageSize())
         .hasPrevious(forms.hasPrevious())
         .hasNext(forms.hasNext())
         .build();
 
     return formsResponse;
+      
   }
 
   public Boolean existingValidForm(String titre) {
