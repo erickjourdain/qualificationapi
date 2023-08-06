@@ -3,6 +3,7 @@ package lne.intra.formsapi.model;
 import java.util.Date;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -48,13 +49,16 @@ public class Form {
   @Builder.Default
   private Boolean valide = true;
 
+  @Column(nullable = false)
+  private String slug;
+
   @Column(columnDefinition = "DATETIME DEFAULT CURRENT_DATE", nullable = false)
   @CreationTimestamp
   @Builder.Default
   private Date createdAt = new Date();
 
   @Column(columnDefinition = "DATETIME DEFAULT CURRENT_DATE", nullable = false)
-  @CreationTimestamp
+  @UpdateTimestamp
   @Builder.Default
   private Date updatedAt = new Date();
 

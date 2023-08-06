@@ -85,6 +85,11 @@
 			<artifactId>jpa</artifactId>
 			<version>3.1.2</version>
 		</dependency>
+		<dependency>
+			<groupId>com.ibm.icu</groupId>
+			<artifactId>icu4j</artifactId>
+			<version>73.2</version>
+		</dependency>
 	</dependencies>
 
 	<build>

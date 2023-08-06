@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import jakarta.persistence.EntityNotFoundException;
-import lne.intra.formsapi.model.dto.ErrorDto;
 import lne.intra.formsapi.model.exception.AppException;
 import lne.intra.formsapi.model.exception.ObjectNotValidException;
 
@@ -62,15 +61,8 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(AppException.class)
-  public ResponseEntity<?> handleException(AppException exception) {
-    var error = ErrorDto
-        .builder()
-        .code(exception.getCodeException())
-        .message(exception.getMessage())
-        .build();
-    return ResponseEntity
-        .badRequest()
-        .body(error);
+  public ResponseEntity<Object> handleException(AppException exception) {
+    return new ResponseEntity<Object>(exception, null, HttpStatus.BAD_REQUEST);
   }
 
   @ExceptionHandler(AccessDeniedException.class)

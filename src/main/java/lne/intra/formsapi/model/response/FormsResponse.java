@@ -1,8 +1,8 @@
 package lne.intra.formsapi.model.response;
 
 import java.util.List;
+import java.util.Map;
 
-import lne.intra.formsapi.model.dto.FormDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class FormsResponse {
 
-  private List<FormDto> data;
+  private List<Map<String, Object>> data;
 
   private Integer page;
   

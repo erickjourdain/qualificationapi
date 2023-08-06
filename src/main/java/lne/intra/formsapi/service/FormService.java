@@ -1,7 +1,9 @@
 package lne.intra.formsapi.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
@@ -14,8 +16,6 @@ import com.turkraft.springfilter.boot.Filter;
 
 import lne.intra.formsapi.model.Form;
 import lne.intra.formsapi.model.User;
-import lne.intra.formsapi.model.dto.FormDto;
-import lne.intra.formsapi.model.dto.UserDto;
 import lne.intra.formsapi.model.exception.AppException;
 import lne.intra.formsapi.model.request.FormRequest;
 import lne.intra.formsapi.model.response.FormsResponse;
@@ -24,6 +24,7 @@ import lne.intra.formsapi.repository.UserRepository;
 import lne.intra.formsapi.util.ObjectCreate;
 import lne.intra.formsapi.util.ObjectUpdate;
 import lne.intra.formsapi.util.ObjectsValidator;
+import lne.intra.formsapi.util.Slugify;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -34,36 +35,33 @@ public class FormService {
   private final FormRepository repository;
   private final ObjectsValidator<FormRequest> formValidator;
 
-  private FormDto addUserToForm(Form form) throws AppException {
+  private Map<String, Object> addUserToForm(Form form) throws AppException {
     User createur = userRepository.findById(form.getCreateur().getId())
-      .orElseThrow(() -> new AppException(404, "Impossible de trouver le créateur"));
+        .orElseThrow(() -> new AppException(404, "Impossible de trouver le créateur"));
 
-    UserDto createurDto = UserDto
-        .builder()
-        .id(createur.getId())
-        .prenom(createur.getPrenom())
-        .nom(createur.getNom())
-        .role(createur.getRole())
-        .createdAt(createur.getCreatedAt())
-        .updatedAt(createur.getUpdatedAt())
-        .build();
-    FormDto formDto = FormDto
-        .builder()
-        .id(form.getId())
-        .titre(form.getTitre())
-        .description(form.getDescription())
-        .formulaire(form.getFormulaire())
-        .version(form.getVersion())
-        .valide(form.getValide())
-        .createdAt(form.getCreatedAt())
-        .createur(createurDto)
-        .updatedAt(form.getUpdatedAt())
-        .build();
+    Map<String, Object> user = new HashMap<>();
+    Map<String, Object> response = new HashMap<>();
+    
+    user.put("id", createur.getId());
+    user.put("prenom", createur.getPrenom());
+    user.put("nom", createur.getNom());
+    user.put("role", createur.getRole());
 
-    return formDto;
+    response.put("id", form.getId());
+    response.put("titre", form.getTitre());
+    response.put("description", form.getDescription());
+    response.put("version", form.getVersion());
+    response.put("valide", form.getValide());
+    response.put("slug", form.getSlug());
+    response.put("createur", user);
+    response.put("createdAt", form.getCreatedAt());
+    response.put("updatedAt", form.getUpdatedAt());
+
+    return response;
   }
 
-  public FormDto saveForm(FormRequest request) throws AppException {
+  public Map<String, Object> saveForm(FormRequest request) throws AppException {
+    final Slugify slug = Slugify.builder().build();
     // validation des champs fournis dans la requête
     formValidator.validateForm(request, ObjectCreate.class);
     // récupération du créateur
@@ -75,13 +73,15 @@ public class FormService {
         .formulaire(request.getFormulaire().trim())
         .description((request.getDescription() != null) ? request.getDescription().trim() : null)
         .createur(createur)
+        .slug(slug.slugify(request.getTitre().trim() + "v" + 1))
         .build();
     // sauvegarde de la nouvelle entrée
     Form newForm = repository.save(form);
     return getForm(newForm.getId());
   }
 
-  public FormDto partialUpdateForm(Integer id,FormRequest request) throws AppException {
+  public Map<String, Object> partialUpdateForm(Integer id, FormRequest request) throws AppException {
+    final Slugify slug = Slugify.builder().build();
     // validation des champs fournis dans la requête
     formValidator.validateForm(request, ObjectUpdate.class);
     // récupération du formulaire à mettre à jour
@@ -89,7 +89,10 @@ public class FormService {
         .orElseThrow(() -> new AppException(404, "Le formulaire à mettre à jour n'existe pas"));
     List<Integer> newId = new ArrayList<>();
     Optional.ofNullable(request.getTitre())
-        .ifPresent(res -> form.setTitre(res));
+        .ifPresent(res -> {
+          form.setTitre(res);
+          form.setSlug(slug.slugify(res + "v" + form.getVersion()));
+        });
     Optional.ofNullable(request.getDescription())
         .ifPresent(res -> form.setDescription(res));
     Optional.ofNullable(request.getCreateur())
@@ -106,6 +109,7 @@ public class FormService {
               .description(form.getDescription())
               .formulaire(res)
               .version(form.getVersion() + 1)
+              .slug(slug.slugify(form.getTitre() + "v" + form.getVersion() + 1))
               .createur(form.getCreateur())
               .build();
           newId.add(repository.save(newForm).getId());
@@ -115,7 +119,7 @@ public class FormService {
     return getForm(newId.size() > 0 ? newId.get(0) : id);
   }
 
-  public FormDto getForm(Integer id) throws AppException {
+  public Map<String, Object> getForm(Integer id) throws AppException {
     Form form = repository.findById(id)
         .orElseThrow(() -> new AppException(400, "Le formuaire n'existe pas"));
     return addUserToForm(form);
@@ -123,41 +127,41 @@ public class FormService {
 
   public FormsResponse getAllForms(Pageable paging) throws NotFoundException {
     Page<Form> forms = repository.findAll(paging);
-    List<FormDto> formsDto = new ArrayList<>();
+    List<Map<String, Object>> formsWithCreateur = new ArrayList<>();
 
     for (Form form : forms) {
-      formsDto.add(addUserToForm(form));
+      formsWithCreateur.add(addUserToForm(form));
     }
-    var formsResponse = FormsResponse.builder()
+    var response = FormsResponse.builder()
         .nombreFormulaires(forms.getTotalElements())
-        .data(formsDto)
-        .page(paging.getPageNumber()+1)
-        .size(paging.getPageSize())
-        .hasPrevious(forms.hasPrevious())
-        .hasNext(forms.hasNext())
-        .build();
-
-    return formsResponse;
-  }
-  
-  public FormsResponse search(@Filter Specification<Form> spec, Pageable paging) {
-    Page<Form> forms = repository.findAll(spec, paging);
-    List<FormDto> formsDto = new ArrayList<>();
-
-    for (Form form : forms) {
-      formsDto.add(addUserToForm(form));
-    }
-    var formsResponse = FormsResponse.builder()
-        .nombreFormulaires(forms.getTotalElements())
-        .data(formsDto)
+        .data(formsWithCreateur)
         .page(paging.getPageNumber() + 1)
         .size(paging.getPageSize())
         .hasPrevious(forms.hasPrevious())
         .hasNext(forms.hasNext())
         .build();
 
-    return formsResponse;
-      
+    return response;
+  }
+
+  public FormsResponse search(@Filter Specification<Form> spec, Pageable paging) {
+    Page<Form> forms = repository.findAll(spec, paging);
+    List<Map<String, Object>> formsWithCreateur = new ArrayList<>();
+
+    for (Form form : forms) {
+      formsWithCreateur.add(addUserToForm(form));
+    }
+    var response = FormsResponse.builder()
+        .nombreFormulaires(forms.getTotalElements())
+        .data(formsWithCreateur)
+        .page(paging.getPageNumber() + 1)
+        .size(paging.getPageSize())
+        .hasPrevious(forms.hasPrevious())
+        .hasNext(forms.hasNext())
+        .build();
+
+    return response;
+
   }
 
   public Boolean existingValidForm(String titre) {

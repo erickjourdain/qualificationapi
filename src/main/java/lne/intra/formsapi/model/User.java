@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 // import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -53,13 +54,18 @@ public class User implements UserDetails{
   @Builder.Default private Boolean expired = false;
 
   @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
-  @Builder.Default private Boolean locked = false;
+  @Builder.Default
+  private Boolean locked = false;
+  
+  @Column(nullable = false)
+  private String slug;
 
   @Column(columnDefinition = "DATETIME DEFAULT CURRENT_DATE", nullable = false)
   @CreationTimestamp
   @Builder.Default private Date createdAt = new Date();
 
   @Column(columnDefinition = "DATETIME DEFAULT CURRENT_DATE", nullable = false)
+  @UpdateTimestamp
   @Builder.Default private Date updatedAt = new Date();
 
   @OneToMany(mappedBy = "user")
