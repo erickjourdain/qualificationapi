@@ -38,7 +38,7 @@ public class Form {
   @Size(min = 25, max = 255, message = "La description doit contenir entre 25 et 255 caractères")
   private String description;
 
-  @Column(nullable = false)
+  @Column(nullable = false, columnDefinition = "TEXT")
   private String formulaire;
 
   @Column(nullable = false)
@@ -49,7 +49,7 @@ public class Form {
   @Builder.Default
   private Boolean valide = true;
 
-  @Column(nullable = false)
+  @Column(nullable = false, unique = true)
   private String slug;
 
   @Column(columnDefinition = "DATETIME DEFAULT CURRENT_DATE", nullable = false)

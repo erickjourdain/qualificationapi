@@ -69,4 +69,11 @@ public class FormController {
       @PathVariable Integer id) throws NotFoundException {
     return ResponseEntity.ok(service.getForm(id));
   }
+
+  @GetMapping("slug/{slug}")
+  @PreAuthorize("hasAnyAuthority('admin:read','user:read')")
+  public ResponseEntity<Map<String, Object>> getFormBySlug(
+      @PathVariable String slug) throws NotFoundException {
+    return ResponseEntity.ok(service.getFormBySlug(slug));
+  }
 }

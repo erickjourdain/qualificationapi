@@ -1,5 +1,7 @@
 package lne.intra.formsapi.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,6 +13,8 @@ import lne.intra.formsapi.model.Form;
 public interface FormRepository extends JpaRepository<Form, Integer>, JpaSpecificationExecutor<Form> {
 
   Page<Form> findAll(Pageable pageable);
+
+  Optional<Form> findBySlug(String slug);
 
   @Query("""
       select count(f.id) from Form f

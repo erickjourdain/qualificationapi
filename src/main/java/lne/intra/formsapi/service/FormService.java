@@ -73,7 +73,7 @@ public class FormService {
         .formulaire(request.getFormulaire().trim())
         .description((request.getDescription() != null) ? request.getDescription().trim() : null)
         .createur(createur)
-        .slug(slug.slugify(request.getTitre().trim() + "v" + 1))
+        .slug(slug.slugify(request.getTitre().trim() + " v1"))
         .build();
     // sauvegarde de la nouvelle entrée
     Form newForm = repository.save(form);
@@ -91,7 +91,7 @@ public class FormService {
     Optional.ofNullable(request.getTitre())
         .ifPresent(res -> {
           form.setTitre(res);
-          form.setSlug(slug.slugify(res + "v" + form.getVersion()));
+          form.setSlug(slug.slugify(res + " v" + form.getVersion()));
         });
     Optional.ofNullable(request.getDescription())
         .ifPresent(res -> form.setDescription(res));
@@ -109,7 +109,7 @@ public class FormService {
               .description(form.getDescription())
               .formulaire(res)
               .version(form.getVersion() + 1)
-              .slug(slug.slugify(form.getTitre() + "v" + form.getVersion() + 1))
+              .slug(slug.slugify(form.getTitre() + " v" + form.getVersion() + 1))
               .createur(form.getCreateur())
               .build();
           newId.add(repository.save(newForm).getId());
@@ -121,6 +121,12 @@ public class FormService {
 
   public Map<String, Object> getForm(Integer id) throws AppException {
     Form form = repository.findById(id)
+        .orElseThrow(() -> new AppException(400, "Le formuaire n'existe pas"));
+    return addUserToForm(form);
+  }
+
+  public Map<String, Object> getFormBySlug(String slug) throws AppException {
+    Form form = repository.findBySlug(slug)
         .orElseThrow(() -> new AppException(400, "Le formuaire n'existe pas"));
     return addUserToForm(form);
   }

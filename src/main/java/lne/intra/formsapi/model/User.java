@@ -57,7 +57,7 @@ public class User implements UserDetails{
   @Builder.Default
   private Boolean locked = false;
   
-  @Column(nullable = false)
+  @Column(nullable = false, unique = true)
   private String slug;
 
   @Column(columnDefinition = "DATETIME DEFAULT CURRENT_DATE", nullable = false)
