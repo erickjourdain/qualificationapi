@@ -1,6 +1,7 @@
 package lne.intra.formsapi.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,32 +36,38 @@ public class FormService {
   private final FormRepository repository;
   private final ObjectsValidator<FormRequest> formValidator;
 
-  private Map<String, Object> addUserToForm(Form form) throws AppException {
+  private Map<String, Object> addUserToForm(Form form, String include) throws AppException {
     User createur = userRepository.findById(form.getCreateur().getId())
         .orElseThrow(() -> new AppException(404, "Impossible de trouver le créateur"));
 
     Map<String, Object> user = new HashMap<>();
     Map<String, Object> response = new HashMap<>();
     
-    user.put("id", createur.getId());
-    user.put("prenom", createur.getPrenom());
-    user.put("nom", createur.getNom());
-    user.put("role", createur.getRole());
+    List<String> fields = new ArrayList<String>();
+    if (include != "") Arrays.asList(include.toLowerCase().split(","));
 
-    response.put("id", form.getId());
-    response.put("titre", form.getTitre());
-    response.put("description", form.getDescription());
-    response.put("version", form.getVersion());
-    response.put("valide", form.getValide());
-    response.put("slug", form.getSlug());
-    response.put("createur", user);
-    response.put("createdAt", form.getCreatedAt());
-    response.put("updatedAt", form.getUpdatedAt());
+    if (fields.isEmpty() || fields.contains("createur")) {
+      user.put("id", createur.getId());
+      user.put("prenom", createur.getPrenom());
+      user.put("nom", createur.getNom());
+      user.put("role", createur.getRole());
+    }
+
+    if (fields.isEmpty() || fields.contains("id")) response.put("id", form.getId());
+    if (fields.isEmpty() || fields.contains("titre")) response.put("titre", form.getTitre());
+    if (fields.isEmpty() || fields.contains("description")) response.put("description", form.getDescription());
+    if (fields.isEmpty() || fields.contains("formulaire")) response.put("formulaire", form.getFormulaire());
+    if (fields.isEmpty() || fields.contains("version")) response.put("version", form.getVersion());
+    if (fields.isEmpty() || fields.contains("valide")) response.put("valide", form.getValide());
+    if (fields.isEmpty() || fields.contains("slug")) response.put("slug", form.getSlug());
+    if (fields.isEmpty() || fields.contains("createur")) response.put("createur", user);
+    if (fields.isEmpty() || fields.contains("createdAt")) response.put("createdAt", form.getCreatedAt());
+    if (fields.isEmpty() || fields.contains("updatedAt")) response.put("updatedAt", form.getUpdatedAt());
 
     return response;
   }
 
-  public Map<String, Object> saveForm(FormRequest request) throws AppException {
+  public Map<String, Object> saveForm(FormRequest request, String include) throws AppException {
     final Slugify slug = Slugify.builder().build();
     // validation des champs fournis dans la requête
     formValidator.validateForm(request, ObjectCreate.class);
@@ -77,10 +84,10 @@ public class FormService {
         .build();
     // sauvegarde de la nouvelle entrée
     Form newForm = repository.save(form);
-    return getForm(newForm.getId());
+    return getForm(newForm.getId(), include);
   }
 
-  public Map<String, Object> partialUpdateForm(Integer id, FormRequest request) throws AppException {
+  public Map<String, Object> partialUpdateForm(Integer id, FormRequest request, String include) throws AppException {
     final Slugify slug = Slugify.builder().build();
     // validation des champs fournis dans la requête
     formValidator.validateForm(request, ObjectUpdate.class);
@@ -116,27 +123,27 @@ public class FormService {
         });
     // mise à jour du formulaire
     repository.save(form);
-    return getForm(newId.size() > 0 ? newId.get(0) : id);
+    return getForm(newId.size() > 0 ? newId.get(0) : id, include);
   }
 
-  public Map<String, Object> getForm(Integer id) throws AppException {
+  public Map<String, Object> getForm(Integer id, String include) throws AppException {
     Form form = repository.findById(id)
         .orElseThrow(() -> new AppException(400, "Le formuaire n'existe pas"));
-    return addUserToForm(form);
+    return addUserToForm(form, include);
   }
 
-  public Map<String, Object> getFormBySlug(String slug) throws AppException {
+  public Map<String, Object> getFormBySlug(String slug, String include) throws AppException {
     Form form = repository.findBySlug(slug)
         .orElseThrow(() -> new AppException(400, "Le formuaire n'existe pas"));
-    return addUserToForm(form);
+    return addUserToForm(form, include);
   }
 
-  public FormsResponse getAllForms(Pageable paging) throws NotFoundException {
+  public FormsResponse getAllForms(Pageable paging, String include) throws NotFoundException {
     Page<Form> forms = repository.findAll(paging);
     List<Map<String, Object>> formsWithCreateur = new ArrayList<>();
 
     for (Form form : forms) {
-      formsWithCreateur.add(addUserToForm(form));
+      formsWithCreateur.add(addUserToForm(form, include));
     }
     var response = FormsResponse.builder()
         .nombreFormulaires(forms.getTotalElements())
@@ -150,12 +157,12 @@ public class FormService {
     return response;
   }
 
-  public FormsResponse search(@Filter Specification<Form> spec, Pageable paging) {
+  public FormsResponse search(@Filter Specification<Form> spec, Pageable paging, String include) {
     Page<Form> forms = repository.findAll(spec, paging);
     List<Map<String, Object>> formsWithCreateur = new ArrayList<>();
 
     for (Form form : forms) {
-      formsWithCreateur.add(addUserToForm(form));
+      formsWithCreateur.add(addUserToForm(form, include));
     }
     var response = FormsResponse.builder()
         .nombreFormulaires(forms.getTotalElements())
