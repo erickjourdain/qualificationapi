@@ -18,21 +18,32 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.turkraft.springfilter.converter.FilterSpecification;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lne.intra.formsapi.model.Form;
 import lne.intra.formsapi.model.exception.AppException;
 import lne.intra.formsapi.model.request.FormRequest;
+import lne.intra.formsapi.model.response.FormResponse;
 import lne.intra.formsapi.model.response.FormsResponse;
 import lne.intra.formsapi.service.FormService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/data/forms")
+@RequestMapping("/api/v${lne.intra.formsapi.api}/data/forms")
 @PreAuthorize("hasAnyRole('ADMIN','USER')")
 @RequiredArgsConstructor
 public class FormController {
 
   private final FormService service;
 
+  @Operation(summary = "Création d'une nouvelle entrée pour un formulaire")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Formulaire créé", content = {
+          @Content(mediaType = "application/json", schema = @Schema(implementation = FormResponse.class)) }),
+      @ApiResponse(responseCode = "400", description = "Données fournies invalides", content = @Content) })
   @PostMapping()
   @PreAuthorize("hasAuthority('admin:create')")
   public ResponseEntity<Map<String, Object>> save(

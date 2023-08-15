@@ -2,6 +2,16 @@
   {
     "name": "lne.intra.formsapi.secretkey",
     "type": "java.lang.String",
-    "description": "A description for 'lne.intra.formsapi.SECRETKEY'"
+    "description": "Clef de cryptage pour les mots de passe utilisateur"
+  },
+  {
+    "name": "lne.intra.formsapi.version",
+    "type": "java.lang.String",
+    "description": "Version de l'application"
+  },
+  {
+    "name": "lne.intra.formsapi.api",
+    "type": "java.lang.String",
+    "description": "Version de l'API"
   }
 ]}

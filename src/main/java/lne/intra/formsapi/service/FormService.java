@@ -36,16 +36,28 @@ public class FormService {
   private final FormRepository repository;
   private final ObjectsValidator<FormRequest> formValidator;
 
+  /**
+   * Définition des champs à retourner et ajout du créateur du formulaire
+   * 
+   * @param form <Form> formulaire à mettre à jour
+   * @param include <String> chaine de caractère avec les champs à retourner
+   * @return Liste des champs du formulaire à retourner
+   * @throws AppException
+   */
   private Map<String, Object> addUserToForm(Form form, String include) throws AppException {
+    // recherche du créateur du formaulire dans la base
     User createur = userRepository.findById(form.getCreateur().getId())
         .orElseThrow(() -> new AppException(404, "Impossible de trouver le créateur"));
 
     Map<String, Object> user = new HashMap<>();
     Map<String, Object> response = new HashMap<>();
-    
-    List<String> fields = new ArrayList<String>();
-    if (include != "") Arrays.asList(include.toLowerCase().split(","));
 
+    // création de la liste des champs à retourner par la requête
+    List<String> fields = new ArrayList<String>();
+    if (include != "")
+      Arrays.asList(include.toLowerCase().split(","));
+
+    // ajout du champ créateur
     if (fields.isEmpty() || fields.contains("createur")) {
       user.put("id", createur.getId());
       user.put("prenom", createur.getPrenom());
@@ -53,20 +65,39 @@ public class FormService {
       user.put("role", createur.getRole());
     }
 
-    if (fields.isEmpty() || fields.contains("id")) response.put("id", form.getId());
-    if (fields.isEmpty() || fields.contains("titre")) response.put("titre", form.getTitre());
-    if (fields.isEmpty() || fields.contains("description")) response.put("description", form.getDescription());
-    if (fields.isEmpty() || fields.contains("formulaire")) response.put("formulaire", form.getFormulaire());
-    if (fields.isEmpty() || fields.contains("version")) response.put("version", form.getVersion());
-    if (fields.isEmpty() || fields.contains("valide")) response.put("valide", form.getValide());
-    if (fields.isEmpty() || fields.contains("slug")) response.put("slug", form.getSlug());
-    if (fields.isEmpty() || fields.contains("createur")) response.put("createur", user);
-    if (fields.isEmpty() || fields.contains("createdAt")) response.put("createdAt", form.getCreatedAt());
-    if (fields.isEmpty() || fields.contains("updatedAt")) response.put("updatedAt", form.getUpdatedAt());
+    // ajout des différents champs à retourner en fonction de la demande exposée dans la requêtes d'interrogation
+    if (fields.isEmpty() || fields.contains("id"))
+      response.put("id", form.getId());
+    if (fields.isEmpty() || fields.contains("titre"))
+      response.put("titre", form.getTitre());
+    if (fields.isEmpty() || fields.contains("description"))
+      response.put("description", form.getDescription());
+    if (fields.isEmpty() || fields.contains("formulaire"))
+      response.put("formulaire", form.getFormulaire());
+    if (fields.isEmpty() || fields.contains("version"))
+      response.put("version", form.getVersion());
+    if (fields.isEmpty() || fields.contains("valide"))
+      response.put("valide", form.getValide());
+    if (fields.isEmpty() || fields.contains("slug"))
+      response.put("slug", form.getSlug());
+    if (fields.isEmpty() || fields.contains("createur"))
+      response.put("createur", user);
+    if (fields.isEmpty() || fields.contains("createdAt"))
+      response.put("createdAt", form.getCreatedAt());
+    if (fields.isEmpty() || fields.contains("updatedAt"))
+      response.put("updatedAt", form.getUpdatedAt());
 
     return response;
   }
 
+  /**
+   * Création d'un nouveau formulaire dans la base de données
+   * 
+   * @param request <Request> la requête de création
+   * @param include <String> chaine de caractère avec les champs à retourner
+   * @return Liste des champs du formulaire à retourner
+   * @throws AppException
+   */
   public Map<String, Object> saveForm(FormRequest request, String include) throws AppException {
     final Slugify slug = Slugify.builder().build();
     // validation des champs fournis dans la requête
@@ -87,6 +118,14 @@ public class FormService {
     return getForm(newForm.getId(), include);
   }
 
+  /**
+   * Mise à jour partielle d'un formulaire
+   * @param id <Integer> l'id du formulaire à mettre à jour
+   * @param request <Request> la requête de mise à jour
+   * @param include <String> chaine de caractère avec les champs à retourner
+   * @return Liste des champs du formulaire à retourner
+   * @throws AppException
+   */
   public Map<String, Object> partialUpdateForm(Integer id, FormRequest request, String include) throws AppException {
     final Slugify slug = Slugify.builder().build();
     // validation des champs fournis dans la requête
@@ -95,19 +134,24 @@ public class FormService {
     Form form = repository.findById(id)
         .orElseThrow(() -> new AppException(404, "Le formulaire à mettre à jour n'existe pas"));
     List<Integer> newId = new ArrayList<>();
+    // Mise à jour du titre
     Optional.ofNullable(request.getTitre())
         .ifPresent(res -> {
           form.setTitre(res);
           form.setSlug(slug.slugify(res + " v" + form.getVersion()));
         });
+    // Mise à jour de la description
     Optional.ofNullable(request.getDescription())
         .ifPresent(res -> form.setDescription(res));
+    // Mise à jour du créateur
     Optional.ofNullable(request.getCreateur())
         .ifPresent(res -> {
           var createur = userRepository.findById(request.getCreateur())
               .orElseThrow(() -> new AppException(404, "Impossible de trouver le créateur"));
           form.setCreateur(createur);
         });
+    // Mise à jour du formualire Tripetto
+    // Enregistrement d'une nouvelle entrée avec changement de version
     Optional.ofNullable(request.getFormulaire())
         .ifPresent(res -> {
           form.setValide(false);
@@ -126,57 +170,95 @@ public class FormService {
     return getForm(newId.size() > 0 ? newId.get(0) : id, include);
   }
 
+  /**
+   * Récupération d'un formulaire à partir de son id
+   * @param id <Interger> identifiant du formulaire
+   * @param include <String> chaine de caractère avec les champs à retourner
+   * @return Liste des champs du formulaire à retourner
+   * @throws AppException
+   */
   public Map<String, Object> getForm(Integer id, String include) throws AppException {
     Form form = repository.findById(id)
         .orElseThrow(() -> new AppException(400, "Le formuaire n'existe pas"));
     return addUserToForm(form, include);
   }
 
+  /**
+   * Récupération d'un formulaire à partir de son slug
+   * @param slug <String> slug du formulaire
+   * @param include <String> chaine de caractère avec les champs à retourner
+   * @return Liste des champs du formulaire à retourner
+   * @throws AppException
+   */
   public Map<String, Object> getFormBySlug(String slug, String include) throws AppException {
     Form form = repository.findBySlug(slug)
         .orElseThrow(() -> new AppException(400, "Le formuaire n'existe pas"));
     return addUserToForm(form, include);
   }
 
+  /**
+   * Récupération de tous les formulaires
+   * @param paging <Pageable> les informations de pagination (nb d'éléments, # page, tri)
+   * @param include <String> chaine de caractère avec les champs à retourner
+   * @return <FormsResponse>
+   * @throws NotFoundException
+   */
   public FormsResponse getAllForms(Pageable paging, String include) throws NotFoundException {
+    // Récupération des formulaires
     Page<Form> forms = repository.findAll(paging);
     List<Map<String, Object>> formsWithCreateur = new ArrayList<>();
 
+    // boucle sur les formulaires pour ajout du créateur
     for (Form form : forms) {
       formsWithCreateur.add(addUserToForm(form, include));
     }
+    // définition de la réponse
     var response = FormsResponse.builder()
-        .nombreFormulaires(forms.getTotalElements())
-        .data(formsWithCreateur)
-        .page(paging.getPageNumber() + 1)
-        .size(paging.getPageSize())
-        .hasPrevious(forms.hasPrevious())
-        .hasNext(forms.hasNext())
+        .nombreFormulaires(forms.getTotalElements()) // nombre de formulaires totales
+        .data(formsWithCreateur) // les formulaires 
+        .page(paging.getPageNumber() + 1) // le numéro de la page retournée
+        .size(paging.getPageSize()) // le nombre d'éléments retournées
+        .hasPrevious(forms.hasPrevious()) // existe-t-il une page précédente
+        .hasNext(forms.hasNext()) // existe-t-il une page suivante
         .build();
 
     return response;
   }
 
+  /**
+   * Récupération de tous les formulaires correspondant à un critère de recherche
+   * @param spec <Specification<Form>> les critères de recherche
+   * @param paging <Pageable> les informations de pagination (nb d'éléments, # page, tri)
+   * @param include <String> chaine de caractère avec les champs à retourner
+   * @return <FormsResponse>
+   */
   public FormsResponse search(@Filter Specification<Form> spec, Pageable paging, String include) {
+    // Récupération des formulaires
     Page<Form> forms = repository.findAll(spec, paging);
     List<Map<String, Object>> formsWithCreateur = new ArrayList<>();
 
+    // boucle sur les formulaires pour ajout du créateur
     for (Form form : forms) {
       formsWithCreateur.add(addUserToForm(form, include));
     }
     var response = FormsResponse.builder()
-        .nombreFormulaires(forms.getTotalElements())
-        .data(formsWithCreateur)
-        .page(paging.getPageNumber() + 1)
-        .size(paging.getPageSize())
-        .hasPrevious(forms.hasPrevious())
-        .hasNext(forms.hasNext())
+        .nombreFormulaires(forms.getTotalElements()) // nombre de formulaires totales
+        .data(formsWithCreateur) // les formulaires 
+        .page(paging.getPageNumber() + 1) // le numéro de la page retournée
+        .size(paging.getPageSize()) // le nombre d'éléments retournées
+        .hasPrevious(forms.hasPrevious()) // existe-t-il une page précédente
+        .hasNext(forms.hasNext()) // existe-t-il une page suivante
         .build();
 
     return response;
 
   }
 
+  /**
+   * Recherche d'un formulaire valide à partir de son titre
+   * @param titre <String> le titre à rechercher
+   * @return <Integer> nombre de formulaires trouvés
+   */
   public Boolean existingValidForm(String titre) {
     Integer nbForms = repository.findValidVersionByTitre(titre);
     return nbForms > 0;

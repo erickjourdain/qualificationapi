@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -15,13 +16,12 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import lne.intra.formsapi.configuration.CustomProperties;
 
 @Service
 public class JwtService {
-
+  
   @Autowired
-  private CustomProperties props;
+  private Environment env;
 
   /**
    * Extraction du nom de l'utilisateur
@@ -36,7 +36,7 @@ public class JwtService {
   /**
    * Extraction d'un élément du token
    * 
-   * @param token String le token
+   * @param token          String le token
    * @param claimsResolver la fonction d'extraction
    * @return valeur du paramètre extrait
    */
@@ -59,7 +59,8 @@ public class JwtService {
    * Génération d'un token à partir des informations de l'utilisateur courant
    * et d'informations complémentaires
    * 
-   * @param extraClaims Map<String, Object> Map des informations complémentaires à ajouter au token 
+   * @param extraClaims Map<String, Object> Map des informations complémentaires à
+   *                    ajouter au token
    * @param userDetails les informations de l'utilisateur
    * @return String le token généré
    */
@@ -104,7 +105,7 @@ public class JwtService {
   /**
    * Vérification de la validité du token
    * 
-   * @param token String le token
+   * @param token       String le token
    * @param userDetails UserDetails l'utilisateur connecté
    * @return Boolean état du token
    */
@@ -112,7 +113,7 @@ public class JwtService {
     // extraction de l'identifiant de l'utilisateur présent dans le token
     final String username = extractUsername(token);
     // vérification de la correspondande de l'utilisateur et de la date d'expiration
-    return (username.equals(userDetails.getUsername())) && !isTokenExpired(token); 
+    return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
   }
 
   /**
@@ -131,7 +132,7 @@ public class JwtService {
    * @return la clef de signature du token
    */
   private Key getSigningKey() {
-    byte[] keyBytes = Decoders.BASE64.decode(props.getSecretkey());
+    byte[] keyBytes = Decoders.BASE64.decode(env.getProperty("lne.intra.formsapi.secretkey"));
     return Keys.hmacShaKeyFor(keyBytes);
   }
 }

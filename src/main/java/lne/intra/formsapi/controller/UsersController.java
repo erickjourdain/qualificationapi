@@ -24,7 +24,7 @@ import lne.intra.formsapi.service.UserService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("api/v1/data/users")
+@RequestMapping("api/v${lne.intra.formsapi.api}/data/users")
 @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
 @RequiredArgsConstructor
 public class UsersController {

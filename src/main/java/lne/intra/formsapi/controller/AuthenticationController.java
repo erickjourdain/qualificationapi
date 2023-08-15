@@ -13,7 +13,7 @@ import lne.intra.formsapi.service.AuthentificationService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/v${lne.intra.formsapi.api}/auth")
 @RequiredArgsConstructor
 public class AuthenticationController {
 
