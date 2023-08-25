@@ -48,7 +48,7 @@ public class FormController {
   @PreAuthorize("hasAuthority('admin:create')")
   public ResponseEntity<Map<String, Object>> save(
       @RequestBody FormRequest request,
-      @RequestParam(defaultValue = "") String include) throws AppException {
+      @RequestParam(required = false) String include) throws AppException {
     if (service.existingValidForm(request.getTitre())) {
       throw new AppException(400, "Une formulaire valide avec ce titre existe dans la base de données");
     }
@@ -59,7 +59,7 @@ public class FormController {
   @PreAuthorize("hasAuthority('admin:update')")
   public ResponseEntity<Map<String, Object>> update(
       @PathVariable Integer id,
-      @RequestParam(defaultValue = "") String include,
+      @RequestParam(required = false) String include,
       @RequestBody FormRequest request) throws NotFoundException {
     return ResponseEntity.ok(service.partialUpdateForm(id, request, include));
   }
@@ -70,7 +70,7 @@ public class FormController {
       @RequestParam(defaultValue = "1") Integer page,
       @RequestParam(defaultValue = "10") Integer size,
       @RequestParam(defaultValue = "id") String sortBy,
-      @RequestParam(defaultValue = "") String include,
+      @RequestParam(required = false) String include,
       FilterSpecification<Form> filter) throws NotFoundException {
 
     Pageable paging = PageRequest.of(page - 1, size);
@@ -81,7 +81,7 @@ public class FormController {
   @PreAuthorize("hasAnyAuthority('admin:read','user:read')")
   public ResponseEntity<Map<String, Object>> getForm(
       @PathVariable Integer id,
-      @RequestParam(defaultValue = "") String include) throws NotFoundException {
+      @RequestParam(required = false) String include) throws NotFoundException {
     return ResponseEntity.ok(service.getForm(id, include));
   }
 
@@ -89,7 +89,7 @@ public class FormController {
   @PreAuthorize("hasAnyAuthority('admin:read','user:read')")
   public ResponseEntity<Map<String, Object>> getFormBySlug(
       @PathVariable String slug,
-      @RequestParam(defaultValue = "") String include) throws NotFoundException {
+      @RequestParam(required = false) String include) throws NotFoundException {
     return ResponseEntity.ok(service.getFormBySlug(slug, include));
   }
 }

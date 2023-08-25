@@ -54,7 +54,7 @@ public class FormService {
 
     // création de la liste des champs à retourner par la requête
     List<String> fields = new ArrayList<String>();
-    if (include != "")
+    if (include != null)
       fields = Arrays.asList(include.toLowerCase().split(","));
 
     // ajout du champ créateur
