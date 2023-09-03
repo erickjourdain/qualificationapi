@@ -14,7 +14,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,32 +24,24 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class Form {
-
+public class Answer {
+  
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
-  @Column(nullable = false)
-  @Size(min = 5, max = 125, message = "Le titre doit contenir entre 5 et 125 caractères")
-  private String titre;
-
-  @Size(min = 25, max = 255, message = "La description doit contenir entre 25 et 255 caractères")
-  private String description;
-
   @Column(nullable = false, columnDefinition = "TEXT")
-  private String formulaire;
+  private String reponse;
 
-  @Column(nullable = false)
-  @Builder.Default
-  private Integer version = 1;
+  @JsonBackReference
+  @ManyToOne
+  @JoinColumn(name = "createur")
+  private User createur;
 
-  @Column(nullable = false)
-  @Builder.Default
-  private Boolean valide = true;
-
-  @Column(nullable = false, unique = true)
-  private String slug;
+  @JsonBackReference
+  @ManyToOne
+  @JoinColumn(name = "form_id")
+  private Form formulaire;
 
   @Column(columnDefinition = "DATETIME DEFAULT CURRENT_DATE", nullable = false)
   @CreationTimestamp
@@ -59,10 +50,4 @@ public class Form {
   @Column(columnDefinition = "DATETIME DEFAULT CURRENT_DATE", nullable = false)
   @UpdateTimestamp
   private Date updatedAt;
-
-  @JsonBackReference
-  @ManyToOne
-  @JoinColumn(name = "createur")
-  private User createur;
-
 }

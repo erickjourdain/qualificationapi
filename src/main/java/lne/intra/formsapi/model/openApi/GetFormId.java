@@ -1,18 +1,18 @@
-package lne.intra.formsapi.model.response;
+package lne.intra.formsapi.model.openApi;
 
 import java.util.Date;
 
 import lombok.Data;
 
 @Data
-public class FormResponse {
+public class GetFormId {
   private Integer id;
   private String titre;
+  private String slug;
   private String description;
-  private String formulaire;
-  private Integer version;
+  private Boolean courant;
   private Boolean valide;
-  private CreateurResponse createur;
+  private GetUserId createur;
   private Date createdAt;
   private Date updatedAt;
 }

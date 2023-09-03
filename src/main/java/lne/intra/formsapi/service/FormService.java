@@ -45,7 +45,7 @@ public class FormService {
    * @throws AppException
    */
   private Map<String, Object> addUserToForm(Form form, String include) throws AppException {
-    // recherche du créateur du formaulire dans la base
+    // recherche du créateur du formulaire dans la base
     User createur = userRepository.findById(form.getCreateur().getId())
         .orElseThrow(() -> new AppException(404, "Impossible de trouver le créateur"));
 
@@ -55,7 +55,7 @@ public class FormService {
     // création de la liste des champs à retourner par la requête
     List<String> fields = new ArrayList<String>();
     if (include != null)
-      fields = Arrays.asList(include.toLowerCase().split(","));
+      fields = Arrays.asList(include.toLowerCase().replaceAll(" ", "").split(","));
 
     // ajout du champ créateur
     if (fields.isEmpty() || fields.contains("createur")) {
@@ -82,9 +82,9 @@ public class FormService {
       response.put("slug", form.getSlug());
     if (fields.isEmpty() || fields.contains("createur"))
       response.put("createur", user);
-    if (fields.isEmpty() || fields.contains("createdAt"))
+    if (fields.isEmpty() || fields.contains("createdat"))
       response.put("createdAt", form.getCreatedAt());
-    if (fields.isEmpty() || fields.contains("updatedAt"))
+    if (fields.isEmpty() || fields.contains("updatedat"))
       response.put("updatedAt", form.getUpdatedAt());
 
     return response;
@@ -101,7 +101,7 @@ public class FormService {
   public Map<String, Object> saveForm(FormRequest request, String include) throws AppException {
     final Slugify slug = Slugify.builder().build();
     // validation des champs fournis dans la requête
-    formValidator.validateForm(request, ObjectCreate.class);
+    formValidator.validateData(request, ObjectCreate.class);
     // récupération du créateur
     User createur = userRepository.findById(request.getCreateur())
         .orElseThrow(() -> new AppException(404, "Impossible de trouver le créateur"));
@@ -129,7 +129,7 @@ public class FormService {
   public Map<String, Object> partialUpdateForm(Integer id, FormRequest request, String include) throws AppException {
     final Slugify slug = Slugify.builder().build();
     // validation des champs fournis dans la requête
-    formValidator.validateForm(request, ObjectUpdate.class);
+    formValidator.validateData(request, ObjectUpdate.class);
     // récupération du formulaire à mettre à jour
     Form form = repository.findById(id)
         .orElseThrow(() -> new AppException(404, "Le formulaire à mettre à jour n'existe pas"));
@@ -179,19 +179,6 @@ public class FormService {
    */
   public Map<String, Object> getForm(Integer id, String include) throws AppException {
     Form form = repository.findById(id)
-        .orElseThrow(() -> new AppException(400, "Le formuaire n'existe pas"));
-    return addUserToForm(form, include);
-  }
-
-  /**
-   * Récupération d'un formulaire à partir de son slug
-   * @param slug <String> slug du formulaire
-   * @param include <String> chaine de caractère avec les champs à retourner
-   * @return Liste des champs du formulaire à retourner
-   * @throws AppException
-   */
-  public Map<String, Object> getFormBySlug(String slug, String include) throws AppException {
-    Form form = repository.findBySlug(slug)
         .orElseThrow(() -> new AppException(400, "Le formuaire n'existe pas"));
     return addUserToForm(form, include);
   }

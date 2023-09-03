@@ -3,15 +3,12 @@ package lne.intra.formsapi.service;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import lne.intra.formsapi.model.Role;
 import lne.intra.formsapi.model.Token;
 import lne.intra.formsapi.model.TokenType;
 import lne.intra.formsapi.model.User;
 import lne.intra.formsapi.model.request.AuthenticationRequest;
-import lne.intra.formsapi.model.request.RegisterRequest;
 import lne.intra.formsapi.model.response.AuthenticationResponse;
 import lne.intra.formsapi.repository.TokenRepository;
 import lne.intra.formsapi.repository.UserRepository;
@@ -24,41 +21,9 @@ public class AuthentificationService {
 
   private final UserRepository repository;
   private final TokenRepository tokenRepository;
-  private final PasswordEncoder passwordEncoder;
   private final JwtService jwtService;
   private final AuthenticationManager authenticationManager;
-  private final ObjectsValidator<RegisterRequest> registerRequestValidator;
   private final ObjectsValidator<AuthenticationRequest> authenticationRequest;
-
-  /**
-   * Enregistrement des nouveaux utilisateurs
-   * 
-   * @param request RegisterRequest requête de création
-   * @return AuthenticationResponse réponse contenant le token de connexion
-   */
-  public AuthenticationResponse register(RegisterRequest request) {
-    // validation des champs fournis dans la requête
-    registerRequestValidator.validate(request);
-    // création du nouvel utilisatuer avec les données fournies
-    var user = User.builder()
-        .prenom(request.getPrenom())
-        .nom(request.getNom())
-        .login(request.getLogin())
-        .password(passwordEncoder.encode(request.getPassword()))
-        .role(Role.USER)
-        .build();
-    // sauvegarde de l'utilisateur
-    var savedUser = repository.save(user);
-    // génération du token pour le nouvel utilisateur
-    var jwtToken = jwtService.generateToken(user);
-    // sauvegarde du token généré
-    saveUserToken(savedUser, jwtToken);
-    // définition et retour de la réponse avec le token généré
-    return AuthenticationResponse
-        .builder()
-        .token(jwtToken)
-        .build();
-  }
 
   /**
    * Authentification d'un utilisateur via son login / mot de passe

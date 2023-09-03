@@ -28,7 +28,7 @@ public class ObjectsValidator<T> {
     }
   }
 
-  public void validateForm(T objectToValidate, Class<?> classValidation) {
+  public void validateData(T objectToValidate, Class<?> classValidation) {
     Set<ConstraintViolation<T>> violations = validator.validate(objectToValidate, classValidation);
     if (!violations.isEmpty()) {
       var errorMessages = violations

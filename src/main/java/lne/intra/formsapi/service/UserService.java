@@ -8,6 +8,7 @@ import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.boot.Filter;
@@ -15,8 +16,10 @@ import com.turkraft.springfilter.boot.Filter;
 import lne.intra.formsapi.model.Role;
 import lne.intra.formsapi.model.User;
 import lne.intra.formsapi.model.exception.AppException;
+import lne.intra.formsapi.model.request.RegisterRequest;
 import lne.intra.formsapi.model.response.UsersResponse;
 import lne.intra.formsapi.repository.UserRepository;
+import lne.intra.formsapi.util.ObjectsValidator;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -24,6 +27,8 @@ import lombok.RequiredArgsConstructor;
 public class UserService {
 
   private final UserRepository repository;
+  private final PasswordEncoder passwordEncoder;
+  private final ObjectsValidator<RegisterRequest> registerRequestValidator;
 
   public Map<String, Object> getUser(Integer id) throws AppException {
     User user = repository.findById(id)
@@ -120,10 +125,10 @@ public class UserService {
     return response;
   }
 
-  public Map<String, Object>  getByLogin(String login) {
+  public Map<String, Object> getByLogin(String login) {
     User user = repository.findByLogin(login)
         .orElseThrow(() -> new AppException(404, "L'utilisateur recherché n'existe pas"));
-    
+
     Map<String, Object> response = new HashMap<>();
 
     response.put("id", user.getId());
@@ -135,6 +140,29 @@ public class UserService {
     response.put("updatedAt", user.getUpdatedAt());
 
     return response;
+  }
+  
+  /**
+   * Enregistrement des nouveaux utilisateurs
+   * 
+   * @param request RegisterRequest requête de création
+   * @return Utilisateur réponse contenant le token de connexion
+   */
+  public Map<String, Object> register(RegisterRequest request) {
+    // validation des champs fournis dans la requête
+    registerRequestValidator.validate(request);
+    // création du nouvel utilisatuer avec les données fournies
+    var user = User.builder()
+        .prenom(request.getPrenom())
+        .nom(request.getNom())
+        .login(request.getLogin())
+        .password(passwordEncoder.encode(request.getPassword()))
+        .role(Role.USER)
+        .build();
+    // sauvegarde de l'utilisateur
+    var savedUser = repository.save(user);
+    // réponse avec les données de l'utilisateur
+    return getUser(savedUser.getId());
   }
 
 }

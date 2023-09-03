@@ -5,14 +5,11 @@ import java.util.Date;
 import lombok.Data;
 
 @Data
-public class FormResponse {
+public class AnswerResponse {
   private Integer id;
-  private String titre;
-  private String description;
-  private String formulaire;
-  private Integer version;
-  private Boolean valide;
+  private String reponse;
   private CreateurResponse createur;
+  private FormResponse formulaire;
   private Date createdAt;
   private Date updatedAt;
 }
