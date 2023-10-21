@@ -20,6 +20,22 @@ VALUES
     "$2a$10$CFleb5bK8a3.boLzTwe4aOsaPpulMmbj3ooAdTjY77Fx75XnKSj6S",
     "isabelle_lenoir", 
     "USER"
+  ),
+  (
+    "lerouxp", 
+    "le roux", 
+    "philippe", 
+    "$2a$10$CFleb5bK8a3.boLzTwe4aOsaPpulMmbj3ooAdTjY77Fx75XnKSj6S",
+    "philippe_le_roux", 
+    "USER"
+  ),
+  (
+    "toru", 
+    "toru", 
+    "denis", 
+    "$2a$10$CFleb5bK8a3.boLzTwe4aOsaPpulMmbj3ooAdTjY77Fx75XnKSj6S",
+    "denis_toru", 
+    "USER"
   )
 ;
 

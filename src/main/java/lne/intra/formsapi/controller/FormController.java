@@ -7,10 +7,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,7 +25,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -48,9 +50,10 @@ public class FormController {
   /**
    * Création d'un nouveau formulaire
    * 
-   * @param request FormRequest objet JSON avec les champs définissant le
-   *                formulaire
-   * @param include String liste des champs à retourner
+   * @param userDetails <UserDetails> information sur l'utilisateur connecté
+   * @param request     FormRequest objet JSON avec les champs définissant le
+   *                    formulaire
+   * @param include     String liste des champs à retourner
    * @return ResponseEntity<GetFormId> Le formulaire enregistré
    * @throws AppException
    */
@@ -62,21 +65,41 @@ public class FormController {
   @PostMapping()
   @PreAuthorize("hasAuthority('admin:create')")
   public ResponseEntity<Map<String, Object>> save(
-      @RequestBody(description = "Objet JSON représentant le formulaire à insérer", required = true, content = @Content(mediaType = "application/json", schema = @Schema(implementation = FormRequest.class))) FormRequest request,
+      @AuthenticationPrincipal UserDetails userDetails,
+      @RequestBody FormRequest request,
       @RequestParam(required = false) String include) throws AppException {
     if (service.existingValidForm(request.getTitre())) {
       throw new AppException(400, "Une formulaire valide avec ce titre existe dans la base de données");
     }
-    return ResponseEntity.ok(service.saveForm(request, include));
+    return ResponseEntity.ok(service.saveForm(request, include, userDetails));
   }
+  /* 
+  @Operation(summary = "Création d'un nouveau formulaire", description = "Accès limité au rôle `ADMIN`")
+  @Parameter(in = ParameterIn.QUERY, name = "include", description = "Liste des champs à retourner", required = false, example = "id, titre, version, createur")
+  @ApiResponse(responseCode = "200", description = "Le formulaire créé", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetFormId.class)))
+  @ApiResponse(responseCode = "400", description = "Données fournies incorrectes", content = @Content(mediaType = "application/json"))
+  @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
+  @PostMapping()
+  @PreAuthorize("hasAuthority('admin:create')")
+  public ResponseEntity<Map<String, Object>> save(
+      @AuthenticationPrincipal UserDetails userDetails,
+      @RequestBody FormRequest request,
+      @RequestParam(required = false) String include) throws AppException {
+    if (service.existingValidForm(request.getTitre())) {
+      throw new AppException(400, "Une formulaire valide avec ce titre existe dans la base de données");
+    }
+    return ResponseEntity.ok(service.saveForm(request, include, userDetails));
+  }
+  */
 
   /**
    * Mise à jour d'un formulaire via son id
    * 
-   * @param id      Integer l'identifiant du formulaire
-   * @param include String liste des champs à retourner
-   * @param request FormRequest object JSON avec les champs définissant le
-   *                formulaire
+   * @param userDetails <UserDetails> information sur l'utilisateur connecté
+   * @param id          Integer l'identifiant du formulaire
+   * @param include     String liste des champs à retourner
+   * @param request     FormRequest object JSON avec les champs définissant le
+   *                    formulaire
    * @return ResponseEntity<GetFormId> le formulaire mis à jour
    * @throws NotFoundException
    */
@@ -88,14 +111,15 @@ public class FormController {
   @PatchMapping("/{id}")
   @PreAuthorize("hasAuthority('admin:update')")
   public ResponseEntity<Map<String, Object>> update(
+      @AuthenticationPrincipal UserDetails userDetails,
       @PathVariable Integer id,
       @RequestParam(required = false) String include,
-      @RequestBody(description = "Objet JSON représentant les champs à modifier", required = true, content = @Content(mediaType = "application/json", schema = @Schema(implementation = FormRequest.class))) FormRequest request)
-      throws NotFoundException {
+      @RequestBody FormRequest request)
+      throws AppException {
     if (request.getTitre() != null && service.existingValidForm(request.getTitre())) {
       throw new AppException(400, "Une formulaire valide avec ce titre existe dans la base de données");
     }
-    return ResponseEntity.ok(service.partialUpdateForm(id, request, include));
+    return ResponseEntity.ok(service.partialUpdateForm(id, request, include, userDetails));
   }
 
   /**

@@ -11,6 +11,7 @@ import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.boot.Filter;
@@ -39,7 +40,7 @@ public class FormService {
   /**
    * Définition des champs à retourner et ajout du créateur du formulaire
    * 
-   * @param form <Form> formulaire à mettre à jour
+   * @param form    <Form> formulaire à mettre à jour
    * @param include <String> chaine de caractère avec les champs à retourner
    * @return Liste des champs du formulaire à retourner
    * @throws AppException
@@ -65,7 +66,8 @@ public class FormService {
       user.put("role", createur.getRole());
     }
 
-    // ajout des différents champs à retourner en fonction de la demande exposée dans la requêtes d'interrogation
+    // ajout des différents champs à retourner en fonction de la demande exposée
+    // dans la requêtes d'interrogation
     if (fields.isEmpty() || fields.contains("id"))
       response.put("id", form.getId());
     if (fields.isEmpty() || fields.contains("titre"))
@@ -93,18 +95,20 @@ public class FormService {
   /**
    * Création d'un nouveau formulaire dans la base de données
    * 
-   * @param request <Request> la requête de création
-   * @param include <String> chaine de caractère avec les champs à retourner
+   * @param request     <Request> la requête de création
+   * @param include     <String> chaine de caractère avec les champs à retourner
+   * @param userDetails <UserDetails> information sur l'utilisateur connecté
    * @return Liste des champs du formulaire à retourner
    * @throws AppException
    */
-  public Map<String, Object> saveForm(FormRequest request, String include) throws AppException {
+  public Map<String, Object> saveForm(FormRequest request, String include, UserDetails userDetails)
+      throws AppException {
     final Slugify slug = Slugify.builder().build();
     // validation des champs fournis dans la requête
     formValidator.validateData(request, ObjectCreate.class);
-    // récupération du créateur
-    User createur = userRepository.findById(request.getCreateur())
-        .orElseThrow(() -> new AppException(404, "Impossible de trouver le créateur"));
+    // récupération des informations sur l'utilisateur connecté
+    User createur = userRepository.findByLogin(userDetails.getUsername())
+        .orElseThrow(() -> new AppException(404, "Impossible de trouver l'utilisateur connecté'"));
     // création de la nouvelle entrée
     Form form = Form.builder()
         .titre(request.getTitre().trim())
@@ -120,13 +124,16 @@ public class FormService {
 
   /**
    * Mise à jour partielle d'un formulaire
-   * @param id <Integer> l'id du formulaire à mettre à jour
-   * @param request <Request> la requête de mise à jour
-   * @param include <String> chaine de caractère avec les champs à retourner
+   * 
+   * @param id          <Integer> l'id du formulaire à mettre à jour
+   * @param request     <Request> la requête de mise à jour
+   * @param include     <String> chaine de caractère avec les champs à retourner
+   * @param userDetails <UserDetails> information sur l'utilisateur connecté
    * @return Liste des champs du formulaire à retourner
    * @throws AppException
    */
-  public Map<String, Object> partialUpdateForm(Integer id, FormRequest request, String include) throws AppException {
+  public Map<String, Object> partialUpdateForm(Integer id, FormRequest request, String include, UserDetails userDetails)
+      throws AppException {
     final Slugify slug = Slugify.builder().build();
     // validation des champs fournis dans la requête
     formValidator.validateData(request, ObjectUpdate.class);
@@ -144,12 +151,11 @@ public class FormService {
     Optional.ofNullable(request.getDescription())
         .ifPresent(res -> form.setDescription(res));
     // Mise à jour du créateur
-    Optional.ofNullable(request.getCreateur())
-        .ifPresent(res -> {
-          var createur = userRepository.findById(request.getCreateur())
-              .orElseThrow(() -> new AppException(404, "Impossible de trouver le créateur"));
-          form.setCreateur(createur);
-        });
+    // récupération des informations sur l'utilisateur connecté
+    User createur = userRepository.findByLogin(userDetails.getUsername())
+        .orElseThrow(() -> new AppException(404, "Impossible de trouver l'utilisateur connecté'"));
+    if (createur.getId() != form.getCreateur().getId())
+      form.setCreateur(createur);
     // Mise à jour du formualire Tripetto
     // Enregistrement d'une nouvelle entrée avec changement de version
     Optional.ofNullable(request.getFormulaire())
@@ -172,7 +178,8 @@ public class FormService {
 
   /**
    * Récupération d'un formulaire à partir de son id
-   * @param id <Interger> identifiant du formulaire
+   * 
+   * @param id      <Interger> identifiant du formulaire
    * @param include <String> chaine de caractère avec les champs à retourner
    * @return Liste des champs du formulaire à retourner
    * @throws AppException
@@ -185,7 +192,9 @@ public class FormService {
 
   /**
    * Récupération de tous les formulaires
-   * @param paging <Pageable> les informations de pagination (nb d'éléments, # page, tri)
+   * 
+   * @param paging  <Pageable> les informations de pagination (nb d'éléments, #
+   *                page, tri)
    * @param include <String> chaine de caractère avec les champs à retourner
    * @return <FormsResponse>
    * @throws NotFoundException
@@ -202,7 +211,7 @@ public class FormService {
     // définition de la réponse
     var response = FormsResponse.builder()
         .nombreFormulaires(forms.getTotalElements()) // nombre de formulaires totales
-        .data(formsWithCreateur) // les formulaires 
+        .data(formsWithCreateur) // les formulaires
         .page(paging.getPageNumber() + 1) // le numéro de la page retournée
         .size(paging.getPageSize()) // le nombre d'éléments retournées
         .hasPrevious(forms.hasPrevious()) // existe-t-il une page précédente
@@ -214,8 +223,10 @@ public class FormService {
 
   /**
    * Récupération de tous les formulaires correspondant à un critère de recherche
-   * @param spec <Specification<Form>> les critères de recherche
-   * @param paging <Pageable> les informations de pagination (nb d'éléments, # page, tri)
+   * 
+   * @param spec    <Specification<Form>> les critères de recherche
+   * @param paging  <Pageable> les informations de pagination (nb d'éléments, #
+   *                page, tri)
    * @param include <String> chaine de caractère avec les champs à retourner
    * @return <FormsResponse>
    */
@@ -230,7 +241,7 @@ public class FormService {
     }
     var response = FormsResponse.builder()
         .nombreFormulaires(forms.getTotalElements()) // nombre de formulaires totales
-        .data(formsWithCreateur) // les formulaires 
+        .data(formsWithCreateur) // les formulaires
         .page(paging.getPageNumber() + 1) // le numéro de la page retournée
         .size(paging.getPageSize()) // le nombre d'éléments retournées
         .hasPrevious(forms.hasPrevious()) // existe-t-il une page précédente
@@ -243,6 +254,7 @@ public class FormService {
 
   /**
    * Recherche d'un formulaire valide à partir de son titre
+   * 
    * @param titre <String> le titre à rechercher
    * @return <Integer> nombre de formulaires trouvés
    */

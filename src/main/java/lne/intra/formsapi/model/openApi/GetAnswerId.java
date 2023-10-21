@@ -10,6 +10,8 @@ public class GetAnswerId {
   private String reponse;
   private GetUserId createur;
   private GetFormId formulaire;
+  private String demande;
+  private String opportunite;
   private Date createdAt;
   private Date updatedAt;
 }

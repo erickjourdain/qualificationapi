@@ -5,8 +5,12 @@ import java.util.Map;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,9 +51,10 @@ public class AnswerController {
   /**
    * Création d'un nouvelle réponse
    * 
-   * @param request AnswerRequest objet JSON avec les champs définissant une
-   *                réponse à un formulaire
-   * @param include String liste des champs à retourner
+   * @param userDetails <UserDetails> information sur l'utilisateur connecté
+   * @param request     AnswerRequest objet JSON avec les champs définissant une
+   *                    réponse à un formulaire
+   * @param include     String liste des champs à retourner
    * @return ResponseEntity<GetAnswerId> La réponse enregistrée
    * @throws AppException
    */
@@ -61,9 +66,10 @@ public class AnswerController {
   @PostMapping()
   @PreAuthorize("hasAnyAuthority('admin:create','user:create')")
   public ResponseEntity<Map<String, Object>> save(
+      @AuthenticationPrincipal UserDetails userDetails,
       @RequestBody AnswerRequest request,
       @RequestParam(required = false) String include) throws AppException {
-    return ResponseEntity.ok(service.saveAnswer(request, include));
+    return ResponseEntity.ok(service.saveAnswer(request, include, userDetails));
   }
 
   /**
@@ -95,7 +101,7 @@ public class AnswerController {
       @RequestParam(required = false) String include,
       FilterSpecification<Answer> filter) throws NotFoundException {
 
-    Pageable paging = PageRequest.of(page - 1, size);
+    Pageable paging = PageRequest.of(page - 1, size, Sort.by(Direction.DESC, sortBy));
     return ResponseEntity.ok(service.search(filter, paging, include));
   }
 

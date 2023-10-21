@@ -16,7 +16,7 @@ public class AnswersResponse {
   private List<Map<String, Object>> data;
   private Integer page;
   private Integer size;
-  private Long nombreFormulaires;
+  private Long nombreReponses;
   private Boolean hasPrevious;
   private Boolean hasNext;
 }

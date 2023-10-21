@@ -9,6 +9,7 @@ import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.boot.Filter;
@@ -34,7 +35,6 @@ public class AnswerService {
   private final UserRepository userRepository;
   private final FormRepository formRepository;
   private final ObjectsValidator<AnswerRequest> answerValidator;
-
 
   private Map<String, Object> addUserFormToAnswer(Answer answer, String include) throws AppException {
     // recherche du créateur de la réponse dans la base
@@ -70,7 +70,8 @@ public class AnswerService {
       form.put("slug", formulaire.getSlug());
     }
 
-    // ajout des différents champs à retourner en fonction de la demande exposée dans la requêtes d'interrogation
+    // ajout des différents champs à retourner en fonction de la demande exposée
+    // dans la requêtes d'interrogation
     if (fields.isEmpty() || fields.contains("id"))
       response.put("id", answer.getId());
     if (fields.isEmpty() || fields.contains("reponse"))
@@ -79,6 +80,12 @@ public class AnswerService {
       response.put("formulaire", form);
     if (fields.isEmpty() || fields.contains("createur"))
       response.put("createur", user);
+    if (fields.isEmpty() || fields.contains("statut"))
+      response.put("statut", answer.getStatut());
+    if (fields.isEmpty() || fields.contains("demande"))
+      response.put("demande", answer.getDemande());
+    if (fields.isEmpty() || fields.contains("opportunite"))
+      response.put("opportunite", answer.getOpportunite());
     if (fields.isEmpty() || fields.contains("createdat"))
       response.put("createdAt", answer.getCreatedAt());
     if (fields.isEmpty() || fields.contains("updatedat"))
@@ -93,12 +100,13 @@ public class AnswerService {
     return addUserFormToAnswer(answer, include);
   }
 
-  public Map<String, Object> saveAnswer(AnswerRequest request, String include) throws AppException {
+  public Map<String, Object> saveAnswer(AnswerRequest request, String include, UserDetails userDetails)
+      throws AppException {
     // validation des champs fournis dans la requête
     answerValidator.validateData(request, ObjectCreate.class);
-    // récupération du créateur
-    User createur = userRepository.findById(request.getCreateur())
-        .orElseThrow(() -> new AppException(404, "Impossible de trouver le créateur"));
+    // récupération des informations sur l'utilisateur connecté
+    User createur = userRepository.findByLogin(userDetails.getUsername())
+        .orElseThrow(() -> new AppException(404, "Impossible de trouver l'utilisateur connecté'"));
     // récupération du formulaire
     Form formulaire = formRepository.findById(request.getFormulaire())
         .orElseThrow(() -> new AppException(404, "Impossible de trouver le formulaire"));
@@ -123,7 +131,7 @@ public class AnswerService {
       AnswersWithCreateur.add(addUserFormToAnswer(answer, include));
     }
     var response = AnswersResponse.builder()
-        .nombreFormulaires(answers.getTotalElements()) // nombre de formulaires totales
+        .nombreReponses(answers.getTotalElements()) // nombre de formulaires totales
         .data(AnswersWithCreateur) // les réponses
         .page(paging.getPageNumber() + 1) // le numéro de la page retournée
         .size(paging.getPageSize()) // le nombre d'éléments retournées

@@ -13,5 +13,15 @@
     "name": "lne.intra.formsapi.api",
     "type": "java.lang.String",
     "description": "Version de l'API"
+  },
+  {
+    "name": "lne.intra.formsapi.upload-dir",
+    "type": "java.lang.String",
+    "description": "Répertoire de stockage des fichiers"
+  },
+  {
+    "name": "lne.intra.formsapi.storage-mapping",
+    "type": "java.lang.String",
+    "description": "Chemin d'accès au répertoire de stockage des fichiers"
   }
 ]}

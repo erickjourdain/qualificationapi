@@ -9,8 +9,6 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -19,45 +17,40 @@ import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 @Builder
 @Entity
 @AllArgsConstructor
-@NoArgsConstructor
-public class Answer {
+public class File {
   
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
-  @Column(nullable = false, columnDefinition = "TEXT")
-  private String reponse;
+  @Column(nullable = false)
+  private String fileName;
 
-  private Integer demande;
+  @Column(nullable = false)
+  private String initialName;
 
-  private Integer opportunite;
-
-  @Enumerated(EnumType.STRING)
-  @Column(columnDefinition = "VARCHAR(55) DEFAULT 'BROUILLON'")
-  @Builder.Default private Statut statut = Statut.BROUILLON;
-
-  @JsonBackReference
-  @ManyToOne
-  @JoinColumn(name = "createur")
-  private User createur;
-
-  @JsonBackReference
-  @ManyToOne
-  @JoinColumn(name = "form_id")
-  private Form formulaire;
-
+  @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
+  @Builder.Default
+  private Boolean confirmed = false;
+  
   @Column(columnDefinition = "DATETIME DEFAULT CURRENT_DATE", nullable = false)
   @CreationTimestamp
-  private Date createdAt;
-
+  @Builder.Default
+  private Date createdAt = new Date();
+  
   @Column(columnDefinition = "DATETIME DEFAULT CURRENT_DATE", nullable = false)
   @UpdateTimestamp
-  private Date updatedAt;
+  @Builder.Default
+  private Date updatedAt = new Date();
+  
+  @JsonBackReference
+  @ManyToOne
+  @JoinColumn(name = "proprietaire")
+  private User proprietaire;
+
 }

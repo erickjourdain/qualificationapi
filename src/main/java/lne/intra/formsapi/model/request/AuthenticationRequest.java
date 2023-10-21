@@ -1,5 +1,7 @@
 package lne.intra.formsapi.model.request;
 
+// import org.springframework.web.multipart.MultipartFile;
+
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,4 +19,6 @@ public class AuthenticationRequest {
 
   @NotBlank(message = "le champ 'password' est obligatoire")
   private String password;
+
+  // private MultipartFile file;
 }
