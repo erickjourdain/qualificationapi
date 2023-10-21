@@ -19,6 +19,9 @@ public class AnswerRequest {
   @NotBlank(groups = ObjectCreate.class, message = "le champ 'reponse' est obligatoire")
   private String reponse;
 
+  @NotBlank(groups = ObjectCreate.class, message = "le champ 'values' est obligatoire")
+  private String donnees;
+
   @NotNull(groups = ObjectCreate.class, message = "le champ 'formulaire' est obligatoire")
   @Min(groups = { ObjectCreate.class,
       ObjectUpdate.class }, value = 1, message = "le champ 'formulaire' doit être positif")

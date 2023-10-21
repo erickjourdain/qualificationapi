@@ -35,6 +35,9 @@ public class Answer {
   @Column(nullable = false, columnDefinition = "TEXT")
   private String reponse;
 
+  @Column(nullable = false, columnDefinition = "TEXT")
+  private String donnees;
+
   private Integer demande;
 
   private Integer opportunite;

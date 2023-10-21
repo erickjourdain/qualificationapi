@@ -9,6 +9,7 @@ import lombok.Data;
 public class AnswerResponse {
   private Integer id;
   private String reponse;
+  private String donnees;
   private CreateurResponse createur;
   private FormResponse formulaire;
   private Integer demande;

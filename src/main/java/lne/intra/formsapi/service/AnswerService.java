@@ -74,10 +74,12 @@ public class AnswerService {
     // dans la requêtes d'interrogation
     if (fields.isEmpty() || fields.contains("id"))
       response.put("id", answer.getId());
-    if (fields.isEmpty() || fields.contains("reponse"))
-      response.put("reponse", answer.getReponse());
     if (fields.isEmpty() || fields.contains("formulaire"))
       response.put("formulaire", form);
+    if (fields.isEmpty() || fields.contains("reponse"))
+      response.put("reponse", answer.getReponse());
+    if (fields.isEmpty() || fields.contains("donnees"))
+      response.put("donnees", answer.getDonnees());
     if (fields.isEmpty() || fields.contains("createur"))
       response.put("createur", user);
     if (fields.isEmpty() || fields.contains("statut"))
@@ -113,6 +115,7 @@ public class AnswerService {
     // création de la nouvelle entrée
     Answer answer = Answer.builder()
         .reponse(request.getReponse().trim())
+        .donnees(request.getDonnees().trim())
         .formulaire(formulaire)
         .createur(createur)
         .build();

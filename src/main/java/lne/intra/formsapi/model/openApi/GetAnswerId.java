@@ -8,6 +8,7 @@ import lombok.Data;
 public class GetAnswerId {
   private Integer id;
   private String reponse;
+  private String donnees;
   private GetUserId createur;
   private GetFormId formulaire;
   private String demande;
