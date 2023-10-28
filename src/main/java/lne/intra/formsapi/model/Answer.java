@@ -34,6 +34,14 @@ public class Answer {
 
   @Column(nullable = false, columnDefinition = "TEXT")
   private String reponse;
+  
+  @Column(nullable = false)
+  @Builder.Default
+  private Integer version = 1;
+
+  @Column(nullable = false)
+  @Builder.Default
+  private Boolean valide = true;
 
   @Column(nullable = false, columnDefinition = "TEXT")
   private String donnees;

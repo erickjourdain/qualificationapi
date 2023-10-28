@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +25,7 @@ import lne.intra.formsapi.repository.AnswerRepository;
 import lne.intra.formsapi.repository.FormRepository;
 import lne.intra.formsapi.repository.UserRepository;
 import lne.intra.formsapi.util.ObjectCreate;
+import lne.intra.formsapi.util.ObjectUpdate;
 import lne.intra.formsapi.util.ObjectsValidator;
 import lombok.RequiredArgsConstructor;
 
@@ -64,6 +66,7 @@ public class AnswerService {
     // ajout du champ formulaire
     if (fields.isEmpty() || fields.contains("formulaire")) {
       form.put("id", formulaire.getId());
+      form.put("formulaire", formulaire.getFormulaire());
       form.put("titre", formulaire.getTitre());
       form.put("version", formulaire.getVersion());
       form.put("valide", formulaire.getValide());
@@ -88,6 +91,10 @@ public class AnswerService {
       response.put("demande", answer.getDemande());
     if (fields.isEmpty() || fields.contains("opportunite"))
       response.put("opportunite", answer.getOpportunite());
+    if (fields.isEmpty() || fields.contains("version"))
+      response.put("version", answer.getVersion());
+    if (fields.isEmpty() || fields.contains("valide"))
+      response.put("valide", answer.getValide());
     if (fields.isEmpty() || fields.contains("createdat"))
       response.put("createdAt", answer.getCreatedAt());
     if (fields.isEmpty() || fields.contains("updatedat"))
@@ -122,6 +129,57 @@ public class AnswerService {
     // sauvegarde de la nouvelle entrée
     Answer newAnswer = answerRepository.save(answer);
     return getAnswer(newAnswer.getId(), include);
+  }
+
+  public Map<String, Object> updateAnswer(Integer id, AnswerRequest request, String include, UserDetails userDetails) 
+      throws AppException {
+    // validation des champs fournis dans la requête
+    answerValidator.validateData(request, ObjectUpdate.class);
+    // récupération de l'entité à modifier
+    Answer answer = answerRepository.findById(id)
+        .orElseThrow(() -> new AppException(404, "Impossible de trouver la réponse à modifier"));
+    List<Integer> newId = new ArrayList<>();
+    // Mise à jour de la demande 
+    Optional.ofNullable(request.getDemande())
+        .ifPresent(res -> {
+          answer.setDemande(res);
+        });
+    // Mise à jour de l'opportunité 
+    Optional.ofNullable(request.getOpportunite())
+        .ifPresent(res -> {
+          answer.setOpportunite(res);
+        });
+    // Mise à jour du statut 
+    Optional.ofNullable(request.getStatut())
+        .ifPresent(res -> {
+          answer.setStatut(res);
+        });
+    // Mise à jour du créateur
+    // récupération des informations sur l'utilisateur connecté
+    User createur = userRepository.findByLogin(userDetails.getUsername())
+        .orElseThrow(() -> new AppException(404, "Impossible de trouver l'utilisateur connecté'"));
+    if (createur.getId() != answer.getCreateur().getId())
+      answer.setCreateur(createur);
+    // Mise à jour des données et de la réponse
+    // Enregistrement d'une nouvelle entrée avec changement de version
+    Optional.ofNullable(request.getDonnees())
+        .ifPresent(res -> {
+          answer.setValide(false);
+          Answer newAnswer = Answer.builder()
+              .formulaire(answer.getFormulaire())
+              .reponse(request.getReponse())
+              .donnees(res)
+              .version(answer.getVersion() + 1)
+              .createur(createur)
+              .demande(answer.getDemande())
+              .opportunite(answer.getOpportunite())
+              .statut(answer.getStatut())
+              .build();
+          newId.add(answerRepository.save(newAnswer).getId());
+        });
+    // mise à jour de la réponse
+    answerRepository.save(answer);
+    return getAnswer(newId.size() > 0 ? newId.get(0) : id, include);
   }
 
   public AnswersResponse search(@Filter Specification<Answer> spec, Pageable paging, String include) {

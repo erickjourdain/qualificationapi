@@ -9,6 +9,8 @@ public class GetAnswerId {
   private Integer id;
   private String reponse;
   private String donnees;
+  private Integer version;
+  private Boolean valide;
   private GetUserId createur;
   private GetFormId formulaire;
   private String demande;

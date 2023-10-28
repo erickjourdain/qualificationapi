@@ -156,7 +156,7 @@ public class FormService {
         .orElseThrow(() -> new AppException(404, "Impossible de trouver l'utilisateur connecté'"));
     if (createur.getId() != form.getCreateur().getId())
       form.setCreateur(createur);
-    // Mise à jour du formualire Tripetto
+    // Mise à jour du formulaire Tripetto
     // Enregistrement d'une nouvelle entrée avec changement de version
     Optional.ofNullable(request.getFormulaire())
         .ifPresent(res -> {
