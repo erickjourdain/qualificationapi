@@ -105,7 +105,7 @@ public class AnswerController {
       FilterSpecification<Answer> filter) throws NotFoundException {
     
     // Test paramètre de tri
-    boolean b = Pattern.matches("(desc|asc)[(](id|uuid|version|createdAt|updatedAt)[)]", sortBy.toLowerCase());
+    boolean b = Pattern.matches("(desc|asc)[(](id|uuid|version|createdAt|updatedAt)[)]", sortBy);
     if (!b)
       throw new AppException(400, "Le champ de tri est incorrect");
     // Définition du paramètre de tri

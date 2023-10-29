@@ -174,7 +174,7 @@ public class FormController {
       @RequestParam(required = false) FilterSpecification<Form> filter) throws NotFoundException {
 
     // Test paramètre de tri
-    boolean b = Pattern.matches("(desc|asc)[(](id|version|createdAt|updatedAt)[)]", sortBy.toLowerCase());
+    boolean b = Pattern.matches("(desc|asc)[(](id|version|createdAt|updatedAt)[)]", sortBy);
     if (!b)
       throw new AppException(400, "Le champ de tri est incorrect");
     // Définition du paramètre de tri
