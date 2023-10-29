@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -77,12 +78,12 @@ public class AnswerService {
     // dans la requêtes d'interrogation
     if (fields.isEmpty() || fields.contains("id"))
       response.put("id", answer.getId());
+    if (fields.isEmpty() || fields.contains("uuid"))
+      response.put("uuid", answer.getUuid());
     if (fields.isEmpty() || fields.contains("formulaire"))
       response.put("formulaire", form);
     if (fields.isEmpty() || fields.contains("reponse"))
       response.put("reponse", answer.getReponse());
-    if (fields.isEmpty() || fields.contains("donnees"))
-      response.put("donnees", answer.getDonnees());
     if (fields.isEmpty() || fields.contains("createur"))
       response.put("createur", user);
     if (fields.isEmpty() || fields.contains("statut"))
@@ -121,8 +122,8 @@ public class AnswerService {
         .orElseThrow(() -> new AppException(404, "Impossible de trouver le formulaire"));
     // création de la nouvelle entrée
     Answer answer = Answer.builder()
+        .uuid(UUID.randomUUID())
         .reponse(request.getReponse().trim())
-        .donnees(request.getDonnees().trim())
         .formulaire(formulaire)
         .createur(createur)
         .build();
@@ -162,13 +163,13 @@ public class AnswerService {
       answer.setCreateur(createur);
     // Mise à jour des données et de la réponse
     // Enregistrement d'une nouvelle entrée avec changement de version
-    Optional.ofNullable(request.getDonnees())
+    Optional.ofNullable(request.getReponse())
         .ifPresent(res -> {
           answer.setValide(false);
           Answer newAnswer = Answer.builder()
+              .uuid(answer.getUuid())
               .formulaire(answer.getFormulaire())
-              .reponse(request.getReponse())
-              .donnees(res)
+              .reponse(res)
               .version(answer.getVersion() + 1)
               .createur(createur)
               .demande(answer.getDemande())

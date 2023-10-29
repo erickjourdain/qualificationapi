@@ -1,6 +1,7 @@
 package lne.intra.formsapi.model;
 
 import java.util.Date;
+import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -32,6 +33,9 @@ public class Answer {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
+  @Column(nullable = false)
+  private UUID uuid;
+
   @Column(nullable = false, columnDefinition = "TEXT")
   private String reponse;
   
@@ -42,9 +46,6 @@ public class Answer {
   @Column(nullable = false)
   @Builder.Default
   private Boolean valide = true;
-
-  @Column(nullable = false, columnDefinition = "TEXT")
-  private String donnees;
 
   private Integer demande;
 

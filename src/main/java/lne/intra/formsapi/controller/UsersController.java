@@ -1,10 +1,13 @@
 package lne.intra.formsapi.controller;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -29,6 +32,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lne.intra.formsapi.model.User;
+import lne.intra.formsapi.model.exception.AppException;
 import lne.intra.formsapi.model.openApi.GetUserId;
 import lne.intra.formsapi.model.openApi.GetUsers;
 import lne.intra.formsapi.model.request.RegisterRequest;
@@ -78,7 +82,7 @@ public class UsersController {
   @Operation(summary = "Récupération des utilisateurs avec pagination et filtre", description = "Accès limité au rôle `ADMIN`")
   @Parameter(in = ParameterIn.QUERY, name = "page", description = "Numéro de la page à retourner", required = false)
   @Parameter(in = ParameterIn.QUERY, name = "size", description = "Nombre d'éléments à retourner", required = false)
-  @Parameter(in = ParameterIn.QUERY, name = "sortBy", description = "Champ de tri", required = false)
+  @Parameter(in = ParameterIn.QUERY, name = "sortBy", description = "Champ de tri ex: asc(id) ou desc(createdAt)", required = false)
   @Parameter(in = ParameterIn.QUERY, name = "include", description = "Liste des champs à retourner", required = false, example = "id, titre, version, createur")
   @Parameter(in = ParameterIn.QUERY, name = "filter", description = "Filtre au format défini dans le package [turkraft/springfilter](https://github.com/turkraft/springfilter)", required = false, schema = @Schema(implementation = String.class), example = "valide:true and titre ~~ '*formulaire*'")
   @ApiResponse(responseCode = "200", description = "Les utilisateurs et informations sur la pagination", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetUsers.class)))
@@ -88,10 +92,22 @@ public class UsersController {
   public ResponseEntity<UsersResponse> search(
       @RequestParam(defaultValue = "1") Integer page,
       @RequestParam(defaultValue = "10") Integer size,
-      @RequestParam(defaultValue = "id") String sortBy,
+      @RequestParam(defaultValue = "asc(id)") String sortBy,
       FilterSpecification<User> filter) throws NotFoundException {
 
-    Pageable paging = PageRequest.of(page - 1, size);
+    
+    // Test paramètre de tri
+    boolean b = Pattern.matches("(desc|asc)[(](id|createdAt|updatedAt)[)]", sortBy.toLowerCase());
+    if (!b)
+      throw new AppException(400, "Le champ de tri est incorrect");
+    // Définition du paramètre de tri
+    int indexStart = sortBy.indexOf("(");
+    String direction = sortBy.substring(0, indexStart);
+    int indexEnd = sortBy.indexOf(")");
+    String field = sortBy.substring(indexStart + 1, indexEnd);
+    
+    Pageable paging = PageRequest.of(page - 1, size,
+        Sort.by((direction == "asc") ? Direction.ASC : Direction.DESC, field));
     return ResponseEntity.ok(service.search(filter, paging));
   }
 

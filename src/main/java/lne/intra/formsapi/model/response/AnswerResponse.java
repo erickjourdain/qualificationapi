@@ -8,8 +8,8 @@ import lombok.Data;
 @Data
 public class AnswerResponse {
   private Integer id;
+  private Integer uuid;
   private String reponse;
-  private String donnees;
   private Integer version;
   private Boolean valide;
   private CreateurResponse createur;

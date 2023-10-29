@@ -1,6 +1,7 @@
 package lne.intra.formsapi.controller;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.data.domain.PageRequest;
@@ -51,7 +52,7 @@ public class AnswerController {
   private final AnswerService service;
 
   /**
-   * Création d'un nouvelle réponse
+   * Contrôleur de création d'un nouvelle réponse
    * 
    * @param userDetails <UserDetails> information sur l'utilisateur connecté
    * @param request     AnswerRequest objet JSON avec les champs définissant une
@@ -88,7 +89,7 @@ public class AnswerController {
   @Operation(summary = "Récupération des réponses apportées à un formulaire avec pagination et filtre", description = "Accès limité aux rôles `ADMIN` et `USER`")
   @Parameter(in = ParameterIn.QUERY, name = "page", description = "Numéro de la page à retourner", required = false)
   @Parameter(in = ParameterIn.QUERY, name = "size", description = "Nombre d'éléments à retourner", required = false)
-  @Parameter(in = ParameterIn.QUERY, name = "sortBy", description = "Champ de tri", required = false)
+  @Parameter(in = ParameterIn.QUERY, name = "sortBy", description = "Champ de tri ex: asc(id) ou desc(createdAt)", required = false)
   @Parameter(in = ParameterIn.QUERY, name = "include", description = "Liste des champs à retourner", required = false, example = "id, titre, version, createur")
   @Parameter(in = ParameterIn.QUERY, name = "filter", description = "Filtre au format défini dans le package [turkraft/springfilter](https://github.com/turkraft/springfilter)", required = false, schema = @Schema(implementation = String.class), example = "valide:true and titre ~~ '*formulaire*'")
   @ApiResponse(responseCode = "200", description = "Les réponses et informations sur la pagination", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetAnswers.class)))
@@ -99,11 +100,22 @@ public class AnswerController {
   public ResponseEntity<AnswersResponse> search(
       @RequestParam(defaultValue = "1") Integer page,
       @RequestParam(defaultValue = "10") Integer size,
-      @RequestParam(defaultValue = "id") String sortBy,
+      @RequestParam(defaultValue = "asc(id)") String sortBy,
       @RequestParam(required = false) String include,
       FilterSpecification<Answer> filter) throws NotFoundException {
+    
+    // Test paramètre de tri
+    boolean b = Pattern.matches("(desc|asc)[(](id|uuid|version|createdAt|updatedAt)[)]", sortBy.toLowerCase());
+    if (!b)
+      throw new AppException(400, "Le champ de tri est incorrect");
+    // Définition du paramètre de tri
+    int indexStart = sortBy.indexOf("(");
+    String direction = sortBy.substring(0, indexStart);
+    int indexEnd = sortBy.indexOf(")");
+    String field = sortBy.substring(indexStart + 1, indexEnd);
 
-    Pageable paging = PageRequest.of(page - 1, size, Sort.by(Direction.DESC, sortBy));
+    Pageable paging = PageRequest.of(page - 1, size,
+        Sort.by((direction == "asc") ? Direction.ASC : Direction.DESC, field));
     return ResponseEntity.ok(service.search(filter, paging, include));
   }
 
@@ -128,6 +140,16 @@ public class AnswerController {
     return ResponseEntity.ok(service.getAnswer(id, include));
   }
 
+  /**
+   * Contrôleur de mise à jour d'une réponse
+   * 
+   * @param userDetails
+   * @param id
+   * @param request
+   * @param include
+   * @return
+   * @throws NotFoundException
+   */
   @Operation(summary = "Mise à jour d'une réponse apportée à un formulaire", description = "Accès limité aux rôles `ADMIN` et `USER`")
   @ApiResponse(responseCode = "200", description = "La réponse mise à jour", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetAnswers.class)))
   @ApiResponse(responseCode = "404", description = "Réponse ou Créateur non trouvé dans la base", content = @Content(mediaType = "application/text"))
@@ -153,20 +175,12 @@ public class AnswerController {
       throw new AppException(400, "La réponse ne peut être modifiée");
     }
     if (answer.get("statut") == Statut.DEVIS || answer.get("statut") == Statut.GAGNE
-        || answer.get("statut") == Statut.PERDU && request.getDonnees() != null) {
-      throw new AppException(400, "Les données ne peuvent être modifiées");
-    }
-    if (answer.get("statut") == Statut.DEVIS || answer.get("statut") == Statut.GAGNE
         || answer.get("statut") == Statut.PERDU && request.getOpportunite() != null) {
       throw new AppException(400, "L'opportunité ne peut être modifiée");
     }
     if (answer.get("statut") == Statut.DEVIS || answer.get("statut") == Statut.GAGNE
         || answer.get("statut") == Statut.PERDU && request.getDemande() != null) {
       throw new AppException(400, "La demande ne peut être modifiée");
-    }
-    if ((request.getDonnees() != null && request.getReponse() == null)
-        || (request.getDonnees() == null && request.getReponse() != null)) {
-      throw new AppException(400, "Les données et la réponse doivent être modifiées simultanéement");
     }
 
     return ResponseEntity.ok(service.updateAnswer(id, request, include, userDetails));

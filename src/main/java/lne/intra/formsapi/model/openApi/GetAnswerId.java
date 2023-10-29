@@ -7,8 +7,8 @@ import lombok.Data;
 @Data
 public class GetAnswerId {
   private Integer id;
+  private String uuid;
   private String reponse;
-  private String donnees;
   private Integer version;
   private Boolean valide;
   private GetUserId createur;

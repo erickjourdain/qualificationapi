@@ -1,10 +1,13 @@
 package lne.intra.formsapi.controller;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -73,24 +76,43 @@ public class FormController {
     }
     return ResponseEntity.ok(service.saveForm(request, include, userDetails));
   }
-  /* 
-  @Operation(summary = "Création d'un nouveau formulaire", description = "Accès limité au rôle `ADMIN`")
-  @Parameter(in = ParameterIn.QUERY, name = "include", description = "Liste des champs à retourner", required = false, example = "id, titre, version, createur")
-  @ApiResponse(responseCode = "200", description = "Le formulaire créé", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetFormId.class)))
-  @ApiResponse(responseCode = "400", description = "Données fournies incorrectes", content = @Content(mediaType = "application/json"))
-  @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
-  @PostMapping()
-  @PreAuthorize("hasAuthority('admin:create')")
-  public ResponseEntity<Map<String, Object>> save(
-      @AuthenticationPrincipal UserDetails userDetails,
-      @RequestBody FormRequest request,
-      @RequestParam(required = false) String include) throws AppException {
-    if (service.existingValidForm(request.getTitre())) {
-      throw new AppException(400, "Une formulaire valide avec ce titre existe dans la base de données");
-    }
-    return ResponseEntity.ok(service.saveForm(request, include, userDetails));
-  }
-  */
+  /*
+   * @Operation(summary = "Création d'un nouveau formulaire", description =
+   * "Accès limité au rôle `ADMIN`")
+   * 
+   * @Parameter(in = ParameterIn.QUERY, name = "include", description =
+   * "Liste des champs à retourner", required = false, example =
+   * "id, titre, version, createur")
+   * 
+   * @ApiResponse(responseCode = "200", description = "Le formulaire créé",
+   * content = @Content(mediaType = "application/json", schema
+   * = @Schema(implementation = GetFormId.class)))
+   * 
+   * @ApiResponse(responseCode = "400", description =
+   * "Données fournies incorrectes", content = @Content(mediaType =
+   * "application/json"))
+   * 
+   * @ApiResponse(responseCode = "403", description =
+   * "Accès non autorisé ou token invalide", content = @Content(mediaType =
+   * "application/text"))
+   * 
+   * @PostMapping()
+   * 
+   * @PreAuthorize("hasAuthority('admin:create')")
+   * public ResponseEntity<Map<String, Object>> save(
+   * 
+   * @AuthenticationPrincipal UserDetails userDetails,
+   * 
+   * @RequestBody FormRequest request,
+   * 
+   * @RequestParam(required = false) String include) throws AppException {
+   * if (service.existingValidForm(request.getTitre())) {
+   * throw new AppException(400,
+   * "Une formulaire valide avec ce titre existe dans la base de données");
+   * }
+   * return ResponseEntity.ok(service.saveForm(request, include, userDetails));
+   * }
+   */
 
   /**
    * Mise à jour d'un formulaire via son id
@@ -136,7 +158,7 @@ public class FormController {
   @Operation(summary = "Récupération de formulaires avec pagination et filtre", description = "Accès limité aux rôles `ADMIN` et `USER`")
   @Parameter(in = ParameterIn.QUERY, name = "page", description = "Numéro de la page à retourner", required = false)
   @Parameter(in = ParameterIn.QUERY, name = "size", description = "Nombre d'éléments à retourner", required = false)
-  @Parameter(in = ParameterIn.QUERY, name = "sortBy", description = "Champ de tri", required = false)
+  @Parameter(in = ParameterIn.QUERY, name = "sortBy", description = "Champ de tri ex: asc(id) ou desc(createdAt)", required = false)
   @Parameter(in = ParameterIn.QUERY, name = "include", description = "Liste des champs à retourner", required = false, example = "id, titre, version, createur")
   @Parameter(in = ParameterIn.QUERY, name = "filter", description = "Filtre au format défini dans le package [turkraft/springfilter](https://github.com/turkraft/springfilter)", required = false, schema = @Schema(implementation = String.class), example = "valide:true and titre ~~ '*formulaire*'")
   @ApiResponse(responseCode = "200", description = "Les formulaires et informations sur la pagination", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetForms.class)))
@@ -147,11 +169,22 @@ public class FormController {
   public ResponseEntity<FormsResponse> get(
       @RequestParam(defaultValue = "1") Integer page,
       @RequestParam(defaultValue = "10") Integer size,
-      @RequestParam(defaultValue = "id") String sortBy,
+      @RequestParam(defaultValue = "asc(id)") String sortBy,
       @RequestParam(required = false) String include,
       @RequestParam(required = false) FilterSpecification<Form> filter) throws NotFoundException {
 
-    Pageable paging = PageRequest.of(page - 1, size);
+    // Test paramètre de tri
+    boolean b = Pattern.matches("(desc|asc)[(](id|version|createdAt|updatedAt)[)]", sortBy.toLowerCase());
+    if (!b)
+      throw new AppException(400, "Le champ de tri est incorrect");
+    // Définition du paramètre de tri
+    int indexStart = sortBy.indexOf("(");
+    String direction = sortBy.substring(0, indexStart);
+    int indexEnd = sortBy.indexOf(")");
+    String field = sortBy.substring(indexStart + 1, indexEnd);
+
+    Pageable paging = PageRequest.of(page - 1, size,
+        Sort.by((direction == "asc") ? Direction.ASC : Direction.DESC, field));
     return ResponseEntity.ok(service.search(filter, paging, include));
   }
 
