@@ -107,7 +107,7 @@ public class UsersController {
     String field = sortBy.substring(indexStart + 1, indexEnd);
     
     Pageable paging = PageRequest.of(page - 1, size,
-        Sort.by((direction == "asc") ? Direction.ASC : Direction.DESC, field));
+        Sort.by((Pattern.matches("asc", direction)) ? Direction.ASC : Direction.DESC, field));
     return ResponseEntity.ok(service.search(filter, paging));
   }
 

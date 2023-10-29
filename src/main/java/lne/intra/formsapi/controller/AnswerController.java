@@ -110,12 +110,12 @@ public class AnswerController {
       throw new AppException(400, "Le champ de tri est incorrect");
     // Définition du paramètre de tri
     int indexStart = sortBy.indexOf("(");
-    String direction = sortBy.substring(0, indexStart);
+    String direction = sortBy.substring(0, indexStart + 1);
     int indexEnd = sortBy.indexOf(")");
     String field = sortBy.substring(indexStart + 1, indexEnd);
 
     Pageable paging = PageRequest.of(page - 1, size,
-        Sort.by((direction == "asc") ? Direction.ASC : Direction.DESC, field));
+        Sort.by((Pattern.matches("asc", direction)) ? Direction.ASC : Direction.DESC, field));
     return ResponseEntity.ok(service.search(filter, paging, include));
   }
 
