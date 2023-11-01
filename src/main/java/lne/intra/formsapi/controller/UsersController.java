@@ -105,6 +105,9 @@ public class UsersController {
     String direction = sortBy.substring(0, indexStart);
     int indexEnd = sortBy.indexOf(")");
     String field = sortBy.substring(indexStart + 1, indexEnd);
+
+    // Limitation nombre d'éléments retrourné
+    size = (size > 50) ? 50 : size;
     
     Pageable paging = PageRequest.of(page - 1, size,
         Sort.by((Pattern.matches("asc", direction)) ? Direction.ASC : Direction.DESC, field));
