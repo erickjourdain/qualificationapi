@@ -2,6 +2,7 @@ package lne.intra.formsapi.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,15 +40,17 @@ public class AnswerService {
   private final FormRepository formRepository;
   private final ObjectsValidator<AnswerRequest> answerValidator;
 
-  private Map<String, Object> addUserFormToAnswer(Answer answer, String include) throws AppException {
-    // recherche du créateur de la réponse dans la base
-    User createur = userRepository.findById(answer.getCreateur().getId())
-        .orElseThrow(() -> new AppException(404, "Impossible de trouver le créateur"));
-    // recherche du formulaire dans la base
-    Form formulaire = formRepository.findById(answer.getFormulaire().getId())
-        .orElseThrow(() -> new AppException(404, "Impossible de trouver le formulaire"));
-
-    Map<String, Object> user = new HashMap<>();
+  /**
+   * Ajout des champs à retourner à la réponse
+   * @param answer
+   * @param include
+   * @return
+   * @throws AppException
+   */
+  private Map<String, Object> addFieldsToAnswer(Answer answer, String include) throws AppException {
+    Map<String, Object> user1 = new HashMap<>();
+    Map<String, Object> user2 = new HashMap<>();
+    Map<String, Object> user3 = new HashMap<>();
     Map<String, Object> form = new HashMap<>();
     Map<String, Object> response = new HashMap<>();
 
@@ -58,20 +61,54 @@ public class AnswerService {
 
     // ajout du champ créateur
     if (fields.isEmpty() || fields.contains("createur")) {
-      user.put("id", createur.getId());
-      user.put("prenom", createur.getPrenom());
-      user.put("nom", createur.getNom());
-      user.put("role", createur.getRole());
+      // recherche du créateur de la réponse dans la base
+      User createur = userRepository.findById(answer.getCreateur().getId())
+          .orElseThrow(() -> new AppException(404, "Impossible de trouver le créateur"));
+      user1.put("id", createur.getId());
+      user1.put("prenom", createur.getPrenom());
+      user1.put("nom", createur.getNom());
+      user1.put("role", createur.getRole());
+      response.put("createur", user1);
+    }
+
+    // ajout du champ gestionnaire
+    if (fields.isEmpty() || fields.contains("gestionnaire")) {
+      // recherche du gestionnaire courant dans la base
+      User gestionnaire = userRepository.findById(answer.getGestionnaire().getId())
+          .orElseThrow(() -> new AppException(404, "Impossible de trouver le gestionnaire"));
+      user2.put("id", gestionnaire.getId());
+      user2.put("prenom", gestionnaire.getPrenom());
+      user2.put("nom", gestionnaire.getNom());
+      user2.put("role", gestionnaire.getRole());
+      response.put("gestionnaire", user2);
+    }
+
+    // ajout du champ utilisateur
+    if (fields.isEmpty() || fields.contains("utilisateur")) {
+      if (answer.getUtilisateur() != null) {
+        // recherche de l'utilisateur courant dans la base
+        User utilisateur = userRepository.findById(answer.getUtilisateur().getId())
+            .orElseThrow(() -> new AppException(404, "Impossible de trouver l'utilisateur courant"));
+        user3.put("id", utilisateur.getId());
+        user3.put("prenom", utilisateur.getPrenom());
+        user3.put("nom", utilisateur.getNom());
+        user3.put("role", utilisateur.getRole());
+      }
+      response.put("utilisateur", user3);
     }
 
     // ajout du champ formulaire
     if (fields.isEmpty() || fields.contains("formulaire")) {
+      // recherche du formulaire dans la base
+      Form formulaire = formRepository.findById(answer.getFormulaire().getId())
+          .orElseThrow(() -> new AppException(404, "Impossible de trouver le formulaire"));
       form.put("id", formulaire.getId());
       form.put("formulaire", formulaire.getFormulaire());
       form.put("titre", formulaire.getTitre());
       form.put("version", formulaire.getVersion());
       form.put("valide", formulaire.getValide());
       form.put("slug", formulaire.getSlug());
+      response.put("formulaire", form);
     }
 
     // ajout des différents champs à retourner en fonction de la demande exposée
@@ -80,12 +117,8 @@ public class AnswerService {
       response.put("id", answer.getId());
     if (fields.isEmpty() || fields.contains("uuid"))
       response.put("uuid", answer.getUuid());
-    if (fields.isEmpty() || fields.contains("formulaire"))
-      response.put("formulaire", form);
     if (fields.isEmpty() || fields.contains("reponse"))
       response.put("reponse", answer.getReponse());
-    if (fields.isEmpty() || fields.contains("createur"))
-      response.put("createur", user);
     if (fields.isEmpty() || fields.contains("statut"))
       response.put("statut", answer.getStatut());
     if (fields.isEmpty() || fields.contains("demande"))
@@ -94,8 +127,10 @@ public class AnswerService {
       response.put("opportunite", answer.getOpportunite());
     if (fields.isEmpty() || fields.contains("version"))
       response.put("version", answer.getVersion());
-    if (fields.isEmpty() || fields.contains("valide"))
-      response.put("valide", answer.getValide());
+    if (fields.isEmpty() || fields.contains("courante"))
+      response.put("courante", answer.getCourante());
+    if (fields.isEmpty() || fields.contains("lockedAt"))
+      response.put("lockedAt", answer.getLockedAt());
     if (fields.isEmpty() || fields.contains("createdat"))
       response.put("createdAt", answer.getCreatedAt());
     if (fields.isEmpty() || fields.contains("updatedat"))
@@ -104,12 +139,27 @@ public class AnswerService {
     return response;
   }
 
+  /**
+   * Recherche d'une réponse en fonction de son id
+   * @param id
+   * @param include
+   * @return
+   * @throws AppException
+   */
   public Map<String, Object> getAnswer(Integer id, String include) throws AppException {
     Answer answer = answerRepository.findById(id)
         .orElseThrow(() -> new AppException(400, "La réponse n'existe pas"));
-    return addUserFormToAnswer(answer, include);
+    return addFieldsToAnswer(answer, include);
   }
 
+  /**
+   * Energistrement d'une nouvelle réponse
+   * @param request
+   * @param include
+   * @param userDetails
+   * @return
+   * @throws AppException
+   */
   public Map<String, Object> saveAnswer(AnswerRequest request, String include, UserDetails userDetails)
       throws AppException {
     // validation des champs fournis dans la requête
@@ -122,17 +172,27 @@ public class AnswerService {
         .orElseThrow(() -> new AppException(404, "Impossible de trouver le formulaire"));
     // création de la nouvelle entrée
     Answer answer = Answer.builder()
-        .uuid(UUID.randomUUID())
+        .uuid(UUID.randomUUID().toString())
         .reponse(request.getReponse().trim())
         .formulaire(formulaire)
         .createur(createur)
+        .gestionnaire(createur)
         .build();
     // sauvegarde de la nouvelle entrée
     Answer newAnswer = answerRepository.save(answer);
     return getAnswer(newAnswer.getId(), include);
   }
 
-  public Map<String, Object> updateAnswer(Integer id, AnswerRequest request, String include, UserDetails userDetails) 
+  /**
+   * Mise à jour d'une réponse
+   * @param id
+   * @param request
+   * @param include
+   * @param userDetails
+   * @return
+   * @throws AppException
+   */
+  public Map<String, Object> updateAnswer(Integer id, AnswerRequest request, String include, UserDetails userDetails)
       throws AppException {
     // validation des champs fournis dans la requête
     answerValidator.validateData(request, ObjectUpdate.class);
@@ -140,38 +200,38 @@ public class AnswerService {
     Answer answer = answerRepository.findById(id)
         .orElseThrow(() -> new AppException(404, "Impossible de trouver la réponse à modifier"));
     List<Integer> newId = new ArrayList<>();
-    // Mise à jour de la demande 
+    // Mise à jour de la demande
     Optional.ofNullable(request.getDemande())
         .ifPresent(res -> {
           answer.setDemande(res);
         });
-    // Mise à jour de l'opportunité 
+    // Mise à jour de l'opportunité
     Optional.ofNullable(request.getOpportunite())
         .ifPresent(res -> {
           answer.setOpportunite(res);
         });
-    // Mise à jour du statut 
+    // Mise à jour du statut
     Optional.ofNullable(request.getStatut())
         .ifPresent(res -> {
           answer.setStatut(res);
         });
-    // Mise à jour du créateur
     // récupération des informations sur l'utilisateur connecté
-    User createur = userRepository.findByLogin(userDetails.getUsername())
+    User user = userRepository.findByLogin(userDetails.getUsername())
         .orElseThrow(() -> new AppException(404, "Impossible de trouver l'utilisateur connecté'"));
-    if (createur.getId() != answer.getCreateur().getId())
-      answer.setCreateur(createur);
+    // Mise à jour du gestionnaire
+    answer.setGestionnaire(user);
     // Mise à jour des données et de la réponse
     // Enregistrement d'une nouvelle entrée avec changement de version
     Optional.ofNullable(request.getReponse())
         .ifPresent(res -> {
-          answer.setValide(false);
+          answer.setCourante(false);
           Answer newAnswer = Answer.builder()
               .uuid(answer.getUuid())
               .formulaire(answer.getFormulaire())
               .reponse(res)
               .version(answer.getVersion() + 1)
-              .createur(createur)
+              .createur(user)
+              .gestionnaire(user)
               .demande(answer.getDemande())
               .opportunite(answer.getOpportunite())
               .statut(answer.getStatut())
@@ -183,6 +243,13 @@ public class AnswerService {
     return getAnswer(newId.size() > 0 ? newId.get(0) : id, include);
   }
 
+  /**
+   * Recherche d'une liste de réponses
+   * @param spec
+   * @param paging
+   * @param include
+   * @return
+   */
   public AnswersResponse search(@Filter Specification<Answer> spec, Pageable paging, String include) {
     // Récupération des formulaires
     Page<Answer> answers = answerRepository.findAll(spec, paging);
@@ -190,7 +257,7 @@ public class AnswerService {
 
     // boucle sur les formulaires pour ajout du créateur
     for (Answer answer : answers) {
-      AnswersWithCreateur.add(addUserFormToAnswer(answer, include));
+      AnswersWithCreateur.add(addFieldsToAnswer(answer, include));
     }
     var response = AnswersResponse.builder()
         .nombreReponses(answers.getTotalElements()) // nombre de formulaires totales
@@ -204,4 +271,39 @@ public class AnswerService {
     return response;
   }
 
+  /**
+   * Pose d'un verrou sur l'enregistrement
+   * @param id
+   * @param userDetails
+   * @throws AppException
+   */
+  public void lockAnswer(Integer id, UserDetails userDetails) throws AppException {
+    // récupération de l'entité à modifier
+    Answer answer = answerRepository.findById(id)
+        .orElseThrow(() -> new AppException(404, "Impossible de trouver la réponse à modifier"));
+    if (answer.getLockedAt() != null) throw new AppException(400, "Un verrou est déjà posé sur cette entité");    
+    // récupération des informations sur l'utilisateur connecté
+    User user = userRepository.findByLogin(userDetails.getUsername())
+        .orElseThrow(() -> new AppException(404, "Impossible de trouver l'utilisateur connecté'"));
+    answer.setLockedAt(new Date());
+    answer.setUtilisateur(user);
+    // mise à jour de la réponse
+    answerRepository.save(answer);
+  }
+
+  public void unlockAnswer(Integer id, UserDetails userDetails) throws AppException {
+    // récupération de l'entité à modifier
+    Answer answer = answerRepository.findById(id)
+        .orElseThrow(() -> new AppException(404, "Impossible de trouver la réponse à modifier"));
+    if (answer.getLockedAt() == null) throw new AppException(400, "Aucun verrou posé sur cette entité");
+    // récupération des informations sur l'utilisateur connecté
+    User user = userRepository.findByLogin(userDetails.getUsername())
+        .orElseThrow(() -> new AppException(404, "Impossible de trouver l'utilisateur connecté'"));
+    if (user.getId() != answer.getUtilisateur().getId())
+      throw new AppException(400, "Vous ne pouvez supprimer le verrou sur cette entité");   
+    answer.setLockedAt(null);
+    answer.setUtilisateur(null);
+    // mise à jour de la réponse
+    answerRepository.save(answer);
+  }
 }

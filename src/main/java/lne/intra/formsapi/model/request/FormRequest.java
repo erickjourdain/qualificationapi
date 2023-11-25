@@ -25,6 +25,7 @@ public class FormRequest {
   private String description;
 
   @NotBlank(groups = ObjectCreate.class, message = "le champ 'formulaire' est obligatoire")
+  //private Clob formulaire;
   private String formulaire;
 
 }

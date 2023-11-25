@@ -40,11 +40,11 @@ public class FileUploadController {
    * @param file        <MultipartFile>
    * @return objet représentant le fichier sauvegardé <UploadResponse>
    */
-  @Operation(summary = "Enregistrement d'un fichier", description = "Accès limité au rôle `ADMIN`")
+  @Operation(summary = "Enregistrement d'un fichier", description = "Accès limité aux rôles `ADMIN` et `CREATOR`")
   @ApiResponse(responseCode = "200", description = "Fichier enregistré", content = @Content(mediaType = "application/json"))
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @PostMapping()
-  @PreAuthorize("hasAnyAuthority('admin:create','user:create')")
+  @PreAuthorize("hasAnyAuthority('admin:create','creator:create','user:create')")
   public ResponseEntity<UploadResponse> uploadFile(
       @AuthenticationPrincipal UserDetails userDetails,
       @RequestParam(name = "file", required = true) MultipartFile file) {
@@ -60,12 +60,12 @@ public class FileUploadController {
    * @param id          <Integer> l'identifiant du fichier à supprimer
    * @return            <Boolean>
    */
-  @Operation(summary = "Suppression d'un fichier via son id", description = "Accès limité au rôle `ADMIN`")
+  @Operation(summary = "Suppression d'un fichier via son id", description = "Accès limité aux rôles `ADMIN` et `CREATOR`")
   @ApiResponse(responseCode = "200", description = "Fichier supprimé", content = @Content(mediaType = "application/text"))
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @ApiResponse(responseCode = "404", description = "Fichier ou propriétaire inexistant dans la base", content = @Content(mediaType = "application/text"))
   @DeleteMapping()
-  @PreAuthorize("hasAnyAuthority('admin:delete','user:delete')")
+  @PreAuthorize("hasAnyAuthority('admin:delete','creator:delete','user:delete')")
   public ResponseEntity<Boolean> deleteFile(
       @AuthenticationPrincipal UserDetails userDetails,
       @PathVariable Integer id

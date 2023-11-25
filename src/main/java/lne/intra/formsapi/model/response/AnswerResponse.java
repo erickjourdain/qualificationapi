@@ -11,8 +11,9 @@ public class AnswerResponse {
   private Integer uuid;
   private String reponse;
   private Integer version;
-  private Boolean valide;
-  private CreateurResponse createur;
+  private Boolean courante;
+  private UtilisateurResponse createur;
+  private UtilisateurResponse gestionnaire;
   private FormResponse formulaire;
   private Integer demande;
   private Integer opportunite;

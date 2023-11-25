@@ -38,7 +38,7 @@ public class Form {
   @Size(min = 25, max = 255, message = "La description doit contenir entre 25 et 255 caractères")
   private String description;
 
-  @Column(nullable = false, columnDefinition = "TEXT")
+  @Column(nullable = false, columnDefinition = "MEDIUMTEXT")
   private String formulaire;
 
   @Column(nullable = false)

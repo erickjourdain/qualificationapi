@@ -112,7 +112,7 @@ public class FormService {
     // création de la nouvelle entrée
     Form form = Form.builder()
         .titre(request.getTitre().trim())
-        .formulaire(request.getFormulaire().trim())
+        .formulaire(request.getFormulaire())
         .description((request.getDescription() != null) ? request.getDescription().trim() : null)
         .createur(createur)
         .slug(slug.slugify(request.getTitre().trim() + " v1"))

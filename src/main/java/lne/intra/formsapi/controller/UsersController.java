@@ -143,7 +143,7 @@ public class UsersController {
   @ApiResponse(responseCode = "200", description = "Information sur l'utilisateur", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetUserId.class)))
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @GetMapping("/me")
-  @PreAuthorize("hasAnyAuthority('admin:read','user:read')")
+  @PreAuthorize("hasAnyAuthority('admin:read','creator:read','user:read')")
   public ResponseEntity<Map<String, Object>> getMe(@AuthenticationPrincipal UserDetails userDetails) {
     return ResponseEntity.ok(service.getByLogin(userDetails.getUsername()));
   }

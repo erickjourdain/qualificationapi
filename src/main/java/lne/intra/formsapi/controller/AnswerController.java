@@ -53,7 +53,6 @@ public class AnswerController {
 
   /**
    * Contrôleur de création d'un nouvelle réponse
-   * 
    * @param userDetails <UserDetails> information sur l'utilisateur connecté
    * @param request     AnswerRequest objet JSON avec les champs définissant une
    *                    réponse à un formulaire
@@ -61,13 +60,13 @@ public class AnswerController {
    * @return ResponseEntity<GetAnswerId> La réponse enregistrée
    * @throws AppException
    */
-  @Operation(summary = "Création d'une nouvelle réponse", description = "Accès limité aux rôle `ADMIN` et `USER`")
+  @Operation(summary = "Création d'une nouvelle réponse", description = "Accès limité aux rôle `ADMIN`, `CREATOR` et `USER`")
   @Parameter(in = ParameterIn.QUERY, name = "include", description = "Liste des champs à retourner", required = false, example = "id, titre, version, createur")
   @ApiResponse(responseCode = "200", description = "Le formulaire créé", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetAnswerId.class)))
   @ApiResponse(responseCode = "400", description = "Données fournies incorrectes", content = @Content(mediaType = "application/json"))
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @PostMapping()
-  @PreAuthorize("hasAnyAuthority('admin:create','user:create')")
+  @PreAuthorize("hasAnyAuthority('admin:create','creator:create','user:create')")
   public ResponseEntity<Map<String, Object>> save(
       @AuthenticationPrincipal UserDetails userDetails,
       @RequestBody AnswerRequest request,
@@ -77,7 +76,6 @@ public class AnswerController {
 
   /**
    * Contrôleur d'accès aux réponses apportées aux formulaires
-   * 
    * @param page    Integer numéro de la page à retourner par défaut 1
    * @param size    Integer nombre d'éléments à envoyer par défaut 10
    * @param sortBy  String champ de tri
@@ -86,7 +84,7 @@ public class AnswerController {
    * @return ResponseEntity<AnswersResponse>
    * @throws NotFoundException
    */
-  @Operation(summary = "Récupération des réponses apportées à un formulaire avec pagination et filtre", description = "Accès limité aux rôles `ADMIN` et `USER`")
+  @Operation(summary = "Récupération des réponses apportées à un formulaire avec pagination et filtre", description = "Accès limité aux rôles `ADMIN`, `CREATOR` et `USER`")
   @Parameter(in = ParameterIn.QUERY, name = "page", description = "Numéro de la page à retourner", required = false)
   @Parameter(in = ParameterIn.QUERY, name = "size", description = "Nombre d'éléments à retourner", required = false)
   @Parameter(in = ParameterIn.QUERY, name = "sortBy", description = "Champ de tri ex: asc(id) ou desc(createdAt)", required = false)
@@ -96,14 +94,14 @@ public class AnswerController {
   @ApiResponse(responseCode = "404", description = "Createur non trouvé dans la base", content = @Content(mediaType = "application/text"))
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @GetMapping
-  @PreAuthorize("hasAnyAuthority('admin:read','user:read')")
+  @PreAuthorize("hasAnyAuthority('admin:read','creator:read','user:read')")
   public ResponseEntity<AnswersResponse> search(
       @RequestParam(defaultValue = "1") Integer page,
       @RequestParam(defaultValue = "10") Integer size,
       @RequestParam(defaultValue = "asc(id)") String sortBy,
       @RequestParam(required = false) String include,
       FilterSpecification<Answer> filter) throws NotFoundException {
-    
+
     // Test paramètre de tri
     boolean b = Pattern.matches("(desc|asc)[(](id|uuid|version|createdAt|updatedAt)[)]", sortBy);
     if (!b)
@@ -124,23 +122,34 @@ public class AnswerController {
 
   /**
    * Contrôleur d'accès à une réponse via son id
-   * 
-   * @param id      Integer l'id du réponse
-   * @param include String liste des champs à retourner
+   * @param userDetails
+   * @param id          Integer l'id du réponse
+   * @param include     String liste des champs à retourner
    * @return ResponseEntity<GetAnswerId>
    * @throws NotFoundException
    */
-  @Operation(summary = "Récupération d'une réponse via son id", description = "Accès limité aux rôles `ADMIN` et `USER`")
+  @Operation(summary = "Récupération d'une réponse via son id", description = "Accès limité aux rôles `ADMIN`, `CREATOR` et `USER`")
   @Parameter(in = ParameterIn.QUERY, name = "include", description = "Liste des champs à retourner", required = false, example = "id, titre, version, createur")
   @ApiResponse(responseCode = "200", description = "Réponse recherchée", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetAnswerId.class)))
   @ApiResponse(responseCode = "404", description = "Formuliare ou Createur non trouvé dans la base", content = @Content(mediaType = "application/text"))
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @GetMapping("/{id}")
-  @PreAuthorize("hasAnyAuthority('admin:read','user:read')")
+  @PreAuthorize("hasAnyAuthority('admin:read','creator:read','user:read')")
   public ResponseEntity<Map<String, Object>> getAnswer(
+      @AuthenticationPrincipal UserDetails userDetails,
       @PathVariable Integer id,
       @RequestParam(required = false) String include) throws NotFoundException {
-    return ResponseEntity.ok(service.getAnswer(id, include));
+
+    // recherche de la réponse
+    Map<String, Object> answer = service.getAnswer(id, include);
+    // pose d'un verrour sur la réponse
+    Boolean courante = (Boolean) answer.get("courante");
+    Boolean notLockedAt = (answer.get("lockedAt") == null);
+    if (courante && notLockedAt) {
+      service.lockAnswer(id, userDetails);
+      answer = service.getAnswer(id, include);
+    }
+    return ResponseEntity.ok(answer);
   }
 
   /**
@@ -153,12 +162,12 @@ public class AnswerController {
    * @return
    * @throws NotFoundException
    */
-  @Operation(summary = "Mise à jour d'une réponse apportée à un formulaire", description = "Accès limité aux rôles `ADMIN` et `USER`")
+  @Operation(summary = "Mise à jour d'une réponse apportée à un formulaire", description = "Accès limité aux rôles `ADMIN`, `CREATOR` et `USER`")
   @ApiResponse(responseCode = "200", description = "La réponse mise à jour", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetAnswers.class)))
   @ApiResponse(responseCode = "404", description = "Réponse ou Créateur non trouvé dans la base", content = @Content(mediaType = "application/text"))
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @PutMapping("/{id}")
-  @PreAuthorize("hasAnyAuthority('admin:update','user:update')")
+  @PreAuthorize("hasAnyAuthority('admin:update','creator:update','user:update')")
   public ResponseEntity<Map<String, Object>> update(
       @AuthenticationPrincipal UserDetails userDetails,
       @PathVariable Integer id,
@@ -166,26 +175,42 @@ public class AnswerController {
       @RequestParam(required = false) String include) throws NotFoundException {
 
     Map<String, Object> answer = service.getAnswer(id, include);
+    Statut statut = (Statut) answer.get("statut");
+    // AnswerResponse rep = (AnswerResponse) answer;
+    if (answer.get("courante").equals(false)) {
+      throw new AppException(400, "Seule les dernières réponses peuvent être modifiées");
+    }
     // test de cohérence des données fournies pour mise à jour de la réponse
     if (request.getFormulaire() != null) {
       throw new AppException(400, "Le formulaire ne peut être modifiée");
     }
-    if (answer.get("statut") == Statut.GAGNE || answer.get("statut") == Statut.PERDU) {
-      throw new AppException(400, "La réponse ne peut être modifiée");
-    }
-    if (answer.get("statut") == Statut.DEVIS || answer.get("statut") == Statut.GAGNE
-        || answer.get("statut") == Statut.PERDU && request.getReponse() != null) {
-      throw new AppException(400, "La réponse ne peut être modifiée");
-    }
-    if (answer.get("statut") == Statut.DEVIS || answer.get("statut") == Statut.GAGNE
-        || answer.get("statut") == Statut.PERDU && request.getOpportunite() != null) {
+    if (statut == Statut.DEVIS || statut == Statut.GAGNE
+        || statut == Statut.PERDU || statut == Statut.TERMINE && request.getOpportunite() != null) {
       throw new AppException(400, "L'opportunité ne peut être modifiée");
     }
-    if (answer.get("statut") == Statut.DEVIS || answer.get("statut") == Statut.GAGNE
-        || answer.get("statut") == Statut.PERDU && request.getDemande() != null) {
+    if (statut == Statut.DEVIS || statut == Statut.GAGNE
+        || statut == Statut.PERDU || statut == Statut.TERMINE && request.getDemande() != null) {
       throw new AppException(400, "La demande ne peut être modifiée");
     }
 
     return ResponseEntity.ok(service.updateAnswer(id, request, include, userDetails));
+  }
+
+  @PutMapping("/lock/{id}")
+  @PreAuthorize("hasAnyAuthority('admin:update','creator:update','user:update')")
+  public ResponseEntity<Boolean> lock(
+      @AuthenticationPrincipal UserDetails userDetails,
+      @PathVariable Integer id) throws NotFoundException {
+    service.lockAnswer(id, userDetails);
+    return ResponseEntity.ok(true);
+  }
+
+  @PutMapping("/unlock/{id}")
+  @PreAuthorize("hasAnyAuthority('admin:update','creator:update','user:update')")
+  public ResponseEntity<Boolean> unlock(
+      @AuthenticationPrincipal UserDetails userDetails,
+      @PathVariable Integer id) throws NotFoundException {
+    service.unlockAnswer(id, userDetails);
+    return ResponseEntity.ok(true);
   }
 }

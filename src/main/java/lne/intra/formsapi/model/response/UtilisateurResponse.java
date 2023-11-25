@@ -4,7 +4,7 @@ import lne.intra.formsapi.model.Role;
 import lombok.Data;
 
 @Data
-public class CreateurResponse {
+public class UtilisateurResponse {
   private Integer id;
   private String login;
   private String nom;

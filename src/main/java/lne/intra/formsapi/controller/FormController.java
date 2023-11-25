@@ -60,13 +60,13 @@ public class FormController {
    * @return ResponseEntity<GetFormId> Le formulaire enregistré
    * @throws AppException
    */
-  @Operation(summary = "Création d'un nouveau formulaire", description = "Accès limité au rôle `ADMIN`")
+  @Operation(summary = "Création d'un nouveau formulaire", description = "Accès limité au rôle `ADMIN` et `CREATOR`")
   @Parameter(in = ParameterIn.QUERY, name = "include", description = "Liste des champs à retourner", required = false, example = "id, titre, version, createur")
   @ApiResponse(responseCode = "200", description = "Le formulaire créé", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetFormId.class)))
   @ApiResponse(responseCode = "400", description = "Données fournies incorrectes", content = @Content(mediaType = "application/json"))
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @PostMapping()
-  @PreAuthorize("hasAuthority('admin:create')")
+  @PreAuthorize("hasAnyAuthority('admin:create','creator:create')")
   public ResponseEntity<Map<String, Object>> save(
       @AuthenticationPrincipal UserDetails userDetails,
       @RequestBody FormRequest request,
@@ -125,13 +125,13 @@ public class FormController {
    * @return ResponseEntity<GetFormId> le formulaire mis à jour
    * @throws NotFoundException
    */
-  @Operation(summary = "Mise à jour d'un formulaire", description = "Accès limité au rôle `ADMIN` \n* si le champ formulaire est fourni, création d'une nouvelle entrée en version N+1  \n * sinon mise à jour du formulaire existant")
+  @Operation(summary = "Mise à jour d'un formulaire", description = "Accès limité aux rôles `ADMIN` et `CREATOR`\n* si le champ formulaire est fourni, création d'une nouvelle entrée en version N+1  \n * sinon mise à jour du formulaire existant")
   @Parameter(in = ParameterIn.PATH, name = "id", description = "ID du formulaire à mettre à jour", example = "1")
   @ApiResponse(responseCode = "200", description = "Le formulaire mis à jour", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetFormId.class)))
   @ApiResponse(responseCode = "400", description = "Données fournies incorrecte", content = @Content(mediaType = "application/json"))
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @PatchMapping("/{id}")
-  @PreAuthorize("hasAuthority('admin:update')")
+  @PreAuthorize("hasAnyAuthority('admin:update','creator:update')")
   public ResponseEntity<Map<String, Object>> update(
       @AuthenticationPrincipal UserDetails userDetails,
       @PathVariable Integer id,
@@ -155,7 +155,7 @@ public class FormController {
    * @return ResponseEntity<FormsResponse>
    * @throws NotFoundException
    */
-  @Operation(summary = "Récupération de formulaires avec pagination et filtre", description = "Accès limité aux rôles `ADMIN` et `USER`")
+  @Operation(summary = "Récupération de formulaires avec pagination et filtre", description = "Accès limité aux rôles `ADMIN`, `CREATOR` et `USER`")
   @Parameter(in = ParameterIn.QUERY, name = "page", description = "Numéro de la page à retourner", required = false)
   @Parameter(in = ParameterIn.QUERY, name = "size", description = "Nombre d'éléments à retourner", required = false)
   @Parameter(in = ParameterIn.QUERY, name = "sortBy", description = "Champ de tri ex: asc(id) ou desc(createdAt)", required = false)
@@ -165,7 +165,7 @@ public class FormController {
   @ApiResponse(responseCode = "404", description = "Createur non trouvé dans la base", content = @Content(mediaType = "application/text"))
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @GetMapping
-  @PreAuthorize("hasAnyAuthority('admin:read','user:read')")
+  @PreAuthorize("hasAnyAuthority('admin:read','creator:read','user:read')")
   public ResponseEntity<FormsResponse> get(
       @RequestParam(defaultValue = "1") Integer page,
       @RequestParam(defaultValue = "10") Integer size,
@@ -199,14 +199,14 @@ public class FormController {
    * @return ResponseEntity<GetFormId>
    * @throws NotFoundException
    */
-  @Operation(summary = "Récupération d'un formulaire via son id", description = "Accès limité aux rôles `ADMIN` et `USER`")
+  @Operation(summary = "Récupération d'un formulaire via son id", description = "Accès limité aux rôles `ADMIN`, `CREATOR` et `USER`")
   @Parameter(in = ParameterIn.PATH, name = "id", description = "L'identifinat du formulaire", required = true, example = "1")
   @Parameter(in = ParameterIn.QUERY, name = "include", description = "Liste des champs à retourner", required = false, example = "id, titre, version, createur")
   @ApiResponse(responseCode = "200", description = "Formulaire recherché", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetFormId.class)))
   @ApiResponse(responseCode = "404", description = "Formuliare ou Createur non trouvé dans la base", content = @Content(mediaType = "application/text"))
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @GetMapping("/{id}")
-  @PreAuthorize("hasAnyAuthority('admin:read','user:read')")
+  @PreAuthorize("hasAnyAuthority('admin:read','creator:read','user:read')")
   public ResponseEntity<Map<String, Object>> getForm(
       @PathVariable Integer id,
       @RequestParam(required = false) String include) throws NotFoundException {

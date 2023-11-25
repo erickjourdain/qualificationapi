@@ -12,7 +12,7 @@ public class FormResponse {
   private String formulaire;
   private Integer version;
   private Boolean valide;
-  private CreateurResponse createur;
+  private UtilisateurResponse createur;
   private Date createdAt;
   private Date updatedAt;
 }

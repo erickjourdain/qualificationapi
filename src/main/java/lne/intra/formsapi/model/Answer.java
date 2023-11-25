@@ -1,7 +1,6 @@
 package lne.intra.formsapi.model;
 
 import java.util.Date;
-import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -34,9 +33,9 @@ public class Answer {
   private Integer id;
 
   @Column(nullable = false)
-  private UUID uuid;
+  private String uuid;
 
-  @Column(nullable = false, columnDefinition = "TEXT")
+  @Column(nullable = false, columnDefinition = "MEDIUMTEXT")
   private String reponse;
   
   @Column(nullable = false)
@@ -45,7 +44,7 @@ public class Answer {
 
   @Column(nullable = false)
   @Builder.Default
-  private Boolean valide = true;
+  private Boolean courante = true;
 
   private Integer demande;
 
@@ -62,8 +61,21 @@ public class Answer {
 
   @JsonBackReference
   @ManyToOne
+  @JoinColumn(name = "gestionnaire")
+  private User gestionnaire;
+
+  @JsonBackReference
+  @ManyToOne
+  @JoinColumn(name = "locked_by")
+  private User utilisateur;
+
+  @JsonBackReference
+  @ManyToOne
   @JoinColumn(name = "form_id")
   private Form formulaire;
+
+  @Column(columnDefinition = "DATETIME DEFAULT CURRENT_DATE")
+  private Date lockedAt;
 
   @Column(columnDefinition = "DATETIME DEFAULT CURRENT_DATE", nullable = false)
   @CreationTimestamp
