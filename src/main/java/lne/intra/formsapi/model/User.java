@@ -51,7 +51,12 @@ public class User implements UserDetails{
   @Builder.Default private Role role = Role.USER;
 
   @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
-  @Builder.Default private Boolean expired = false;
+  @Builder.Default
+  private Boolean expired = false;
+  
+  @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
+  @Builder.Default
+  private Boolean validated = false;
 
   @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
   @Builder.Default
@@ -88,7 +93,7 @@ public class User implements UserDetails{
 
   @Override
   public boolean isAccountNonLocked() {
-    return true;
+    return !locked;
   }
 
   @Override
@@ -98,7 +103,7 @@ public class User implements UserDetails{
 
   @Override
   public boolean isEnabled() {
-    return true;
+    return validated;
   }
   
 }

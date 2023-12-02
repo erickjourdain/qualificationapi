@@ -33,11 +33,13 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lne.intra.formsapi.model.Answer;
 import lne.intra.formsapi.model.Statut;
+import lne.intra.formsapi.model.User;
 import lne.intra.formsapi.model.exception.AppException;
 import lne.intra.formsapi.model.openApi.GetAnswerId;
 import lne.intra.formsapi.model.openApi.GetAnswers;
 import lne.intra.formsapi.model.request.AnswerRequest;
 import lne.intra.formsapi.model.response.AnswersResponse;
+import lne.intra.formsapi.repository.UserRepository;
 import lne.intra.formsapi.service.AnswerService;
 import lombok.RequiredArgsConstructor;
 
@@ -50,6 +52,7 @@ import lombok.RequiredArgsConstructor;
 public class AnswerController {
 
   private final AnswerService service;
+  private final UserRepository userRepository;
 
   /**
    * Contrôleur de création d'un nouvelle réponse
@@ -154,7 +157,6 @@ public class AnswerController {
 
   /**
    * Contrôleur de mise à jour d'une réponse
-   * 
    * @param userDetails
    * @param id
    * @param request
@@ -164,6 +166,7 @@ public class AnswerController {
    */
   @Operation(summary = "Mise à jour d'une réponse apportée à un formulaire", description = "Accès limité aux rôles `ADMIN`, `CREATOR` et `USER`")
   @ApiResponse(responseCode = "200", description = "La réponse mise à jour", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetAnswers.class)))
+  @ApiResponse(responseCode = "400", description = "Requête incorrecte", content = @Content(mediaType = "application/text"))
   @ApiResponse(responseCode = "404", description = "Réponse ou Créateur non trouvé dans la base", content = @Content(mediaType = "application/text"))
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @PutMapping("/{id}")
@@ -174,9 +177,16 @@ public class AnswerController {
       @RequestBody AnswerRequest request,
       @RequestParam(required = false) String include) throws NotFoundException {
 
+    // Récupération de la réponse à modifier
     Map<String, Object> answer = service.getAnswer(id, include);
+    // récupération des informations sur l'utilisateur connecté
+    User user = userRepository.findByLogin(userDetails.getUsername())
+        .orElseThrow(() -> new AppException(404, "Impossible de trouver l'utilisateur connecté'"));
+    User utilisateur = (User) answer.get("utilisateur");
+    if (user.getId() != utilisateur.getId())
+      throw new AppException(403, "La réponse est vérouillée par un aute utilisateur");
+    // Vérification de la possibilité de modifier la réponse
     Statut statut = (Statut) answer.get("statut");
-    // AnswerResponse rep = (AnswerResponse) answer;
     if (answer.get("courante").equals(false)) {
       throw new AppException(400, "Seule les dernières réponses peuvent être modifiées");
     }
@@ -192,10 +202,20 @@ public class AnswerController {
         || statut == Statut.PERDU || statut == Statut.TERMINE && request.getDemande() != null) {
       throw new AppException(400, "La demande ne peut être modifiée");
     }
+    if (statut == Statut.TERMINE && request.getStatut() != null) {
+      throw new AppException(400, "La réponse est clôturée");
+    }
 
     return ResponseEntity.ok(service.updateAnswer(id, request, include, userDetails));
   }
 
+  /**
+   * Contrôleur de vérouillage d'une réponse
+   * @param userDetails
+   * @param id
+   * @return
+   * @throws NotFoundException
+   */
   @PutMapping("/lock/{id}")
   @PreAuthorize("hasAnyAuthority('admin:update','creator:update','user:update')")
   public ResponseEntity<Boolean> lock(
@@ -205,6 +225,13 @@ public class AnswerController {
     return ResponseEntity.ok(true);
   }
 
+  /**
+   * Contrôleur de dévérouillage d'une réponse
+   * @param userDetails
+   * @param id
+   * @return
+   * @throws NotFoundException
+   */
   @PutMapping("/unlock/{id}")
   @PreAuthorize("hasAnyAuthority('admin:update','creator:update','user:update')")
   public ResponseEntity<Boolean> unlock(

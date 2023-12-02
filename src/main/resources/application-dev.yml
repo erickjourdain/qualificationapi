@@ -35,6 +35,7 @@ logging:
 lne:
   intra:
     formsapi:
+      signinkey: demande_inscription
       secretkey: FC521E275C4897DA60B4224C99D42FF793447ADA41889F755C1C9009C77F7F7B
       upload-dir: D:/ricoud/Development/java/FormsApi/uploads/files
       storage-mapping: file:///D:/ricoud/Development/java/FormsApi/uploads/

@@ -41,7 +41,10 @@ public enum Role {
           USER_CREATE,
           USER_READ,
           USER_UPDATE,
-          USER_DELETE));
+          USER_DELETE)),
+  READER(
+      Set.of(READER_READ)
+  );
 
   @Getter
   private final Set<Permission> permissions;

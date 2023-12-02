@@ -39,7 +39,6 @@ public class FormService {
 
   /**
    * Définition des champs à retourner et ajout du créateur du formulaire
-   * 
    * @param form    <Form> formulaire à mettre à jour
    * @param include <String> chaine de caractère avec les champs à retourner
    * @return Liste des champs du formulaire à retourner
@@ -94,7 +93,6 @@ public class FormService {
 
   /**
    * Création d'un nouveau formulaire dans la base de données
-   * 
    * @param request     <Request> la requête de création
    * @param include     <String> chaine de caractère avec les champs à retourner
    * @param userDetails <UserDetails> information sur l'utilisateur connecté

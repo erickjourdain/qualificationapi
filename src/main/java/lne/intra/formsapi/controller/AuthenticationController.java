@@ -26,7 +26,6 @@ public class AuthenticationController {
 
   /**
    * Contrôleur d'authentification des utilisateurs
-   * 
    * @param request RegisterRequest objet Json contenant le login / mot de passe de l'utilisateur
    * @return 
    */

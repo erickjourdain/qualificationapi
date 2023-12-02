@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterRequest {
-
+public class SignInRequest {
+  
   @NotBlank(message = "le champ 'nom' est obligatoire")
   @Size(min = 5, message = "le champ 'nom' doit contenir au moins 5 caractères")
   private String nom;
@@ -26,6 +26,9 @@ public class RegisterRequest {
   private String login;
 
   @NotBlank(message = "le champ 'password' est obligatoire")
-  @Size(min = 8, message = "le champ 'password' doit contenir au moins 5 caractères")
+  @Size(min = 8, message = "le champ 'login' doit contenir au moins 8 caractères")
   private String password;
+
+  @NotBlank(message = "le champ 'secret' est obligatoire")
+  private String secret;
 }

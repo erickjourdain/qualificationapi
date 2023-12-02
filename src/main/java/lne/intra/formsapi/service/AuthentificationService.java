@@ -1,5 +1,6 @@
 package lne.intra.formsapi.service;
 
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -42,6 +43,11 @@ public class AuthentificationService {
     // récupération de l'utilisateur via son login
     var user = repository.findByLogin(request.getLogin())
         .orElseThrow(() -> new UsernameNotFoundException("Utilisateur inconnu"));
+    // vérification droit de connexion
+    if (!user.isEnabled()) 
+      throw new AccessDeniedException("Le compte n'est pas validé. Veuillez contacter un administrateur.");
+    if (!user.isAccountNonLocked()) 
+      throw new AccessDeniedException("Le compte est vérouillé. Veuillez contacter un administrateur.");
     // création du token
     var jwtToken = jwtService.generateToken(user);
     // sauvegarde du token

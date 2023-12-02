@@ -35,7 +35,7 @@ import lne.intra.formsapi.model.User;
 import lne.intra.formsapi.model.exception.AppException;
 import lne.intra.formsapi.model.openApi.GetUserId;
 import lne.intra.formsapi.model.openApi.GetUsers;
-import lne.intra.formsapi.model.request.RegisterRequest;
+import lne.intra.formsapi.model.request.UserRequest;
 import lne.intra.formsapi.model.response.UsersResponse;
 import lne.intra.formsapi.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -47,13 +47,13 @@ import lombok.RequiredArgsConstructor;
 @SecurityRequirement(name = "BearerAuth")
 @Tag(name = "utilisateurs endpoint")
 public class UsersController {
-  
+
   private final UserService service;
 
   /**
    * Création d'un nouvel utilisateur
-   * 
-   * @param request RegisterRequest objet Json avec les informations nécessaires à l'enregistrement de l'utilisateur
+   * @param request UserRequest objet Json avec les informations nécessaires à
+   *                l'enregistrement de l'utilisateur
    * @return User le nouvel utilisateur enregistré
    */
   @Operation(summary = "Création d'un nouvel utilisateur", description = "Accès limité au rôle `ADMIN`")
@@ -63,14 +63,14 @@ public class UsersController {
   @PostMapping("/register")
   @PreAuthorize("hasAuthority('admin:create')")
   public ResponseEntity<Map<String, Object>> register(
-    @RequestBody(description = "Objet JSON représentant l'utilisateur à insérer", required = true, content = @Content(mediaType = "application/json", schema = @Schema(implementation = RegisterRequest.class))) RegisterRequest request
-  ) {
+      @RequestBody(description = "Objet JSON représentant l'utilisateur à insérer", required = true, content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserRequest.class))) UserRequest request) {
+    Map<String, Object> rep = service.register(request);
+    service.validate((Integer) rep.get("id"));
     return ResponseEntity.ok(service.register(request));
   }
 
   /**
    * Contrôleur d'accès aux utilisateurs
-   * 
    * @param page    Integer numéro de la page à retourner par défaut 1
    * @param size    Integer nombre d'éléments à envoyer par défaut 10
    * @param sortBy  String champ de tri
@@ -86,7 +86,7 @@ public class UsersController {
   @Parameter(in = ParameterIn.QUERY, name = "include", description = "Liste des champs à retourner", required = false, example = "id, titre, version, createur")
   @Parameter(in = ParameterIn.QUERY, name = "filter", description = "Filtre au format défini dans le package [turkraft/springfilter](https://github.com/turkraft/springfilter)", required = false, schema = @Schema(implementation = String.class), example = "valide:true and titre ~~ '*formulaire*'")
   @ApiResponse(responseCode = "200", description = "Les utilisateurs et informations sur la pagination", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetUsers.class)))
-  @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))  
+  @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @GetMapping
   @PreAuthorize("hasAuthority('admin:read')")
   public ResponseEntity<UsersResponse> search(
@@ -95,7 +95,6 @@ public class UsersController {
       @RequestParam(defaultValue = "asc(id)") String sortBy,
       FilterSpecification<User> filter) throws NotFoundException {
 
-    
     // Test paramètre de tri
     boolean b = Pattern.matches("(desc|asc)[(](id|createdAt|updatedAt)[)]", sortBy);
     if (!b)
@@ -108,7 +107,7 @@ public class UsersController {
 
     // Limitation nombre d'éléments retrourné
     size = (size > 50) ? 50 : size;
-    
+
     Pageable paging = PageRequest.of(page - 1, size,
         Sort.by((Pattern.matches("asc", direction)) ? Direction.ASC : Direction.DESC, field));
     return ResponseEntity.ok(service.search(filter, paging));
@@ -121,7 +120,7 @@ public class UsersController {
    * @return ResponseEntity<User> le nouvel utilisateur enregistré
    * @throws NotFoundException
    */
-  @Operation(summary = "Récupération d'un utilisateur via son id", description = "Accès limité au rôle `ADMIN`")  
+  @Operation(summary = "Récupération d'un utilisateur via son id", description = "Accès limité au rôle `ADMIN`")
   @Parameter(in = ParameterIn.PATH, name = "id", description = "L'identifinat du l'utilisateur", required = true, example = "1")
   @ApiResponse(responseCode = "200", description = "Utilisateur recherché", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetUserId.class)))
   @ApiResponse(responseCode = "404", description = "Utilisateur non trouvé dans la base", content = @Content(mediaType = "application/text"))
@@ -139,17 +138,17 @@ public class UsersController {
    * @param userDetails
    * @return ResponseEntity<User> informations de l'utilisateur connecté
    */
-  @Operation(summary = "Récupération des informations sur l'utilisateur connecté", description = "Accès limité aux rôles `ADMIN` et `USER`")  
+  @Operation(summary = "Récupération des informations sur l'utilisateur connecté", description = "Accès limité aux rôles `ADMIN` et `USER`")
   @ApiResponse(responseCode = "200", description = "Information sur l'utilisateur", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetUserId.class)))
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @GetMapping("/me")
-  @PreAuthorize("hasAnyAuthority('admin:read','creator:read','user:read')")
+  @PreAuthorize("hasAnyAuthority('admin:read','creator:read','user:read','reader:read')")
   public ResponseEntity<Map<String, Object>> getMe(@AuthenticationPrincipal UserDetails userDetails) {
     return ResponseEntity.ok(service.getByLogin(userDetails.getUsername()));
   }
 
   /**
-   * Contrôleur d'ajout des droits d'administeur à un utilisateur
+   * Contrôleur d'ajout des droits d'administrateur à un utilisateur
    * 
    * @param id Integer l'identifiant de l'utilisateur
    * @return ResponseEntity<User> informations de l'utilisateur connecté
@@ -163,9 +162,68 @@ public class UsersController {
   @PatchMapping("setAdmin/{id}")
   @PreAuthorize("hasAuthority('admin:update')")
   public ResponseEntity<Map<String, Object>> setAdmin(
-      @PathVariable Integer id)throws NotFoundException
-  {
+      @PathVariable Integer id) throws NotFoundException {
     return ResponseEntity.ok(service.setAdmin(id));
   }
+
+  /**
+   * Modification d'un utilisateur
+   * @param id Integer l'identifiant de l'utilisateur
+   * @param request UserRequest objet Json avec les informations nécessaires à
+   *                la mise à jour de l'utilisateur
+   * @return ResponseEntity<User> informations de l'utilisateur connecté
+   * @throws NotFoundException
+   */
+  @Operation(summary = "Modifier les données d'un utilisateur", description = "Accès limité au rôle `ADMIN`")
+  @Parameter(in = ParameterIn.PATH, name = "id", description = "L'identifinat du l'utilisateur", required = true, example = "1")
+  @ApiResponse(responseCode = "200", description = "Utilisateur recherché", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetUserId.class)))
+  @ApiResponse(responseCode = "404", description = "Utilisateur non trouvé dans la base", content = @Content(mediaType = "application/text"))
+  @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
+  @PatchMapping("/{id}")
+  @PreAuthorize("hasAuthority('admin:update')")
+  public ResponseEntity<Map<String, Object>> updateUser(
+      @PathVariable Integer id,
+      @RequestBody(description = "Objet JSON représentant les données à modifier", required = true, content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserRequest.class))) UserRequest request)
+      throws NotFoundException {
+    return ResponseEntity.ok(service.update(id, request));
+  }
+
+  /**
+   * Valider un utilisateur
+   * @param id Integer l'identifiant de l'utilisateur
+   * @return ResponseEntity<User> informations de l'utilisateur connecté
+   * @throws NotFoundException
+   */
+  @Operation(summary = "Valider un utilisateur", description = "Accès limité au rôle `ADMIN`")
+  @Parameter(in = ParameterIn.PATH, name = "id", description = "L'identifinat du l'utilisateur", required = true, example = "1")
+  @ApiResponse(responseCode = "200", description = "Utilisateur recherché", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetUserId.class)))
+  @ApiResponse(responseCode = "404", description = "Utilisateur non trouvé dans la base", content = @Content(mediaType = "application/text"))
+  @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
+  @PatchMapping("validate/{id}")
+  @PreAuthorize("hasAuthority('admin:update')")
+  public ResponseEntity<Map<String, Object>> validate(
+      @PathVariable Integer id)
+      throws NotFoundException {
+    return ResponseEntity.ok(service.validate(id));
+  }
+
+  /**
+   * Bloquer un utilisateur
+   * @param id Integer l'identifiant de l'utilisateur
+   * @return ResponseEntity<User> informations de l'utilisateur connecté
+   * @throws NotFoundException
+   */
+  @Operation(summary = "Bloquer un utilisateur", description = "Accès limité au rôle `ADMIN`")
+  @Parameter(in = ParameterIn.PATH, name = "id", description = "L'identifinat du l'utilisateur", required = true, example = "1")
+  @ApiResponse(responseCode = "200", description = "Utilisateur recherché", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetUserId.class)))
+  @ApiResponse(responseCode = "404", description = "Utilisateur non trouvé dans la base", content = @Content(mediaType = "application/text"))
+  @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
+  @PatchMapping("lock/{id}")
+  @PreAuthorize("hasAuthority('admin:update')")
+  public ResponseEntity<Map<String, Object>> lock(
+      @PathVariable Integer id)
+      throws NotFoundException {
+    return ResponseEntity.ok(service.lock(id));
+  }  
 
 }

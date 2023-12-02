@@ -23,5 +23,10 @@
     "name": "lne.intra.formsapi.storage-mapping",
     "type": "java.lang.String",
     "description": "Chemin d'accès au répertoire de stockage des fichiers"
+  },
+  {
+    "name": "lne.intra.formsapi.signinkey",
+    "type": "java.lang.String",
+    "description": "Clef à fournir lors d'une demande d'inscription'"
   }
 ]}

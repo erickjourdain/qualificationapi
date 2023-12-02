@@ -8,6 +8,8 @@ public class GetUserId {
   private Integer id;
   private String prenom;
   private String nom;
-  private String login; 
+  private String login;
   private Role role;
+  private Boolean bloque;
+  private Boolean valide;
 }
