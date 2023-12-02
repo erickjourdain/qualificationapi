@@ -43,10 +43,10 @@ public class SignInController {
     if (!request.getSecret().equals(env.getProperty("lne.intra.formsapi.signinkey")))
       throw new AppException(400, "La clef d'enregistrement est incorrecte");
     var newUser = UserRequest.builder()
-        .nom(request.getNom())
-        .prenom(request.getPrenom())
-        .login(request.getLogin())
-        .password(request.getPassword())
+        .nom(request.getNom().trim())
+        .prenom(request.getPrenom().trim())
+        .login(request.getLogin().trim())
+        .password(request.getPassword().trim())
         .build();
     return ResponseEntity.ok(userService.register(newUser));
   }
