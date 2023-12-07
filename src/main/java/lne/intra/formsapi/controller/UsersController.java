@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,16 +28,17 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lne.intra.formsapi.model.Role;
 import lne.intra.formsapi.model.User;
 import lne.intra.formsapi.model.exception.AppException;
 import lne.intra.formsapi.model.openApi.GetUserId;
 import lne.intra.formsapi.model.openApi.GetUsers;
 import lne.intra.formsapi.model.request.UserRequest;
 import lne.intra.formsapi.model.response.UsersResponse;
+import lne.intra.formsapi.repository.UserRepository;
 import lne.intra.formsapi.service.UserService;
 import lombok.RequiredArgsConstructor;
 
@@ -49,6 +51,7 @@ import lombok.RequiredArgsConstructor;
 public class UsersController {
 
   private final UserService service;
+  private final UserRepository userRepository;
 
   /**
    * Création d'un nouvel utilisateur
@@ -63,10 +66,11 @@ public class UsersController {
   @PostMapping("/register")
   @PreAuthorize("hasAuthority('admin:create')")
   public ResponseEntity<Map<String, Object>> register(
-      @RequestBody(description = "Objet JSON représentant l'utilisateur à insérer", required = true, content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserRequest.class))) UserRequest request) {
-    Map<String, Object> rep = service.register(request);
-    service.validate((Integer) rep.get("id"));
-    return ResponseEntity.ok(service.register(request));
+      @RequestBody UserRequest request,
+      @RequestParam(required = false) String include) throws AppException {
+    Map<String, Object> rep = service.register(request, include);
+    service.validate((Integer) rep.get("id"), include);
+    return ResponseEntity.ok(service.register(request, include));
   }
 
   /**
@@ -93,7 +97,8 @@ public class UsersController {
       @RequestParam(defaultValue = "1") Integer page,
       @RequestParam(defaultValue = "10") Integer size,
       @RequestParam(defaultValue = "asc(id)") String sortBy,
-      FilterSpecification<User> filter) throws NotFoundException {
+      FilterSpecification<User> filter,
+      @RequestParam(required = false) String include) throws NotFoundException {
 
     // Test paramètre de tri
     boolean b = Pattern.matches("(desc|asc)[(](id|createdAt|updatedAt)[)]", sortBy);
@@ -110,12 +115,11 @@ public class UsersController {
 
     Pageable paging = PageRequest.of(page - 1, size,
         Sort.by((Pattern.matches("asc", direction)) ? Direction.ASC : Direction.DESC, field));
-    return ResponseEntity.ok(service.search(filter, paging));
+    return ResponseEntity.ok(service.search(filter, paging, include));
   }
 
   /**
    * Contrôleur d'accès à un utilisateur via son id
-   * 
    * @param id Integer l'identifiant de l'utilisateur
    * @return ResponseEntity<User> le nouvel utilisateur enregistré
    * @throws NotFoundException
@@ -128,13 +132,13 @@ public class UsersController {
   @GetMapping("/{id}")
   @PreAuthorize("hasAuthority('admin:read')")
   public ResponseEntity<Map<String, Object>> getUser(
-      @PathVariable Integer id) throws NotFoundException {
-    return ResponseEntity.ok(service.getUser(id));
+      @PathVariable Integer id,
+      @RequestParam(required = false) String include) throws NotFoundException {
+    return ResponseEntity.ok(service.getUser(id, include));
   }
 
   /**
-   * Contrôleur d'accès aux information de l'utilisateur connecté
-   * 
+   * Contrôleur d'accès aux informations de l'utilisateur connecté
    * @param userDetails
    * @return ResponseEntity<User> informations de l'utilisateur connecté
    */
@@ -143,13 +147,13 @@ public class UsersController {
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @GetMapping("/me")
   @PreAuthorize("hasAnyAuthority('admin:read','creator:read','user:read','reader:read')")
-  public ResponseEntity<Map<String, Object>> getMe(@AuthenticationPrincipal UserDetails userDetails) {
-    return ResponseEntity.ok(service.getByLogin(userDetails.getUsername()));
+  public ResponseEntity<Map<String, Object>> getMe(@AuthenticationPrincipal UserDetails userDetails,
+      @RequestParam(required = false) String include) {
+    return ResponseEntity.ok(service.getByLogin(userDetails.getUsername(), include));
   }
 
   /**
    * Contrôleur d'ajout des droits d'administrateur à un utilisateur
-   * 
    * @param id Integer l'identifiant de l'utilisateur
    * @return ResponseEntity<User> informations de l'utilisateur connecté
    * @throws NotFoundException
@@ -162,8 +166,9 @@ public class UsersController {
   @PatchMapping("setAdmin/{id}")
   @PreAuthorize("hasAuthority('admin:update')")
   public ResponseEntity<Map<String, Object>> setAdmin(
-      @PathVariable Integer id) throws NotFoundException {
-    return ResponseEntity.ok(service.setAdmin(id));
+      @PathVariable Integer id,
+      @RequestParam(required = false) String include) throws NotFoundException {
+    return ResponseEntity.ok(service.setAdmin(id, include));
   }
 
   /**
@@ -180,12 +185,20 @@ public class UsersController {
   @ApiResponse(responseCode = "404", description = "Utilisateur non trouvé dans la base", content = @Content(mediaType = "application/text"))
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @PatchMapping("/{id}")
-  @PreAuthorize("hasAuthority('admin:update')")
+  @PreAuthorize("hasAnyAuthority('admin:update','creator:update','user:update','user:update','reader:update')")
   public ResponseEntity<Map<String, Object>> updateUser(
+      @AuthenticationPrincipal UserDetails userDetails,
       @PathVariable Integer id,
-      @RequestBody(description = "Objet JSON représentant les données à modifier", required = true, content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserRequest.class))) UserRequest request)
+      @RequestBody UserRequest request,
+      @RequestParam(required = false) String include)
       throws NotFoundException {
-    return ResponseEntity.ok(service.update(id, request));
+
+    // récupération des informations sur l'utilisateur connecté
+    User user = userRepository.findByLogin(userDetails.getUsername())
+        .orElseThrow(() -> new AppException(404, "Impossible de trouver l'utilisateur connecté'"));
+    if (!user.getId().equals(id) && user.getRole() != Role.ADMIN)
+      throw new AppException(403, "Vous ne disposez pas des droits nécessaires pour effectuer cette mise à jour");
+    return ResponseEntity.ok(service.update(id, request, include));
   }
 
   /**
@@ -202,9 +215,10 @@ public class UsersController {
   @PatchMapping("validate/{id}")
   @PreAuthorize("hasAuthority('admin:update')")
   public ResponseEntity<Map<String, Object>> validate(
-      @PathVariable Integer id)
+      @PathVariable Integer id,
+      @RequestParam(required = false) String include)
       throws NotFoundException {
-    return ResponseEntity.ok(service.validate(id));
+    return ResponseEntity.ok(service.validate(id, include));
   }
 
   /**
@@ -221,9 +235,10 @@ public class UsersController {
   @PatchMapping("lock/{id}")
   @PreAuthorize("hasAuthority('admin:update')")
   public ResponseEntity<Map<String, Object>> lock(
-      @PathVariable Integer id)
+      @PathVariable Integer id,
+      @RequestParam(required = false) String include)
       throws NotFoundException {
-    return ResponseEntity.ok(service.lock(id));
+    return ResponseEntity.ok(service.lock(id, include));
   }  
 
 }

@@ -3,12 +3,12 @@ spring:
   application:
     name: formsAPI
   profiles:
-    active: dev
+    active: prod
 
 #information application
 lne:
   intra:
     formsapi:
-      version: 0.9.1
+      version: 0.9.9
       api: 1
    

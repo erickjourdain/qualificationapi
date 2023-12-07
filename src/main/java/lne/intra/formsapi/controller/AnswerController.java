@@ -39,6 +39,7 @@ import lne.intra.formsapi.model.openApi.GetAnswerId;
 import lne.intra.formsapi.model.openApi.GetAnswers;
 import lne.intra.formsapi.model.request.AnswerRequest;
 import lne.intra.formsapi.model.response.AnswersResponse;
+import lne.intra.formsapi.repository.AnswerRepository;
 import lne.intra.formsapi.repository.UserRepository;
 import lne.intra.formsapi.service.AnswerService;
 import lombok.RequiredArgsConstructor;
@@ -52,6 +53,7 @@ import lombok.RequiredArgsConstructor;
 public class AnswerController {
 
   private final AnswerService service;
+  private final AnswerRepository answerRepository;
   private final UserRepository userRepository;
 
   /**
@@ -178,16 +180,17 @@ public class AnswerController {
       @RequestParam(required = false) String include) throws NotFoundException {
 
     // Récupération de la réponse à modifier
-    Map<String, Object> answer = service.getAnswer(id, include);
+    Answer answer = answerRepository.findById(id)
+        .orElseThrow(() -> new AppException(400, "La réponse n'existe pas"));
     // récupération des informations sur l'utilisateur connecté
     User user = userRepository.findByLogin(userDetails.getUsername())
-        .orElseThrow(() -> new AppException(404, "Impossible de trouver l'utilisateur connecté'"));
-    User utilisateur = (User) answer.get("utilisateur");
-    if (user.getId() != utilisateur.getId())
+        .orElseThrow(() -> new AppException(404, "Impossible de trouver l'utilisateur connecté"));
+    if (answer.getUtilisateur().equals(null)) throw new AppException(404, "Aucun verrou posé sur cet enregistrement");
+    if (user.getId() != answer.getUtilisateur().getId())
       throw new AppException(403, "La réponse est vérouillée par un aute utilisateur");
     // Vérification de la possibilité de modifier la réponse
-    Statut statut = (Statut) answer.get("statut");
-    if (answer.get("courante").equals(false)) {
+    Statut statut = (Statut) answer.getStatut();
+    if (answer.getCourante().equals(false)) {
       throw new AppException(400, "Seule les dernières réponses peuvent être modifiées");
     }
     // test de cohérence des données fournies pour mise à jour de la réponse

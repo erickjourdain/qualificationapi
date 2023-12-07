@@ -18,6 +18,7 @@ public enum Permission {
   USER_CREATE("user:create"),
   USER_UPDATE("user:update"),
   USER_DELETE("user:delete"),
+  READER_UPDATE("reader:update"),
   READER_READ("reader:read");
 
   @Getter

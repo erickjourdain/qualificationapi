@@ -27,11 +27,11 @@ public class AnswerRequest {
 
   private Statut statut;
 
-  @Min(groups = { ObjectCreate.class, ObjectUpdate.class }, value = 100000, message = "le champ 'opportunite' doit contenir 6 digits")
-  @Max(groups = { ObjectCreate.class, ObjectUpdate.class }, value = 999999, message = "le champ 'opportunite' doit contenir 6 digits")
+  @Min(groups = { ObjectCreate.class, ObjectUpdate.class }, value = 1000000, message = "le champ 'opportunite' doit contenir 7 digits")
+  @Max(groups = { ObjectCreate.class, ObjectUpdate.class }, value = 9999999, message = "le champ 'opportunite' doit contenir 7 digits")
   private Integer opportunite;
 
-  @Min(groups = { ObjectCreate.class, ObjectUpdate.class }, value = 100000, message = "le champ 'demande' doit contenir 6 digits")
-  @Max(groups = { ObjectCreate.class, ObjectUpdate.class }, value = 999999, message = "le champ 'demande' doit contenir 6 digits")
+  @Min(groups = { ObjectCreate.class, ObjectUpdate.class }, value = 1000000, message = "le champ 'demande' doit contenir 7 digits")
+  @Max(groups = { ObjectCreate.class, ObjectUpdate.class }, value = 9999999, message = "le champ 'demande' doit contenir 7 digits")
   private Integer demande;
 }
