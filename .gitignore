@@ -7,8 +7,12 @@ target/
 ### Logs ###
 logs/
 
+### Backup ###
+backup/
+
 ### Uploads ###
 uploads/
+upload/
 
 ### STS ###
 .apt_generated
