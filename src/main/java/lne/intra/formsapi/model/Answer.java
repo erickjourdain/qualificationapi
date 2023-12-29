@@ -16,6 +16,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -54,6 +55,10 @@ public class Answer {
   @Column(columnDefinition = "VARCHAR(55) DEFAULT 'BROUILLON'")
   @Builder.Default private Statut statut = Statut.BROUILLON;
 
+  @OneToOne
+  @JoinColumn(name = "locked_id")
+  private LockedAnswer lock;
+
   @JsonBackReference
   @ManyToOne
   @JoinColumn(name = "createur")
@@ -66,16 +71,8 @@ public class Answer {
 
   @JsonBackReference
   @ManyToOne
-  @JoinColumn(name = "locked_by")
-  private User utilisateur;
-
-  @JsonBackReference
-  @ManyToOne
   @JoinColumn(name = "form_id")
   private Form formulaire;
-
-  @Column(columnDefinition = "DATETIME DEFAULT CURRENT_DATE")
-  private Date lockedAt;
 
   @Column(columnDefinition = "DATETIME DEFAULT CURRENT_DATE", nullable = false)
   @CreationTimestamp

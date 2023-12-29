@@ -1,9 +1,12 @@
 package lne.intra.formsapi.controller;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -38,6 +41,9 @@ import lne.intra.formsapi.model.openApi.GetForms;
 import lne.intra.formsapi.model.request.FormRequest;
 import lne.intra.formsapi.model.response.FormsResponse;
 import lne.intra.formsapi.service.FormService;
+import lne.intra.formsapi.util.ObjectCreate;
+import lne.intra.formsapi.util.ObjectUpdate;
+import lne.intra.formsapi.util.ObjectsValidator;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -49,6 +55,7 @@ import lombok.RequiredArgsConstructor;
 public class FormController {
 
   private final FormService service;
+  private final ObjectsValidator<FormRequest> formValidator;
 
   /**
    * Création d'un nouveau formulaire
@@ -74,45 +81,11 @@ public class FormController {
     if (service.existingValidForm(request.getTitre())) {
       throw new AppException(400, "Une formulaire valide avec ce titre existe dans la base de données");
     }
-    return ResponseEntity.ok(service.saveForm(request, include, userDetails));
+    // validation des champs fournis dans la requête
+    formValidator.validateData(request, ObjectCreate.class);
+    Form newForm = service.saveForm(request, userDetails);
+    return ResponseEntity.ok(service.addUserToForm(newForm, include));
   }
-  /*
-   * @Operation(summary = "Création d'un nouveau formulaire", description =
-   * "Accès limité au rôle `ADMIN`")
-   * 
-   * @Parameter(in = ParameterIn.QUERY, name = "include", description =
-   * "Liste des champs à retourner", required = false, example =
-   * "id, titre, version, createur")
-   * 
-   * @ApiResponse(responseCode = "200", description = "Le formulaire créé",
-   * content = @Content(mediaType = "application/json", schema
-   * = @Schema(implementation = GetFormId.class)))
-   * 
-   * @ApiResponse(responseCode = "400", description =
-   * "Données fournies incorrectes", content = @Content(mediaType =
-   * "application/json"))
-   * 
-   * @ApiResponse(responseCode = "403", description =
-   * "Accès non autorisé ou token invalide", content = @Content(mediaType =
-   * "application/text"))
-   * 
-   * @PostMapping()
-   * 
-   * @PreAuthorize("hasAuthority('admin:create')")
-   * public ResponseEntity<Map<String, Object>> save(
-   * 
-   * @AuthenticationPrincipal UserDetails userDetails,
-   * 
-   * @RequestBody FormRequest request,
-   * 
-   * @RequestParam(required = false) String include) throws AppException {
-   * if (service.existingValidForm(request.getTitre())) {
-   * throw new AppException(400,
-   * "Une formulaire valide avec ce titre existe dans la base de données");
-   * }
-   * return ResponseEntity.ok(service.saveForm(request, include, userDetails));
-   * }
-   */
 
   /**
    * Mise à jour d'un formulaire via son id
@@ -141,7 +114,11 @@ public class FormController {
     if (request.getTitre() != null && service.existingValidForm(request.getTitre())) {
       throw new AppException(400, "Une formulaire valide avec ce titre existe dans la base de données");
     }
-    return ResponseEntity.ok(service.partialUpdateForm(id, request, include, userDetails));
+
+    // validation des champs fournis dans la requête
+    formValidator.validateData(request, ObjectUpdate.class);
+    Form form = service.partialUpdateForm(id, request, userDetails);
+    return ResponseEntity.ok(service.addUserToForm(form, include));
   }
 
   /**
@@ -177,6 +154,7 @@ public class FormController {
     boolean b = Pattern.matches("(desc|asc)[(](id|version|createdAt|updatedAt)[)]", sortBy);
     if (!b)
       throw new AppException(400, "Le champ de tri est incorrect");
+
     // Définition du paramètre de tri
     int indexStart = sortBy.indexOf("(");
     String direction = sortBy.substring(0, indexStart);
@@ -185,10 +163,29 @@ public class FormController {
 
     // Limitation nombre d'éléments retrourné
     size = (size > 50) ? 50 : size;
-
     Pageable paging = PageRequest.of(page - 1, size,
         Sort.by((Pattern.matches("asc", direction)) ? Direction.ASC : Direction.DESC, field));
-    return ResponseEntity.ok(service.search(filter, paging, include));
+
+    // Récupération des formulaires
+    Page<Form> forms = service.search(filter, paging);
+
+    // Création de la liste des formulaires
+    List<Map<String, Object>> formsWithCreateur = new ArrayList<>();
+    // boucle sur les formulaires pour ajout du créateur
+    for (Form form : forms) {
+      formsWithCreateur.add(service.addUserToForm(form, include));
+    }
+    // Création de la réponse 
+    FormsResponse response = FormsResponse.builder()
+        .nombreFormulaires(forms.getTotalElements()) // nombre de formulaires totales
+        .data(formsWithCreateur) // les formulaires
+        .page(paging.getPageNumber() + 1) // le numéro de la page retournée
+        .size(paging.getPageSize()) // le nombre d'éléments retournées
+        .hasPrevious(forms.hasPrevious()) // existe-t-il une page précédente
+        .hasNext(forms.hasNext()) // existe-t-il une page suivante
+        .build();
+
+    return ResponseEntity.ok(response);
   }
 
   /**
@@ -210,6 +207,7 @@ public class FormController {
   public ResponseEntity<Map<String, Object>> getForm(
       @PathVariable Integer id,
       @RequestParam(required = false) String include) throws NotFoundException {
-    return ResponseEntity.ok(service.getForm(id, include));
+    Form form = service.getForm(id);
+    return ResponseEntity.ok(service.addUserToForm(form, include));
   }
 }

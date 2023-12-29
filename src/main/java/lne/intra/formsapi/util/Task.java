@@ -9,20 +9,20 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import jakarta.transaction.Transactional;
-import lne.intra.formsapi.repository.AnswerRepository;
+import lne.intra.formsapi.repository.LockedAnswerRepository;
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
 public class Task {
-  private final AnswerRepository answerRepository;
+  private final LockedAnswerRepository lockedAnswerRepository;
 
   @Transactional
   @Scheduled(initialDelay = 15, fixedDelay = 15, timeUnit = TimeUnit.MINUTES)
   public void unlockAnswers() {
     Date targetTime = Calendar.getInstance().getTime();
     targetTime = DateUtils.addMinutes(targetTime, -15);
-    answerRepository.updateLocked(targetTime);
+    lockedAnswerRepository.deleteOldLocked(targetTime);
   }
 
 }

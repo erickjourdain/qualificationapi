@@ -1,9 +1,12 @@
 package lne.intra.formsapi.controller;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -13,9 +16,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,6 +35,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lne.intra.formsapi.model.Answer;
+import lne.intra.formsapi.model.LockedAnswer;
 import lne.intra.formsapi.model.Statut;
 import lne.intra.formsapi.model.User;
 import lne.intra.formsapi.model.exception.AppException;
@@ -40,8 +44,12 @@ import lne.intra.formsapi.model.openApi.GetAnswers;
 import lne.intra.formsapi.model.request.AnswerRequest;
 import lne.intra.formsapi.model.response.AnswersResponse;
 import lne.intra.formsapi.repository.AnswerRepository;
+import lne.intra.formsapi.repository.LockedAnswerRepository;
 import lne.intra.formsapi.repository.UserRepository;
 import lne.intra.formsapi.service.AnswerService;
+import lne.intra.formsapi.util.ObjectCreate;
+import lne.intra.formsapi.util.ObjectUpdate;
+import lne.intra.formsapi.util.ObjectsValidator;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -55,6 +63,8 @@ public class AnswerController {
   private final AnswerService service;
   private final AnswerRepository answerRepository;
   private final UserRepository userRepository;
+  private final LockedAnswerRepository lockedAnswerRepository;
+  private final ObjectsValidator<AnswerRequest> answerValidator;
 
   /**
    * Contrôleur de création d'un nouvelle réponse
@@ -76,7 +86,12 @@ public class AnswerController {
       @AuthenticationPrincipal UserDetails userDetails,
       @RequestBody AnswerRequest request,
       @RequestParam(required = false) String include) throws AppException {
-    return ResponseEntity.ok(service.saveAnswer(request, include, userDetails));
+    
+    // Validation des champs fournis dans la requête
+    answerValidator.validateData(request, ObjectCreate.class);
+    // Sauvegarde de la réponse
+    Answer answer = service.saveAnswer(request, userDetails);
+    return ResponseEntity.ok(service.addFieldsToAnswer(answer, include));
   }
 
   /**
@@ -119,10 +134,28 @@ public class AnswerController {
 
     // Limitation nombre d'éléments retrourné
     size = (size > 50) ? 50 : size;
-
     Pageable paging = PageRequest.of(page - 1, size,
         Sort.by((Pattern.matches("asc", direction)) ? Direction.ASC : Direction.DESC, field));
-    return ResponseEntity.ok(service.search(filter, paging, include));
+    
+    // Récupération des réponses
+    Page<Answer> answers = service.search(filter, paging);
+    
+    // Création de la liste des formulaires
+    List<Map<String, Object>> AnswersWithCreateur = new ArrayList<>();
+    // boucle sur les réponses pour ajout des informations
+    for (Answer answer : answers) {
+      AnswersWithCreateur.add(service.addFieldsToAnswer(answer, include));
+    }
+    AnswersResponse response = AnswersResponse.builder()
+        .nombreReponses(answers.getTotalElements()) // nombre de formulaires totales
+        .data(AnswersWithCreateur) // les réponses
+        .page(paging.getPageNumber() + 1) // le numéro de la page retournée
+        .size(paging.getPageSize()) // le nombre d'éléments retournées
+        .hasPrevious(answers.hasPrevious()) // existe-t-il une page précédente
+        .hasNext(answers.hasNext()) // existe-t-il une page suivante
+        .build();
+    
+    return ResponseEntity.ok(response);
   }
 
   /**
@@ -146,15 +179,19 @@ public class AnswerController {
       @RequestParam(required = false) String include) throws NotFoundException {
 
     // recherche de la réponse
-    Map<String, Object> answer = service.getAnswer(id, include);
+    Answer answer = answerRepository.findById(id)
+      .orElseThrow(() -> new AppException(400, "La réponse recherchée n'existe pas"));
     // pose d'un verrour sur la réponse
-    Boolean courante = (Boolean) answer.get("courante");
-    Boolean notLockedAt = (answer.get("lockedAt") == null);
-    if (courante && notLockedAt) {
-      service.lockAnswer(id, userDetails);
-      answer = service.getAnswer(id, include);
+    if (answer.getCourante() && answer.getLock() != null) {
+          User user = userRepository.findByLogin(userDetails.getUsername())
+        .orElseThrow(() -> new AppException(404, "Impossible de trouver l'utilisateur connecté"));
+      LockedAnswer lockedAnswer = LockedAnswer.builder()
+        .answer(answer)
+        .utilisateur(user)
+        .build();
+      lockedAnswerRepository.save(lockedAnswer);
     }
-    return ResponseEntity.ok(answer);
+    return ResponseEntity.ok(service.addFieldsToAnswer(answer, include));
   }
 
   /**
@@ -171,7 +208,7 @@ public class AnswerController {
   @ApiResponse(responseCode = "400", description = "Requête incorrecte", content = @Content(mediaType = "application/text"))
   @ApiResponse(responseCode = "404", description = "Réponse ou Créateur non trouvé dans la base", content = @Content(mediaType = "application/text"))
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
-  @PutMapping("/{id}")
+  @PatchMapping("/{id}")
   @PreAuthorize("hasAnyAuthority('admin:update','creator:update','user:update')")
   public ResponseEntity<Map<String, Object>> update(
       @AuthenticationPrincipal UserDetails userDetails,
@@ -179,14 +216,17 @@ public class AnswerController {
       @RequestBody AnswerRequest request,
       @RequestParam(required = false) String include) throws NotFoundException {
 
+    // validation des champs fournis dans la requête
+    answerValidator.validateData(request, ObjectUpdate.class);
+
     // Récupération de la réponse à modifier
-    Answer answer = answerRepository.findById(id)
-        .orElseThrow(() -> new AppException(400, "La réponse n'existe pas"));
+    Answer answer = service.getAnswer(id);
     // récupération des informations sur l'utilisateur connecté
     User user = userRepository.findByLogin(userDetails.getUsername())
         .orElseThrow(() -> new AppException(404, "Impossible de trouver l'utilisateur connecté"));
-    if (answer.getUtilisateur().equals(null)) throw new AppException(404, "Aucun verrou posé sur cet enregistrement");
-    if (user.getId() != answer.getUtilisateur().getId())
+    if (answer.getLock().equals(null)) throw new AppException(404, "Aucun verrou posé sur cet enregistrement");
+    LockedAnswer lockedAnswer = answer.getLock();
+    if (user.getId() != lockedAnswer.getUtilisateur().getId())
       throw new AppException(403, "La réponse est vérouillée par un aute utilisateur");
     // Vérification de la possibilité de modifier la réponse
     Statut statut = (Statut) answer.getStatut();
@@ -208,8 +248,8 @@ public class AnswerController {
     if (statut == Statut.TERMINE && request.getStatut() != null) {
       throw new AppException(400, "La réponse est clôturée");
     }
-
-    return ResponseEntity.ok(service.updateAnswer(id, request, include, userDetails));
+    answer = service.updateAnswer(id, request, userDetails);
+    return ResponseEntity.ok(service.addFieldsToAnswer(answer, include));
   }
 
   /**
@@ -219,12 +259,24 @@ public class AnswerController {
    * @return
    * @throws NotFoundException
    */
-  @PutMapping("/lock/{id}")
+  @Operation(summary = "Vérouillage d'une réponse", description = "Accès limité aux rôles `ADMIN`, `CREATOR` et `USER`")
+  @ApiResponse(responseCode = "200", description = "Réponse vérouillée", content = @Content(mediaType = "application/text"))
+  @ApiResponse(responseCode = "404", description = "Réponse ou Utilisateur non trouvé dans la base", content = @Content(mediaType = "application/text"))
+  @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))  
+  @PostMapping("/lock/{id}")
   @PreAuthorize("hasAnyAuthority('admin:update','creator:update','user:update')")
   public ResponseEntity<Boolean> lock(
       @AuthenticationPrincipal UserDetails userDetails,
       @PathVariable Integer id) throws NotFoundException {
-    service.lockAnswer(id, userDetails);
+    Answer answer = answerRepository.findById(id)
+      .orElseThrow(() -> new AppException(404, "La réponse recherchée n'exsite pas"));
+    User user = userRepository.findByLogin(userDetails.getUsername())
+      .orElseThrow(() -> new AppException(404, "Impossible de trouver l'utilisateur connecté"));
+    LockedAnswer lockedAnswer = LockedAnswer.builder()
+        .answer(answer)
+        .utilisateur(user)
+        .build();
+    lockedAnswerRepository.save(lockedAnswer);
     return ResponseEntity.ok(true);
   }
 
@@ -235,12 +287,19 @@ public class AnswerController {
    * @return
    * @throws NotFoundException
    */
-  @PutMapping("/unlock/{id}")
+  @Operation(summary = "Dévérouillage d'une réponse", description = "Accès limité aux rôles `ADMIN`, `CREATOR` et `USER`")
+  @ApiResponse(responseCode = "200", description = "Réponse vérouillée", content = @Content(mediaType = "application/text"))
+  @ApiResponse(responseCode = "404", description = "Réponse ou Utilisateur non trouvé dans la base", content = @Content(mediaType = "application/text"))
+  @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))  
+  @PostMapping("/unlock/{id}")
   @PreAuthorize("hasAnyAuthority('admin:update','creator:update','user:update')")
   public ResponseEntity<Boolean> unlock(
       @AuthenticationPrincipal UserDetails userDetails,
       @PathVariable Integer id) throws NotFoundException {
-    service.unlockAnswer(id, userDetails);
+    Answer answer = answerRepository.findById(id)
+      .orElseThrow(() -> new AppException(404, "La réponse recherchée n'exsite pas"));
+    if (answer.getLock() == null) throw new AppException(404, "La réponse n'est pas vérouillée");
+    lockedAnswerRepository.deleteById(answer.getLock().getAnswer().getId());
     return ResponseEntity.ok(true);
   }
 }

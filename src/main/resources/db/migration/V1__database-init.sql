@@ -1,4 +1,5 @@
-create table
+DROP TABLE IF EXISTS answer;
+CREATE TABLE
     answer (
         courante bit not null,
         createur integer,
@@ -18,7 +19,8 @@ create table
         primary key (id)
     ) engine = InnoDB;
 
-create table
+DROP TABLE IF EXISTS file;
+CREATE TABLE
     file (
         confirmed BOOLEAN DEFAULT FALSE,
         id integer not null auto_increment,
@@ -30,7 +32,8 @@ create table
         primary key (id)
     ) engine = InnoDB;
 
-create table
+DROP TABLE IF EXISTS form;
+CREATE TABLE
     form (
         createur integer,
         id integer not null auto_increment,
@@ -45,7 +48,8 @@ create table
         primary key (id)
     ) engine = InnoDB;
 
-create table
+DROP TABLE IF EXISTS token;
+CREATE TABLE
     token (
         expired BOOLEAN DEFAULT FALSE,
         id integer not null auto_increment,
@@ -58,7 +62,8 @@ create table
         primary key (id)
     ) engine = InnoDB;
 
-create table
+DROP TABLE IF EXISTS user;
+CREATE TABLE
     user (
         expired BOOLEAN DEFAULT FALSE,
         id integer not null auto_increment,
@@ -75,43 +80,42 @@ create table
         primary key (id)
     ) engine = InnoDB;
 
-alter table if exists form
-add
-    constraint UK_pnuphfim98xy6y8xtjh7g0kou unique (slug);
+ALTER TABLE IF EXISTS form
+ADD
+    CONSTRAINT UK_pnuphfim98xy6y8xtjh7g0kou UNIQUE (slug);
 
-alter table if exists user
-add
-    constraint UK_ew1hvam8uwaknuaellwhqchhb unique (login);
+ALTER TABLE IF EXISTS user
+ADD
+    CONSTRAINT UK_ew1hvam8uwaknuaellwhqchhb UNIQUE (login);
 
-alter table if exists user
-add
-    constraint UK_4purqiaifeeekn0sgxa1lignd unique (slug);
+ALTER TABLE IF EXISTS user
+ADD
+    CONSTRAINT UK_4purqiaifeeekn0sgxa1lignd UNIQUE (slug);
 
-alter table if exists answer
-add
-    constraint FKclogehral2c3cnykht3cck0ob foreign key (createur) references user (id);
+ALTER TABLE IF EXISTS answer
+ADD
+    CONSTRAINT FKclogehral2c3cnykht3cck0ob FOREIGN KEY (createur) REFERENCES user (id);
 
-alter table if exists answer
-add
-    constraint FKhb4wixuvuplam2c6p81wq44df foreign key (form_id) references form (id);
+ALTER TABLE IF EXISTS answer
+ADD
+    CONSTRAINT FKhb4wixuvuplam2c6p81wq44df FOREIGN KEY (form_id) REFERENCES form (id);
 
-alter table if exists answer
-add
-    constraint FK9c30mxloskapplq1g5lakwlb9 foreign key (gestionnaire) references user (id);
+ALTER TABLE IF EXISTS answer
+ADD
+    CONSTRAINT FK9c30mxloskapplq1g5lakwlb9 FOREIGN KEY (gestionnaire) REFERENCES user (id);
 
-alter table if exists answer
-add
-    constraint FKko9rjeb96wacb77a3h77dvi7s foreign key (locked_by) references user (id);
+ALTER TABLE IF EXISTS answer
+ADD
+    CONSTRAINT FKko9rjeb96wacb77a3h77dvi7s FOREIGN KEY (locked_by) REFERENCES user (id);
 
-alter table if exists file
-add
-    constraint FKnn409o9v7agdo9fyihoe0x909 foreign key (proprietaire) references user (id);
+ALTER TABLE IF EXISTS file
+ADD
+    CONSTRAINT FKnn409o9v7agdo9fyihoe0x909 FOREIGN KEY (proprietaire) REFERENCES user (id);
 
-alter table if exists form
-add
-    constraint FKg6ox68oofyoy5bqdmegvjb36f foreign key (createur) references user (id);
+ALTER TABLE IF EXISTS form
+ADD
+    CONSTRAINT FKg6ox68oofyoy5bqdmegvjb36f FOREIGN KEY (createur) REFERENCES user (id);
 
-alter table
-    if exists token
-add
-    constraint FKe32ek7ixanakfqsdaokm4q9y2 foreign key (user_id) references user (id);
+ALTER TABLE IF EXISTS token
+ADD
+    CONSTRAINT FKe32ek7ixanakfqsdaokm4q9y2 FOREIGN KEY (user_id) REFERENCES user (id);
