@@ -43,10 +43,9 @@ import lne.intra.formsapi.model.openApi.GetAnswerId;
 import lne.intra.formsapi.model.openApi.GetAnswers;
 import lne.intra.formsapi.model.request.AnswerRequest;
 import lne.intra.formsapi.model.response.AnswersResponse;
-import lne.intra.formsapi.repository.AnswerRepository;
-import lne.intra.formsapi.repository.LockedAnswerRepository;
-import lne.intra.formsapi.repository.UserRepository;
 import lne.intra.formsapi.service.AnswerService;
+import lne.intra.formsapi.service.LockedAnswerService;
+import lne.intra.formsapi.service.UserService;
 import lne.intra.formsapi.util.ObjectCreate;
 import lne.intra.formsapi.util.ObjectUpdate;
 import lne.intra.formsapi.util.ObjectsValidator;
@@ -61,9 +60,8 @@ import lombok.RequiredArgsConstructor;
 public class AnswerController {
 
   private final AnswerService service;
-  private final AnswerRepository answerRepository;
-  private final UserRepository userRepository;
-  private final LockedAnswerRepository lockedAnswerRepository;
+  private final UserService userService;
+  private final LockedAnswerService lockedAnswerService;
   private final ObjectsValidator<AnswerRequest> answerValidator;
 
   /**
@@ -140,7 +138,7 @@ public class AnswerController {
     // Récupération des réponses
     Page<Answer> answers = service.search(filter, paging);
     
-    // Création de la liste des formulaires
+    // Création de la liste des réponses
     List<Map<String, Object>> AnswersWithCreateur = new ArrayList<>();
     // boucle sur les réponses pour ajout des informations
     for (Answer answer : answers) {
@@ -179,17 +177,15 @@ public class AnswerController {
       @RequestParam(required = false) String include) throws NotFoundException {
 
     // recherche de la réponse
-    Answer answer = answerRepository.findById(id)
-      .orElseThrow(() -> new AppException(400, "La réponse recherchée n'existe pas"));
+    Answer answer = service.getAnswer(id);
     // pose d'un verrour sur la réponse
     if (answer.getCourante() && answer.getLock() != null) {
-          User user = userRepository.findByLogin(userDetails.getUsername())
-        .orElseThrow(() -> new AppException(404, "Impossible de trouver l'utilisateur connecté"));
+          User user = userService.getByLogin(userDetails.getUsername());
       LockedAnswer lockedAnswer = LockedAnswer.builder()
         .answer(answer)
         .utilisateur(user)
         .build();
-      lockedAnswerRepository.save(lockedAnswer);
+      lockedAnswerService.insert(lockedAnswer);
     }
     return ResponseEntity.ok(service.addFieldsToAnswer(answer, include));
   }
@@ -222,8 +218,7 @@ public class AnswerController {
     // Récupération de la réponse à modifier
     Answer answer = service.getAnswer(id);
     // récupération des informations sur l'utilisateur connecté
-    User user = userRepository.findByLogin(userDetails.getUsername())
-        .orElseThrow(() -> new AppException(404, "Impossible de trouver l'utilisateur connecté"));
+    User user = userService.getByLogin(userDetails.getUsername());
     if (answer.getLock().equals(null)) throw new AppException(404, "Aucun verrou posé sur cet enregistrement");
     LockedAnswer lockedAnswer = answer.getLock();
     if (user.getId() != lockedAnswer.getUtilisateur().getId())
@@ -268,15 +263,13 @@ public class AnswerController {
   public ResponseEntity<Boolean> lock(
       @AuthenticationPrincipal UserDetails userDetails,
       @PathVariable Integer id) throws NotFoundException {
-    Answer answer = answerRepository.findById(id)
-      .orElseThrow(() -> new AppException(404, "La réponse recherchée n'exsite pas"));
-    User user = userRepository.findByLogin(userDetails.getUsername())
-      .orElseThrow(() -> new AppException(404, "Impossible de trouver l'utilisateur connecté"));
+    Answer answer = service.getAnswer(id);
+    User user = userService.getByLogin(userDetails.getUsername());
     LockedAnswer lockedAnswer = LockedAnswer.builder()
         .answer(answer)
         .utilisateur(user)
         .build();
-    lockedAnswerRepository.save(lockedAnswer);
+    lockedAnswerService.insert(lockedAnswer);
     return ResponseEntity.ok(true);
   }
 
@@ -296,10 +289,9 @@ public class AnswerController {
   public ResponseEntity<Boolean> unlock(
       @AuthenticationPrincipal UserDetails userDetails,
       @PathVariable Integer id) throws NotFoundException {
-    Answer answer = answerRepository.findById(id)
-      .orElseThrow(() -> new AppException(404, "La réponse recherchée n'exsite pas"));
+    Answer answer = service.getAnswer(id);
     if (answer.getLock() == null) throw new AppException(404, "La réponse n'est pas vérouillée");
-    lockedAnswerRepository.deleteById(answer.getLock().getAnswer().getId());
+    lockedAnswerService.deleteByAnwser(answer);
     return ResponseEntity.ok(true);
   }
 }

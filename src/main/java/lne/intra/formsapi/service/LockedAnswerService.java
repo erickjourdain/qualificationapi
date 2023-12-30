@@ -12,18 +12,18 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class LockedAnswerService {
-  private final LockedAnswerRepository lockedAnswerRepository;
+  private final LockedAnswerRepository repository;
 
   public Optional<LockedAnswer> getByAnswer(Answer answer) {
-    return lockedAnswerRepository.findByAnswer(answer);
+    return repository.findByAnswer(answer);
   }
 
   public Boolean deleteByAnwser(Answer answer) {
-    Long nbDeleted = lockedAnswerRepository.deleteByAnswer(answer);
+    Long nbDeleted = repository.deleteByAnswer(answer);
     return nbDeleted > 0;
   }
 
   public LockedAnswer insert(LockedAnswer lockedAnswer) {
-    return lockedAnswerRepository.save(lockedAnswer);
+    return repository.save(lockedAnswer);
   }
 }

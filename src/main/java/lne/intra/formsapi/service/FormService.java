@@ -20,7 +20,6 @@ import lne.intra.formsapi.model.User;
 import lne.intra.formsapi.model.exception.AppException;
 import lne.intra.formsapi.model.request.FormRequest;
 import lne.intra.formsapi.repository.FormRepository;
-import lne.intra.formsapi.repository.UserRepository;
 import lne.intra.formsapi.util.Slugify;
 import lombok.RequiredArgsConstructor;
 
@@ -28,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class FormService {
 
-  private final UserRepository userRepository;
+  private final UserService userService;
   private final FormRepository repository;
 
   /**
@@ -41,8 +40,7 @@ public class FormService {
    */
   public Map<String, Object> addUserToForm(Form form, String include) throws AppException {
     // recherche du créateur du formulaire dans la base
-    User createur = userRepository.findById(form.getCreateur().getId())
-        .orElseThrow(() -> new AppException(404, "Impossible de trouver le créateur"));
+    User createur = userService.getUser(form.getCreateur().getId());
 
     Map<String, Object> user = new HashMap<>();
     Map<String, Object> response = new HashMap<>();
@@ -98,8 +96,7 @@ public class FormService {
       throws AppException {
     final Slugify slug = Slugify.builder().build();
     // récupération des informations sur l'utilisateur connecté
-    User createur = userRepository.findByLogin(userDetails.getUsername())
-        .orElseThrow(() -> new AppException(404, "Impossible de trouver l'utilisateur connecté'"));
+    User createur = userService.getByLogin(userDetails.getUsername());
     // création de la nouvelle entrée
     Form form = Form.builder()
         .titre(request.getTitre().trim())
@@ -140,8 +137,7 @@ public class FormService {
         .ifPresent(res -> form.setDescription(res));
     // Mise à jour du créateur
     // récupération des informations sur l'utilisateur connecté
-    User createur = userRepository.findByLogin(userDetails.getUsername())
-        .orElseThrow(() -> new AppException(404, "Impossible de trouver l'utilisateur connecté'"));
+    User createur = userService.getByLogin(userDetails.getUsername());
     if (createur.getId() != form.getCreateur().getId())
       form.setCreateur(createur);
     // Mise à jour du formulaire Tripetto

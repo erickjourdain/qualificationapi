@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -21,11 +22,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lne.intra.formsapi.model.Role;
+import lne.intra.formsapi.model.User;
 import lne.intra.formsapi.model.exception.AppException;
 import lne.intra.formsapi.model.openApi.GetUserId;
 import lne.intra.formsapi.model.request.SignInRequest;
 import lne.intra.formsapi.model.request.UserRequest;
-import lne.intra.formsapi.model.response.UsersResponse;
 import lne.intra.formsapi.service.UserService;
 import lombok.RequiredArgsConstructor;
 
@@ -50,13 +51,14 @@ public class SignInController {
     // vérification clef d'enregistrement
     if (!request.getSecret().equals(env.getProperty("lne.intra.formsapi.signinkey")))
       throw new AppException(400, "La clef d'enregistrement est incorrecte");
-    var newUser = UserRequest.builder()
+    UserRequest userRequest = UserRequest.builder()
         .nom(request.getNom().trim())
         .prenom(request.getPrenom().trim())
         .login(request.getLogin().trim())
         .password(request.getPassword().trim())
         .build();
-    return ResponseEntity.ok(userService.register(newUser, include));
+    User user = userService.register(userRequest);
+    return ResponseEntity.ok(userService.setUserResponse(user, include));
   }
 
   @Operation(summary = "Requête d'enregistrement de l'administrateur")
@@ -73,10 +75,10 @@ public class SignInController {
     // vérification présence d'utilisateur dans la base
     Pageable paging = PageRequest.of(0, 10,
         Sort.by(Direction.ASC, "id"));
-    UsersResponse usersResponse = userService.search(null, paging, "id");
-    if (usersResponse.getNombreUsers() > 0)
+    Page<User> users = userService.search(null, paging);
+    if (users.getNumberOfElements() > 0)
       throw new AppException(400, "Il existe déjà des utilisateurs dans la base de données");
-    var newUser = UserRequest.builder()
+    UserRequest newUser = UserRequest.builder()
         .nom(request.getNom().trim())
         .prenom(request.getPrenom().trim())
         .login(request.getLogin().trim())
@@ -84,6 +86,7 @@ public class SignInController {
         .role(Role.ADMIN)
         .password(request.getPassword().trim())
         .build();
-    return ResponseEntity.ok(userService.register(newUser, include));
+    User admin = userService.register(newUser);
+    return ResponseEntity.ok(userService.setUserResponse(admin, include));
   }
 }

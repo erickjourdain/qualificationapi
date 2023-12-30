@@ -23,9 +23,6 @@ import lne.intra.formsapi.model.User;
 import lne.intra.formsapi.model.exception.AppException;
 import lne.intra.formsapi.model.request.AnswerRequest;
 import lne.intra.formsapi.repository.AnswerRepository;
-import lne.intra.formsapi.repository.FormRepository;
-import lne.intra.formsapi.repository.LockedAnswerRepository;
-import lne.intra.formsapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -33,9 +30,9 @@ import lombok.RequiredArgsConstructor;
 public class AnswerService {
 
   private final AnswerRepository answerRepository;
-  private final UserRepository userRepository;
-  private final FormRepository formRepository;
-  private final LockedAnswerRepository lockedAnswerRepository;
+  private final UserService userService;
+  private final FormService formService;
+  private final LockedAnswerService lockedAnswerService;
 
   /**
    * Ajout des champs à retourner à la réponse
@@ -59,8 +56,7 @@ public class AnswerService {
     // ajout du champ créateur
     if (fields.isEmpty() || fields.contains("createur")) {
       // recherche du créateur de la réponse dans la base
-      User createur = userRepository.findById(answer.getCreateur().getId())
-          .orElseThrow(() -> new AppException(404, "Impossible de trouver le créateur"));
+      User createur = userService.getUser(answer.getCreateur().getId());
       user1.put("id", createur.getId());
       user1.put("prenom", createur.getPrenom());
       user1.put("nom", createur.getNom());
@@ -71,8 +67,7 @@ public class AnswerService {
     // ajout du champ gestionnaire
     if (fields.isEmpty() || fields.contains("gestionnaire")) {
       // recherche du gestionnaire courant dans la base
-      User gestionnaire = userRepository.findById(answer.getGestionnaire().getId())
-          .orElseThrow(() -> new AppException(404, "Impossible de trouver le gestionnaire"));
+      User gestionnaire = userService.getUser(answer.getGestionnaire().getId());
       user2.put("id", gestionnaire.getId());
       user2.put("prenom", gestionnaire.getPrenom());
       user2.put("nom", gestionnaire.getNom());
@@ -83,21 +78,16 @@ public class AnswerService {
     // ajout du champ locked
     if (fields.isEmpty() || fields.contains("lock")) {
       if (answer.getLock() != null) {
-        // recherche de l'utilisateur courant dans la base
-        LockedAnswer lockedAnswer = lockedAnswerRepository.findByAnswer(answer)
-            .orElseThrow(
-                () -> new AppException(404, "Impossible de trouver l'enregistrement de vérouillage recherché"));
+        Optional<LockedAnswer> lockedAnswer = lockedAnswerService.getByAnswer(answer);
         response.put("lock", lockedAnswer);
       } else
         response.put("lock", null);
-
     }
 
     // ajout du champ formulaire
     if (fields.isEmpty() || fields.contains("formulaire")) {
       // recherche du formulaire dans la base
-      Form formulaire = formRepository.findById(answer.getFormulaire().getId())
-          .orElseThrow(() -> new AppException(404, "Impossible de trouver le formulaire"));
+      Form formulaire = formService.getForm(answer.getFormulaire().getId());
       form.put("id", formulaire.getId());
       form.put("formulaire", formulaire.getFormulaire());
       form.put("titre", formulaire.getTitre());
@@ -157,11 +147,9 @@ public class AnswerService {
   public Answer saveAnswer(AnswerRequest request, UserDetails userDetails)
       throws AppException {
     // récupération des informations sur l'utilisateur connecté
-    User createur = userRepository.findByLogin(userDetails.getUsername())
-        .orElseThrow(() -> new AppException(404, "Impossible de trouver l'utilisateur connecté'"));
+    User createur = userService.getByLogin(userDetails.getUsername());
     // récupération du formulaire
-    Form formulaire = formRepository.findById(request.getFormulaire())
-        .orElseThrow(() -> new AppException(404, "Impossible de trouver le formulaire"));
+    Form formulaire = formService.getForm(request.getFormulaire());
     // création de la nouvelle entrée
     Answer answer = Answer.builder()
         .uuid(UUID.randomUUID().toString())
@@ -208,8 +196,7 @@ public class AnswerService {
           answer.setStatut(res);
         });
     // récupération des informations sur l'utilisateur connecté
-    User user = userRepository.findByLogin(userDetails.getUsername())
-        .orElseThrow(() -> new AppException(404, "Impossible de trouver l'utilisateur connecté'"));
+    User user = userService.getByLogin(userDetails.getUsername());
     // Mise à jour du gestionnaire
     answer.setGestionnaire(user);
     // Mise à jour des données et de la réponse

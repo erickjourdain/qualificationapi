@@ -1,9 +1,12 @@
 package lne.intra.formsapi.controller;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -38,8 +41,8 @@ import lne.intra.formsapi.model.openApi.GetUserId;
 import lne.intra.formsapi.model.openApi.GetUsers;
 import lne.intra.formsapi.model.request.UserRequest;
 import lne.intra.formsapi.model.response.UsersResponse;
-import lne.intra.formsapi.repository.UserRepository;
 import lne.intra.formsapi.service.UserService;
+import lne.intra.formsapi.util.ObjectsValidator;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -51,7 +54,7 @@ import lombok.RequiredArgsConstructor;
 public class UsersController {
 
   private final UserService service;
-  private final UserRepository userRepository;
+  private final ObjectsValidator<UserRequest> registerRequestValidator;
 
   /**
    * Création d'un nouvel utilisateur
@@ -68,9 +71,12 @@ public class UsersController {
   public ResponseEntity<Map<String, Object>> register(
       @RequestBody UserRequest request,
       @RequestParam(required = false) String include) throws AppException {
-    Map<String, Object> rep = service.register(request, include);
-    service.validate((Integer) rep.get("id"), include);
-    return ResponseEntity.ok(service.register(request, include));
+    // validation des champs fournis dans la requête
+    registerRequestValidator.validate(request);
+    // Enregistrement de l'utilisateur
+    User user = service.register(request);
+    service.validate(user.getId());
+    return ResponseEntity.ok(service.setUserResponse(user, include));
   }
 
   /**
@@ -112,10 +118,26 @@ public class UsersController {
 
     // Limitation nombre d'éléments retrourné
     size = (size > 50) ? 50 : size;
-
+    // Définition des paramètres de pagination
     Pageable paging = PageRequest.of(page - 1, size,
         Sort.by((Pattern.matches("asc", direction)) ? Direction.ASC : Direction.DESC, field));
-    return ResponseEntity.ok(service.search(filter, paging, include));
+    Page<User> users = service.search(filter, paging);
+    
+    // Création de la liste des utilisateurs
+    List<Map<String, Object>> usersData = new ArrayList<>();
+    for (User user : users) {
+      usersData.add(service.setUserResponse(user, include));
+    }
+    // Construction de la réponse
+    UsersResponse response = UsersResponse.builder()
+        .nombreUsers(users.getTotalElements())
+        .data(usersData)
+        .page(paging.getPageNumber() + 1)
+        .size(paging.getPageSize())
+        .hasPrevious(users.hasPrevious())
+        .hasNext(users.hasNext())
+        .build();
+    return ResponseEntity.ok(response);
   }
 
   /**
@@ -134,7 +156,8 @@ public class UsersController {
   public ResponseEntity<Map<String, Object>> getUser(
       @PathVariable Integer id,
       @RequestParam(required = false) String include) throws NotFoundException {
-    return ResponseEntity.ok(service.getUser(id, include));
+    User user = service.getUser(id);
+    return ResponseEntity.ok(service.setUserResponse(user, include));
   }
 
   /**
@@ -149,7 +172,8 @@ public class UsersController {
   @PreAuthorize("hasAnyAuthority('admin:read','creator:read','user:read','reader:read')")
   public ResponseEntity<Map<String, Object>> getMe(@AuthenticationPrincipal UserDetails userDetails,
       @RequestParam(required = false) String include) {
-    return ResponseEntity.ok(service.getByLogin(userDetails.getUsername(), include));
+    User user = service.getByLogin(userDetails.getUsername());
+    return ResponseEntity.ok(service.setUserResponse(user, include));
   }
 
   /**
@@ -168,7 +192,8 @@ public class UsersController {
   public ResponseEntity<Map<String, Object>> setAdmin(
       @PathVariable Integer id,
       @RequestParam(required = false) String include) throws NotFoundException {
-    return ResponseEntity.ok(service.setAdmin(id, include));
+    User user = service.setAdmin(id);
+    return ResponseEntity.ok(service.setUserResponse(user, include));
   }
 
   /**
@@ -194,11 +219,11 @@ public class UsersController {
       throws NotFoundException {
 
     // récupération des informations sur l'utilisateur connecté
-    User user = userRepository.findByLogin(userDetails.getUsername())
-        .orElseThrow(() -> new AppException(404, "Impossible de trouver l'utilisateur connecté'"));
+    User user =  service.getByLogin(userDetails.getUsername());
     if (!user.getId().equals(id) && user.getRole() != Role.ADMIN)
       throw new AppException(403, "Vous ne disposez pas des droits nécessaires pour effectuer cette mise à jour");
-    return ResponseEntity.ok(service.update(id, request, include));
+    User updatedUser = service.update(id, request);
+    return ResponseEntity.ok(service.setUserResponse(updatedUser, include));
   }
 
   /**
@@ -218,7 +243,8 @@ public class UsersController {
       @PathVariable Integer id,
       @RequestParam(required = false) String include)
       throws NotFoundException {
-    return ResponseEntity.ok(service.validate(id, include));
+    User user = service.validate(id);
+    return ResponseEntity.ok(service.setUserResponse(user, include));
   }
 
   /**
@@ -238,7 +264,8 @@ public class UsersController {
       @PathVariable Integer id,
       @RequestParam(required = false) String include)
       throws NotFoundException {
-    return ResponseEntity.ok(service.lock(id, include));
+    User user = service.lock(id);
+    return ResponseEntity.ok(service.setUserResponse(user, include));
   }  
 
 }
