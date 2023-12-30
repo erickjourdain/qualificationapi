@@ -18,6 +18,7 @@ public class AnswerResponse {
   private Integer demande;
   private Integer opportunite;
   private Statut statut;
+  private LockedResponse lock;
   private Date createdAt;
   private Date updatedAt;
 }

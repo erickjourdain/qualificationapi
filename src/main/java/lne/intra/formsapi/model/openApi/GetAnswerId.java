@@ -16,6 +16,7 @@ public class GetAnswerId {
   private GetFormId formulaire;
   private String demande;
   private String opportunite;
+  private LockId lock;
   private Date createdAt;
   private Date updatedAt;
 }
