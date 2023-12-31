@@ -17,7 +17,7 @@ public interface LockedAnswerRepository extends JpaRepository<LockedAnswer, Inte
   Long deleteByAnswer(Answer answer);
 
   @Modifying
-  @Query("delete LockedAnswer la where la.lockedAt <= : timestamp")
+  @Query("delete LockedAnswer la where la.lockedAt <= :timestamp")
   void deleteOldLocked(Date timestamp);
   
 }

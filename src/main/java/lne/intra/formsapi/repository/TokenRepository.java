@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import lne.intra.formsapi.model.Token;
@@ -15,6 +16,10 @@ public interface TokenRepository extends JpaRepository<Token, Integer>{
       where u.id = :userId and (t.expired = false or t.revoked = false)
       """)
   List<Token> findAllTokensByUser(Integer userId);
+
+  @Modifying
+  @Query("delete Token t where t.expired = true or t.revoked = true")
+  void deleteOldToken();
 
   Optional<Token> findByToken(String token);
 }

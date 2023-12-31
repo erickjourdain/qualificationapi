@@ -22,7 +22,3 @@ alter table
     if exists locked_answer
 add
     constraint FKso327ogpdhuymy9dnj5we4fa foreign key (answer_id) references answer (id);
-
-alter table if exists answer
-add
-    constraint FKmi9bppj9qkp6spm9yw2kfpe6 foreign key (locked_id) references answer (id);

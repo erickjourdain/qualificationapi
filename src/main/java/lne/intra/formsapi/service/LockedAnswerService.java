@@ -18,12 +18,13 @@ public class LockedAnswerService {
     return repository.findByAnswer(answer);
   }
 
-  public Boolean deleteByAnwser(Answer answer) {
-    Long nbDeleted = repository.deleteByAnswer(answer);
-    return nbDeleted > 0;
+  public Boolean delete(Integer id) {
+    repository.deleteById(id);
+    return true;
   }
 
   public LockedAnswer insert(LockedAnswer lockedAnswer) {
     return repository.save(lockedAnswer);
   }
+
 }

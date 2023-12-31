@@ -16,7 +16,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -54,10 +53,6 @@ public class Answer {
   @Enumerated(EnumType.STRING)
   @Column(columnDefinition = "VARCHAR(55) DEFAULT 'BROUILLON'")
   @Builder.Default private Statut statut = Statut.BROUILLON;
-
-  @OneToOne
-  @JoinColumn(name = "locked_id")
-  private LockedAnswer lock;
 
   @JsonBackReference
   @ManyToOne

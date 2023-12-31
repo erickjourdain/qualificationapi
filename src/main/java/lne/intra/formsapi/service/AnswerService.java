@@ -43,10 +43,10 @@ public class AnswerService {
    * @throws AppException
    */
   public Map<String, Object> addFieldsToAnswer(Answer answer, String include) throws AppException {
-    Map<String, Object> user1 = new HashMap<>();
-    Map<String, Object> user2 = new HashMap<>();
+    Map<String, Object> user = new HashMap<>();
     Map<String, Object> form = new HashMap<>();
     Map<String, Object> response = new HashMap<>();
+    Map<String, Object> lock = new HashMap<>();
 
     // création de la liste des champs à retourner par la requête
     List<String> fields = new ArrayList<String>();
@@ -57,31 +57,43 @@ public class AnswerService {
     if (fields.isEmpty() || fields.contains("createur")) {
       // recherche du créateur de la réponse dans la base
       User createur = userService.getUser(answer.getCreateur().getId());
-      user1.put("id", createur.getId());
-      user1.put("prenom", createur.getPrenom());
-      user1.put("nom", createur.getNom());
-      user1.put("role", createur.getRole());
-      response.put("createur", user1);
+      user.clear();
+      user.put("id", createur.getId());
+      user.put("prenom", createur.getPrenom());
+      user.put("nom", createur.getNom());
+      user.put("role", createur.getRole());
+      response.put("createur", user);
     }
 
     // ajout du champ gestionnaire
     if (fields.isEmpty() || fields.contains("gestionnaire")) {
       // recherche du gestionnaire courant dans la base
       User gestionnaire = userService.getUser(answer.getGestionnaire().getId());
-      user2.put("id", gestionnaire.getId());
-      user2.put("prenom", gestionnaire.getPrenom());
-      user2.put("nom", gestionnaire.getNom());
-      user2.put("role", gestionnaire.getRole());
-      response.put("gestionnaire", user2);
+      user.clear();
+      user.put("id", gestionnaire.getId());
+      user.put("prenom", gestionnaire.getPrenom());
+      user.put("nom", gestionnaire.getNom());
+      user.put("role", gestionnaire.getRole());
+      response.put("gestionnaire", user);
     }
 
     // ajout du champ locked
     if (fields.isEmpty() || fields.contains("lock")) {
-      if (answer.getLock() != null) {
-        Optional<LockedAnswer> lockedAnswer = lockedAnswerService.getByAnswer(answer);
-        response.put("lock", lockedAnswer);
-      } else
-        response.put("lock", null);
+      Optional<LockedAnswer> lockedAnswer = lockedAnswerService.getByAnswer(answer);
+      lockedAnswer.ifPresentOrElse(
+          l -> {
+            User lockedBy = userService.getUser(l.getUtilisateur().getId());
+            lock.put("id", l.getId());
+            lock.put("lockedAt", l.getLockedAt());
+            user.clear();
+            user.put("id", lockedBy.getId());
+            user.put("prenom", lockedBy.getPrenom());
+            user.put("nom", lockedBy.getNom());
+            user.put("role", lockedBy.getRole());
+            lock.put("utilisateur", user);
+            response.put("lock", lock);
+          },
+          () -> response.put("lock", null));
     }
 
     // ajout du champ formulaire

@@ -2,6 +2,8 @@ package lne.intra.formsapi.model;
 
 import java.util.Date;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Column;
@@ -29,6 +31,7 @@ public class LockedAnswer {
   private Integer id;
 
   @Column(columnDefinition = "DATETIME DEFAULT CURRENT_DATE")
+  @CreationTimestamp
   private Date lockedAt;
 
   @OneToOne

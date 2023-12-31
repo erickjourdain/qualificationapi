@@ -10,12 +10,14 @@ import org.springframework.stereotype.Component;
 
 import jakarta.transaction.Transactional;
 import lne.intra.formsapi.repository.LockedAnswerRepository;
+import lne.intra.formsapi.repository.TokenRepository;
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
 public class Task {
   private final LockedAnswerRepository lockedAnswerRepository;
+  private final TokenRepository tokenRepository;
 
   @Transactional
   @Scheduled(initialDelay = 15, fixedDelay = 15, timeUnit = TimeUnit.MINUTES)
@@ -25,4 +27,9 @@ public class Task {
     lockedAnswerRepository.deleteOldLocked(targetTime);
   }
 
+  @Transactional
+  @Scheduled(initialDelay = 12, fixedDelay = 12, timeUnit = TimeUnit.HOURS)
+  public void deleteToken() {
+    tokenRepository.deleteOldToken();
+  }
 }
