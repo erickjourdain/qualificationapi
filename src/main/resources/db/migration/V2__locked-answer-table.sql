@@ -2,6 +2,8 @@ alter table answer drop Foreign Key FKko9rjeb96wacb77a3h77dvi7s;
 
 alter table answer drop column locked_by;
 
+alter table answer drop column locked_at;
+
 alter table answer add column (locked_id integer);
 
 create table
