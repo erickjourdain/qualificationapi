@@ -10,6 +10,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -30,8 +31,10 @@ public class UserService {
   private final UserRepository repository;
   private final PasswordEncoder passwordEncoder;
 
-  public Map<String, Object> setUserResponse(User user, String include) {
+  public Map<String, Object> setUserResponse(User user, String include, UserDetails userDetails) {
     Map<String, Object> response = new HashMap<>();
+
+    User logUser = getByLogin(userDetails.getUsername());
 
     // création de la liste des champs à retourner par la requête
     List<String> fields = new ArrayList<String>();
@@ -46,19 +49,19 @@ public class UserService {
       response.put("prenom", user.getPrenom());
     if (fields.isEmpty() || fields.contains("nom"))
       response.put("nom", user.getNom());
-    if (fields.isEmpty() || fields.contains("login"))
+    if ((fields.isEmpty() || fields.contains("login")) && logUser.getRole() == Role.ADMIN)
       response.put("login", user.getLogin());
-    if (fields.isEmpty() || fields.contains("role"))
+    if ((fields.isEmpty() || fields.contains("role")) && logUser.getRole() == Role.ADMIN)
       response.put("role", user.getRole());
-    if (fields.isEmpty() || fields.contains("valide"))
-      response.put("valide", user.getValidated());
-    if (fields.isEmpty() || fields.contains("bloque"))
-      response.put("bloque", user.getLocked());
+    if ((fields.isEmpty() || fields.contains("validated")) && logUser.getRole() == Role.ADMIN)
+      response.put("validated", user.getValidated());
+    if ((fields.isEmpty() || fields.contains("locked")) && logUser.getRole() == Role.ADMIN)
+      response.put("locked", user.getLocked());
     if (fields.isEmpty() || fields.contains("slug"))
       response.put("slug", user.getSlug());
-    if (fields.isEmpty() || fields.contains("createdAt"))
+    if ((fields.isEmpty() || fields.contains("createdAt")) && logUser.getRole() == Role.ADMIN)
       response.put("createdAt", user.getCreatedAt());
-    if (fields.isEmpty() || fields.contains("updatedAt"))
+    if ((fields.isEmpty() || fields.contains("updatedAt")) && logUser.getRole() == Role.ADMIN)
       response.put("updatedAt", user.getUpdatedAt());
 
     return response;
@@ -82,7 +85,7 @@ public class UserService {
    * @param paging  numéro de la page
    * @return
    */
-  public Page<User> search(@Filter Specification<User> spec, Pageable paging) {
+  public Page<User> search(@Filter Specification<User> spec, Pageable paging, UserDetails userDetails) {
     Page<User> users = repository.findAll(spec, paging);    
     return users;
   }
@@ -119,9 +122,9 @@ public class UserService {
     final Slugify slug = Slugify.builder().build();
     // création du nouvel utilisatuer avec les données fournies
     User user = User.builder()
-        .prenom(request.getPrenom())
-        .nom(request.getNom())
-        .login(request.getLogin())
+        .prenom(request.getPrenom().trim().toLowerCase())
+        .nom(request.getNom().trim().toUpperCase())
+        .login(request.getLogin().trim().toLowerCase())
         .password(passwordEncoder.encode(request.getPassword()))
         .slug(slug.slugify(request.getPrenom().trim()+" "+request.getNom().trim()))
         .role(Role.READER)
@@ -144,21 +147,21 @@ public class UserService {
     // Mise à jour des données
     Optional.ofNullable(request.getNom())
         .ifPresent(res -> {
-          user.setNom(res);
+          user.setNom(res.trim().toUpperCase());
         });
     Optional.ofNullable(request.getPrenom())
         .ifPresent(res -> {
-          user.setPrenom(res);
+          user.setPrenom(res.trim().toLowerCase());
         });
     Optional.ofNullable(request.getRole())
         .ifPresent(res -> {
           user.setRole(res);
         });
-    Optional.ofNullable(request.getValide())
+    Optional.ofNullable(request.getValidated())
         .ifPresent(res -> {
           user.setValidated(res);
         });
-    Optional.ofNullable(request.getBloque())
+    Optional.ofNullable(request.getLocked())
         .ifPresent(res -> {
           user.setLocked(res);
         });

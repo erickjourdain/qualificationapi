@@ -61,7 +61,7 @@ public class AnswerService {
       user.put("id", createur.getId());
       user.put("prenom", createur.getPrenom());
       user.put("nom", createur.getNom());
-      user.put("role", createur.getRole());
+      //user.put("role", createur.getRole());
       response.put("createur", user);
     }
 
@@ -73,7 +73,7 @@ public class AnswerService {
       user.put("id", gestionnaire.getId());
       user.put("prenom", gestionnaire.getPrenom());
       user.put("nom", gestionnaire.getNom());
-      user.put("role", gestionnaire.getRole());
+      //user.put("role", gestionnaire.getRole());
       response.put("gestionnaire", user);
     }
 

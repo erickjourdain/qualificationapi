@@ -121,7 +121,7 @@ public class AnswerController {
       @RequestParam(defaultValue = "10") Integer size,
       @RequestParam(defaultValue = "asc(id)") String sortBy,
       @RequestParam(required = false) String include,
-      FilterSpecification<Answer> filter) throws NotFoundException {
+      @RequestParam(required = false) FilterSpecification<Answer> filter) throws NotFoundException {
 
     // Test paramètre de tri
     boolean b = Pattern.matches("(desc|asc)[(](id|uuid|version|createdAt|updatedAt)[)]", sortBy);

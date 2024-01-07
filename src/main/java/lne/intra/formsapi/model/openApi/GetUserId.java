@@ -10,6 +10,6 @@ public class GetUserId {
   private String nom;
   private String login;
   private Role role;
-  private Boolean bloque;
-  private Boolean valide;
+  private Boolean locked;
+  private Boolean validated;
 }

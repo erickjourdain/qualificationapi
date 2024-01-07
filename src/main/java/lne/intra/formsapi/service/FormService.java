@@ -55,7 +55,7 @@ public class FormService {
       user.put("id", createur.getId());
       user.put("prenom", createur.getPrenom());
       user.put("nom", createur.getNom());
-      user.put("role", createur.getRole());
+      //user.put("role", createur.getRole());
     }
 
     // ajout des différents champs à retourner en fonction de la demande exposée

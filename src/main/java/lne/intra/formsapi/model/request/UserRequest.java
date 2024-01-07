@@ -37,6 +37,6 @@ public class UserRequest {
     private String password;
 
     private Role role;
-    private Boolean valide;
-    private Boolean bloque;
+    private Boolean validated;
+    private Boolean locked;
 }

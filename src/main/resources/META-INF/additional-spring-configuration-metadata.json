@@ -28,5 +28,10 @@
     "name": "lne.intra.formsapi.signinkey",
     "type": "java.lang.String",
     "description": "Clef à fournir lors d'une demande d'inscription'"
+  },
+  {
+    "name": "lne.intra.formsapi.server",
+    "type": "java.lang.String",
+    "description": "Adresse du serveur"
   }
 ]}

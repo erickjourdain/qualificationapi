@@ -3,7 +3,7 @@ spring:
   application:
     name: formsAPI
   profiles:
-    active: dev
+    active: prod
 
 #information application
 lne:

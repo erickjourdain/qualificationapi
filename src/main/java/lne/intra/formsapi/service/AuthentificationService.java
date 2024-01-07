@@ -38,7 +38,7 @@ public class AuthentificationService {
     // authentification de l'utilisateur
     authenticationManager.authenticate(
         new UsernamePasswordAuthenticationToken(
-            request.getLogin(),
+            request.getLogin().toLowerCase(),
             request.getPassword()));
     // récupération de l'utilisateur via son login
     var user = repository.findByLogin(request.getLogin())

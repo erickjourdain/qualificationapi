@@ -69,6 +69,7 @@ public class UsersController {
   @PostMapping("/register")
   @PreAuthorize("hasAuthority('admin:create')")
   public ResponseEntity<Map<String, Object>> register(
+      @AuthenticationPrincipal UserDetails userDetails,
       @RequestBody UserRequest request,
       @RequestParam(required = false) String include) throws AppException {
     // validation des champs fournis dans la requête
@@ -76,7 +77,7 @@ public class UsersController {
     // Enregistrement de l'utilisateur
     User user = service.register(request);
     service.validate(user.getId());
-    return ResponseEntity.ok(service.setUserResponse(user, include));
+    return ResponseEntity.ok(service.setUserResponse(user, include, userDetails));
   }
 
   /**
@@ -89,21 +90,22 @@ public class UsersController {
    * @return ResponseEntity<GetUsers>
    * @throws NotFoundException
    */
-  @Operation(summary = "Récupération des utilisateurs avec pagination et filtre", description = "Accès limité au rôle `ADMIN`")
+  @Operation(summary = "Récupération des utilisateurs avec pagination et filtre", description = "Limitation aux utilisateurs actif pour les rôles différents d'ADMIN")
   @Parameter(in = ParameterIn.QUERY, name = "page", description = "Numéro de la page à retourner", required = false)
   @Parameter(in = ParameterIn.QUERY, name = "size", description = "Nombre d'éléments à retourner", required = false)
   @Parameter(in = ParameterIn.QUERY, name = "sortBy", description = "Champ de tri ex: asc(id) ou desc(createdAt)", required = false)
   @Parameter(in = ParameterIn.QUERY, name = "include", description = "Liste des champs à retourner", required = false, example = "id, titre, version, createur")
-  @Parameter(in = ParameterIn.QUERY, name = "filter", description = "Filtre au format défini dans le package [turkraft/springfilter](https://github.com/turkraft/springfilter)", required = false, schema = @Schema(implementation = String.class), example = "valide:true and titre ~~ '*formulaire*'")
+  @Parameter(in = ParameterIn.QUERY, name = "filter", description = "Filtre au format défini dans le package [turkraft/springfilter](https://github.com/turkraft/springfilter)", required = false, schema = @Schema(implementation = String.class), example = "validated:true")
   @ApiResponse(responseCode = "200", description = "Les utilisateurs et informations sur la pagination", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetUsers.class)))
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @GetMapping
-  @PreAuthorize("hasAuthority('admin:read')")
+  @PreAuthorize("hasAnyAuthority('admin:read','creator:read','user:read','reader:read')")
   public ResponseEntity<UsersResponse> search(
+      @AuthenticationPrincipal UserDetails userDetails,
       @RequestParam(defaultValue = "1") Integer page,
       @RequestParam(defaultValue = "10") Integer size,
       @RequestParam(defaultValue = "asc(id)") String sortBy,
-      FilterSpecification<User> filter,
+      @RequestParam(required = false) FilterSpecification<User> filter,
       @RequestParam(required = false) String include) throws NotFoundException {
 
     // Test paramètre de tri
@@ -121,12 +123,12 @@ public class UsersController {
     // Définition des paramètres de pagination
     Pageable paging = PageRequest.of(page - 1, size,
         Sort.by((Pattern.matches("asc", direction)) ? Direction.ASC : Direction.DESC, field));
-    Page<User> users = service.search(filter, paging);
-    
+    Page<User> users = service.search(filter, paging, userDetails);
+
     // Création de la liste des utilisateurs
     List<Map<String, Object>> usersData = new ArrayList<>();
     for (User user : users) {
-      usersData.add(service.setUserResponse(user, include));
+      usersData.add(service.setUserResponse(user, include, userDetails));
     }
     // Construction de la réponse
     UsersResponse response = UsersResponse.builder()
@@ -154,10 +156,11 @@ public class UsersController {
   @GetMapping("/{id}")
   @PreAuthorize("hasAuthority('admin:read')")
   public ResponseEntity<Map<String, Object>> getUser(
+      @AuthenticationPrincipal UserDetails userDetails,
       @PathVariable Integer id,
       @RequestParam(required = false) String include) throws NotFoundException {
     User user = service.getUser(id);
-    return ResponseEntity.ok(service.setUserResponse(user, include));
+    return ResponseEntity.ok(service.setUserResponse(user, include, userDetails));
   }
 
   /**
@@ -170,10 +173,11 @@ public class UsersController {
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @GetMapping("/me")
   @PreAuthorize("hasAnyAuthority('admin:read','creator:read','user:read','reader:read')")
-  public ResponseEntity<Map<String, Object>> getMe(@AuthenticationPrincipal UserDetails userDetails,
+  public ResponseEntity<Map<String, Object>> getMe(
+      @AuthenticationPrincipal UserDetails userDetails,
       @RequestParam(required = false) String include) {
     User user = service.getByLogin(userDetails.getUsername());
-    return ResponseEntity.ok(service.setUserResponse(user, include));
+    return ResponseEntity.ok(service.setUserResponse(user, include, userDetails));
   }
 
   /**
@@ -190,10 +194,11 @@ public class UsersController {
   @PatchMapping("setAdmin/{id}")
   @PreAuthorize("hasAuthority('admin:update')")
   public ResponseEntity<Map<String, Object>> setAdmin(
+      @AuthenticationPrincipal UserDetails userDetails,
       @PathVariable Integer id,
       @RequestParam(required = false) String include) throws NotFoundException {
     User user = service.setAdmin(id);
-    return ResponseEntity.ok(service.setUserResponse(user, include));
+    return ResponseEntity.ok(service.setUserResponse(user, include, userDetails));
   }
 
   /**
@@ -223,7 +228,7 @@ public class UsersController {
     if (!user.getId().equals(id) && user.getRole() != Role.ADMIN)
       throw new AppException(403, "Vous ne disposez pas des droits nécessaires pour effectuer cette mise à jour");
     User updatedUser = service.update(id, request);
-    return ResponseEntity.ok(service.setUserResponse(updatedUser, include));
+    return ResponseEntity.ok(service.setUserResponse(updatedUser, include, userDetails));
   }
 
   /**
@@ -240,11 +245,12 @@ public class UsersController {
   @PatchMapping("validate/{id}")
   @PreAuthorize("hasAuthority('admin:update')")
   public ResponseEntity<Map<String, Object>> validate(
+      @AuthenticationPrincipal UserDetails userDetails,
       @PathVariable Integer id,
       @RequestParam(required = false) String include)
       throws NotFoundException {
     User user = service.validate(id);
-    return ResponseEntity.ok(service.setUserResponse(user, include));
+    return ResponseEntity.ok(service.setUserResponse(user, include, userDetails));
   }
 
   /**
@@ -261,11 +267,12 @@ public class UsersController {
   @PatchMapping("lock/{id}")
   @PreAuthorize("hasAuthority('admin:update')")
   public ResponseEntity<Map<String, Object>> lock(
+      @AuthenticationPrincipal UserDetails userDetails,
       @PathVariable Integer id,
       @RequestParam(required = false) String include)
       throws NotFoundException {
     User user = service.lock(id);
-    return ResponseEntity.ok(service.setUserResponse(user, include));
+    return ResponseEntity.ok(service.setUserResponse(user, include, userDetails));
   }  
 
 }

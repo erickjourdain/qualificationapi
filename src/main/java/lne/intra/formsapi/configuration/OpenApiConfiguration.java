@@ -15,8 +15,8 @@ import io.swagger.v3.oas.annotations.servers.Server;
     ),
     servers = {
         @Server(
-          description = "Serveur local de developpement",
-          url = "http://localhost:3030"
+          description = "Serveur API",
+          url = "${lne.intra.formsapi.server}"
         )
     }
 )
