@@ -1,5 +1,6 @@
 package lne.intra.formsapi.controller;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,10 +47,10 @@ public class SignInController {
   @ApiResponse(responseCode = "400", description = "Données fournies incorrectes", content = @Content(mediaType = "application/json"))
   @PostMapping("")
   public ResponseEntity<Map<String, Object>> signing(
-      UserDetails userDetails,
       @RequestBody SignInRequest request,
       @RequestParam(required = false) String include
   ) {
+    Map<String, Object> response = new HashMap<>();
     // vérification clef d'enregistrement
     if (!request.getSecret().equals(env.getProperty("lne.intra.formsapi.signinkey")))
       throw new AppException(400, "La clef d'enregistrement est incorrecte");
@@ -60,7 +61,15 @@ public class SignInController {
         .password(request.getPassword().trim())
         .build();
     User user = userService.register(userRequest);
-    return ResponseEntity.ok(userService.setUserResponse(user, include, userDetails));
+    response.put("id", user.getId());
+    response.put("prenom", user.getPrenom());
+    response.put("nom", user.getNom());
+    response.put("login", user.getLogin());
+    response.put("role", user.getRole());
+    response.put("slug", user.getSlug());
+    response.put("createdAt", user.getCreatedAt());
+    response.put("updatedAt", user.getUpdatedAt());
+    return ResponseEntity.ok(response);
   }
 
   @Operation(summary = "Requête d'enregistrement de l'administrateur")

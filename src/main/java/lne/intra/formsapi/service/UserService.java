@@ -51,7 +51,7 @@ public class UserService {
       response.put("nom", user.getNom());
     if ((fields.isEmpty() || fields.contains("login")) && logUser.getRole() == Role.ADMIN)
       response.put("login", user.getLogin());
-    if ((fields.isEmpty() || fields.contains("role")) && logUser.getRole() == Role.ADMIN)
+    if ((fields.isEmpty() || fields.contains("role")) && (logUser.getRole() == Role.ADMIN || user.getId() == logUser.getId()))
       response.put("role", user.getRole());
     if ((fields.isEmpty() || fields.contains("validated")) && logUser.getRole() == Role.ADMIN)
       response.put("validated", user.getValidated());
