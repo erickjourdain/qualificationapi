@@ -44,3 +44,16 @@ build/
 
 ### Application configuration ###
 src/main/resources/application-prod.yml
+
+### frontend
+# Dependencies
+/app/node
+/app/node_modules
+
+# Project specific
+/app/public/*
+!/app/public/index.html
+!/app/public/robots.txt
+
+# production
+/app/.env.production
