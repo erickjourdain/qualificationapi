@@ -8,7 +8,7 @@ import Paper from "@mui/material/Paper";
 import Skeleton from "@mui/material/Skeleton";
 import Box from "@mui/material/Box";
 import Alert from "@mui/material/Alert";
-import { AnswerAPI } from "gec-tripetto";
+import { AnswerAPI } from "../gec-tripetto";
 import { displayAlert, loggedUser } from "../atomState";
 import { getUniqueAnswer, unlockAnswer } from "../utils/apiCall";
 import Createur from "../components/reponses/Createur";

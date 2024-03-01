@@ -17,7 +17,7 @@ import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import Alert from "@mui/material/Alert";
 import ChangeCircleOutlinedIcon from "@mui/icons-material/ChangeCircleOutlined";
-import { AnswerAPI, AnwserUpdate } from "gec-tripetto";
+import { AnswerAPI, AnwserUpdate } from "../../gec-tripetto";
 import { displayAlert, changement } from "../../atomState";
 import { updateAnswer } from "../../utils/apiCall";
 import { formatDateTime } from "../../utils/format";
@@ -65,7 +65,7 @@ const UpdateForm = ({ courante, locked, answer, onUpdated }: UpdateFormProps) =>
       }, 500);
     },
     onError(error) {
-      setAlerte({ severite: "error", message: manageError(error) } );
+      setAlerte({ severite: "error", message: manageError(error) });
     },
   });
 
@@ -111,7 +111,7 @@ const UpdateForm = ({ courante, locked, answer, onUpdated }: UpdateFormProps) =>
     const sucbscription = watch(() => {
       setNotSaved(isChanged());
     });
-    return () => sucbscription.unsubscribe();
+    return () => { sucbscription.unsubscribe() };
   }, [watch])
 
   // mise à jour suite validation formulaire Tripetto
@@ -143,15 +143,17 @@ const UpdateForm = ({ courante, locked, answer, onUpdated }: UpdateFormProps) =>
 
   // Modification des données du formulaire
   const isChanged = () => {
-    if (
+    return (
       answer.statut !== getValues("statut") ||
       answer.demande !== getValues("demande") ||
       answer.opportunite !== getValues("opportunite") ||
       answer.reponse !== getValues("reponse")
     )
-      return true;
-    else return false;
   };
+
+  const disabled = () => {
+    return !isUser || !courante || locked;
+  }
 
   if (answer) {
     return (
@@ -177,7 +179,7 @@ const UpdateForm = ({ courante, locked, answer, onUpdated }: UpdateFormProps) =>
                       id="statut-select"
                       labelId="statut-select-label"
                       label="statut"
-                      disabled={!courante || !isUser() || locked}
+                      disabled={disabled()}
                       {...field}
                     >
                       {statuts.map((st) => (
@@ -197,7 +199,7 @@ const UpdateForm = ({ courante, locked, answer, onUpdated }: UpdateFormProps) =>
             InputProps={{
               startAdornment: <InputAdornment position="start">DEM</InputAdornment>,
             }}
-            disabled={!courante || !isUser() || locked}
+            disabled={disabled()}
             {...register("demande", { pattern: { value: /^[0-9]{7,7}$/g, message: "La demande doit comporter 7 chiffres" } })}
             error={errors.demande ? true : false}
           />
@@ -207,7 +209,7 @@ const UpdateForm = ({ courante, locked, answer, onUpdated }: UpdateFormProps) =>
             InputProps={{
               startAdornment: <InputAdornment position="start">OPP</InputAdornment>,
             }}
-            disabled={!courante || !isUser() || locked}
+            disabled={disabled()}
             {...register("opportunite", { pattern: { value: /^[0-9]{7,7}$/g, message: "L'opportunité doit comporter 7 chiffres" } })}
             error={errors.opportunite ? true : false}
           />
@@ -221,7 +223,7 @@ const UpdateForm = ({ courante, locked, answer, onUpdated }: UpdateFormProps) =>
             {errors.opportunite?.message}
           </Typography>
         </Box>
-        {courante && isUser() && !locked && (
+        {disabled() && (
           <Box>
             <Button
               disabled={!answer?.courante || dialog}
@@ -246,7 +248,7 @@ const UpdateForm = ({ courante, locked, answer, onUpdated }: UpdateFormProps) =>
             onSubmit={handleTrippetoChange}
           />
         </div>
-        {courante && isUser() && !locked && (
+        {disabled() && (
           <Box mt={3}>
             <Stack spacing={2} direction="row">
               <Button variant="contained" color="primary" disabled={!isValid || !isChanged() || isPending} onClick={handleSubmit}>
@@ -260,7 +262,7 @@ const UpdateForm = ({ courante, locked, answer, onUpdated }: UpdateFormProps) =>
         )}
       </>
     );
-  }
+  } else return <></>
 };
 
 export default UpdateForm;
