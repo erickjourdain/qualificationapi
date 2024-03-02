@@ -13,7 +13,7 @@ import TableCell from "@mui/material/TableCell";
 import TableBody from "@mui/material/TableBody";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import Skeleton from "@mui/material/Skeleton";
-import { AnswerAPI, User } from "gec-tripetto";
+import { AnswerAPI, User } from "../gec-tripetto";
 import { displayAlert } from "../atomState";
 import { useFormulaire } from "../pages/IndexForm";
 import manageError from "../utils/manageError";

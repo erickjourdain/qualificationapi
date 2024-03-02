@@ -70,6 +70,8 @@ public class FormService {
       response.put("formulaire", form.getFormulaire());
     if (fields.isEmpty() || fields.contains("version"))
       response.put("version", form.getVersion());
+    if (fields.isEmpty() || fields.contains("formulaireInitial"))
+      response.put("formulaireInitial", form.getInitForm());
     if (fields.isEmpty() || fields.contains("valide"))
       response.put("valide", form.getValide());
     if (fields.isEmpty() || fields.contains("slug"))
@@ -150,7 +152,8 @@ public class FormService {
           .description(form.getDescription())
           .formulaire(request.getFormulaire())
           .version(form.getVersion() + 1)
-          .slug(slug.slugify(form.getTitre() + " v" + form.getVersion() + 1))
+          .initForm((form.getInitForm() == null) ? form.getId() : form.getInitForm())
+          .slug(slug.slugify(form.getTitre() + " v" + (form.getVersion() + 1)))
           .createur(form.getCreateur())
           .build();
     }
