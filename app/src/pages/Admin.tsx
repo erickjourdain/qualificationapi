@@ -16,7 +16,7 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import Typography from "@mui/material/Typography";
 import TableHead from "@mui/material/TableHead";
-import { User } from "gec-tripetto";
+import { User } from "../gec-tripetto";
 import { displayAlert } from "../atomState";
 import { getUsers } from "../utils/apiCall";
 import manageError from "../utils/manageError";

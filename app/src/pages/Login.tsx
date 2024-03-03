@@ -117,6 +117,7 @@ const Login = () => {
           <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} disabled={isPending}>
             {!isPending ? "Login" : "Loading ..."}
           </Button>
+          <Link to="/resetpwd">Mot de passe oublié</Link>
         </Box>
       </Box>
     </Container>

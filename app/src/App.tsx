@@ -19,6 +19,7 @@ import SignIn from "./pages/SignIn";
 import Admin from "./pages/Admin";
 import UserForm from "./pages/UserForm";
 import CloseApp from "./pages/CloseApp";
+import ResetPwd from "./pages/ResetPwd";
 
 // création d'un instance de QueryClient
 const queryClient = new QueryClient({});
@@ -89,6 +90,10 @@ function App() {
     {
       path: "/signin",
       element: <SignIn />,
+    },
+    {
+      path: "/resetpwd",
+      element: <ResetPwd />,
     },
     {
       path: "/close",

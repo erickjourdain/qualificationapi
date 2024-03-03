@@ -56,6 +56,20 @@ public class JwtService {
   }
 
   /**
+   * Génération d'un token basique sans extra claim
+   * 
+   * @return String le token généré
+   */
+  public String generateToken() {
+    return Jwts
+    .builder()
+    .setIssuedAt(new Date(System.currentTimeMillis()))
+    .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
+    .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+    .compact();
+  }
+
+  /**
    * Génération d'un token à partir des informations de l'utilisateur courant
    * et d'informations complémentaires
    * 
@@ -122,7 +136,7 @@ public class JwtService {
    * @param token String le token
    * @return Boolean état du token
    */
-  private boolean isTokenExpired(String token) {
+  public boolean isTokenExpired(String token) {
     return extractExpiration(token).before(new Date());
   }
 

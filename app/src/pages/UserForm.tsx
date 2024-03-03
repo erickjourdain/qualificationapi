@@ -8,12 +8,14 @@ import Skeleton from "@mui/material/Skeleton";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import { User } from "gec-tripetto";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import { User } from "../gec-tripetto";
 import { displayAlert, loggedUser } from "../atomState";
-import { getUsers } from "../utils/apiCall";
+import { getResetPwdToken, getUsers } from "../utils/apiCall";
 import manageError from "../utils/manageError";
 import UpdateForm from "../components/users/UpdateForm";
-import Button from "@mui/material/Button";
+import Alert from "@mui/material/Alert";
 
 const UserForm = () => {
   const navigate = useNavigate();
@@ -27,8 +29,11 @@ const UserForm = () => {
 
   // Définition des variables d'état du composant
   const [user, setUser] = useState<User | null>(null);
-  const [saved, setSaved] = useState<boolean>(false);
-  const { data, error, isLoading, isError } = useQuery({
+  const [pwdToken, setPwdToken] = useState<boolean>(false);
+  const [token, setToken] = useState<string | null>(null);
+  const [tokenCopy, setTokenCopy] = useState<boolean>(false);
+
+  const { data: dataUser, error, isLoading, isError } = useQuery({
     queryKey: ["user", slug],
     queryFn: () => {
       const filter = `filter=${sfEqual("slug", slug ? slug : "")}`;
@@ -37,21 +42,33 @@ const UserForm = () => {
     refetchOnWindowFocus: false,
   });
 
+  const { data: dataToken } = useQuery({
+    queryKey: ["resetPwdToken"],
+    queryFn: () => {
+      if (user) return getResetPwdToken(user?.id)
+      else return Promise.resolve(null);
+    },
+    enabled: pwdToken && !!user,
+  })
+
   useEffect(() => {
-    if (data) {
-      if (data?.data.data.length !== 1)
+    if (dataUser) {
+      if (dataUser?.data.data.length !== 1)
         setAlerte({ severite: "warning", message: "Erreur lors du chargement de l'utilisateur" });
-      if (currentUser?.role === "ADMIN" || data?.data.data[0].id !== currentUser?.id) {
-        const us = data?.data.data[0] as User;
+      if (currentUser?.role === "ADMIN" || dataUser?.data.data[0].id !== currentUser?.id) {
+        const us = dataUser?.data.data[0] as User;
         setUser(us);
       } else
         setAlerte({ severite: "warning", message: "Vous ne disposez pas des droits pour accéder à cette page" });
     }
-  }, [data]);
+  }, [dataUser]);
+  useEffect(() => {
+    if (dataToken) setToken(dataToken.data.token);
+  }, [dataToken]);
 
   // gestion des erreurs de chargement des données
   useEffect(() => {
-    if (isError) setAlerte({ severite: "error", message: manageError(error) } );
+    if (isError) setAlerte({ severite: "error", message: manageError(error) });
   }, [isError]);
 
   const handleUpdate = (newUser: User) => {
@@ -82,6 +99,16 @@ const UserForm = () => {
             Profil {user.prenom} {user.nom}
           </Typography>
           <UpdateForm user={user} onUpdated={handleUpdate} />
+          < Box sx={{ mt: 3 }}>
+            {!token && <Button onClick={() => setPwdToken(true)}>Changer mot de passe</Button>}
+            {token && !tokenCopy &&
+              <>
+                <Button onClick={() => { navigator.clipboard.writeText(token); setTokenCopy(true)}}>Copier Token</Button>
+                <TextField sx={{ mt: 1 }} id="outlined-basic" label={token} variant="outlined" disabled fullWidth />
+              </>
+            }
+            {token && tokenCopy && <Alert severity="success">Le token a été copié dans le presse papier</Alert>}
+          </Box>
         </Box>
       </Paper>
     );

@@ -17,4 +17,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
   Page<User> findAll(Specification<User> spec, Pageable paging);
 
+  Optional<User> findByResetPwdToken(String token);
+
 }

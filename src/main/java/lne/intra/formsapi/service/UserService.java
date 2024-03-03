@@ -19,6 +19,7 @@ import com.turkraft.springfilter.boot.Filter;
 import lne.intra.formsapi.model.Role;
 import lne.intra.formsapi.model.User;
 import lne.intra.formsapi.model.exception.AppException;
+import lne.intra.formsapi.model.request.ChangePwdRequest;
 import lne.intra.formsapi.model.request.UserRequest;
 import lne.intra.formsapi.repository.UserRepository;
 import lne.intra.formsapi.util.Slugify;
@@ -197,6 +198,39 @@ public class UserService {
     user.setLocked(true);
     // réponse avec les données de l'utilisateur
     return repository.save(user);
+  }
+
+  /**
+   * Enregistrer le token de reset du mot de passe
+   * @param id
+   * @param token
+   * @return
+   * @throws AppException
+   */
+  public Map<String, Object> setResetpwdToken(Integer id, String token) throws AppException {
+    Map<String, Object> response = new HashMap<>();
+    // vérification de l'existance de l'utilisateur à modifier
+    User user = repository.findById(id)
+        .orElseThrow(() -> new AppException(404, "L'utilisateur recherché n'existe pas"));
+    user.setResetPwdToken(token);
+    repository.save(user);
+    response.put("token", token);
+    return response;
+  }
+
+  /**
+   * Mise à jour du mot de passe
+   * @param request
+   * @return
+   * @throws AppException
+   */
+  public Boolean resetPassword(ChangePwdRequest request) throws AppException {
+    User user = repository.findByResetPwdToken(request.getToken())
+      .orElseThrow(() -> new AppException(404, "Le token est invalide"));
+    user.setPassword(passwordEncoder.encode(request.getPassword()));
+    user.setResetPwdToken(null);
+    repository.save(user);
+    return true;
   }
 
 }
