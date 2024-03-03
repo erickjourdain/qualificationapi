@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosError } from "axios";
-import { AnwserUpdate, FormCreation, User, UserCreation } from "gec-tripetto";
+import { AnwserUpdate, FormCreation, User, UserCreation } from "../gec-tripetto";
 import { sfAnd, sfEqual, sfLike, sfOr } from "spring-filter-query-builder";
 
 // Création de l'instance Axios pour les requêtes vers l'API
@@ -60,15 +60,23 @@ const getForms = (titre: string | null = null, page = 1) => {
   // lancement de la requête
   return instance.request({
     method: "GET",
-    url: `/data/forms?filter=${searchParams}&page=${page}&include=${include.join(",")}`,
+    url: encodeURI(`/data/forms?filter=${searchParams}&page=${page}&include=${include.join(",")}`),
   });
 };
+
+const getFormsInit = (initForm: number, page = 1) => {
+  // lancement de la requête
+  return instance.request({
+    method: "GET",
+    url: encodeURI(`/data/forms?filter=${sfEqual("initForm", initForm)}&page=${page}&size=${50}&include=id`),
+  });
+}
 
 const getForm = (slug: string | undefined) => {
   const searchParams = slug ? sfEqual("slug", slug) : "";
   return instance.request({
     method: "GET",
-    url: `data/forms?filter=${searchParams}`,
+    url: encodeURI(`data/forms?filter=${searchParams}`),
   });
 };
 
@@ -100,14 +108,14 @@ const saveAnswer = (payload: { reponse: string; formulaire: number }) => {
 const getAnswers = (query: string) => {
   return instance.request({
     method: "GET",
-    url: `data/answers?${query}`,
+    url: encodeURI(`data/answers?${query}`),
   });
 };
 
 const getUniqueAnswer = async (query: string) => {
   const { data: rep } = await instance.request({
     method: "GET",
-    url: `data/answers?${query}`,
+    url: encodeURI(`data/answers?${query}`),
   });
   if (rep.nombreReponses !== 1) throw new Error("La réponse n'est pas unique");
   return instance.request({
@@ -163,7 +171,7 @@ const getCurrentUser = () => {
 
 const getUsers = (filter: string | null = null, include: string[] = [], page: number = 1, size: number = 10) => {
   // construction du chemin d'interrogation de l'API
-  const params = [];
+  const params: string[] = [];
   if (filter) params.push(filter);
   if (include.length) params.push(`include=${include.join(",")}`);
   params.push(`page=${page}`);
@@ -198,6 +206,7 @@ export {
   login,
   getCurrentUser,
   getForms,
+  getFormsInit,
   getForm,
   saveAnswer,
   getAnswers,

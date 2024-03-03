@@ -4,7 +4,7 @@ import { Outlet, useNavigate, useOutletContext, useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
 import Skeleton from "@mui/material/Skeleton";
-import { Form } from "gec-tripetto";
+import { Form } from "../gec-tripetto";
 import { displayAlert } from "../atomState";
 import { getForm } from "../utils/apiCall";
 import manageError from "../utils/manageError";

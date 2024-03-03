@@ -3,15 +3,15 @@ import { DateTimeFormatOptions } from "luxon";
 import lodash, { filter } from "lodash";
 import deepdash from "deepdash";
 import { findIndex, get, has } from "lodash";
-import { Form, FormAnswers } from "gec-tripetto";
+import { Form, FormAnswers } from "../gec-tripetto";
 
 const _ = deepdash(lodash);
 
 // conversion au format français de date et heure
 const formatDateTime = (date: number | undefined) => {
   const event = date ? new Date(date) : null;
-  const options: DateTimeFormatOptions = { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" };
-  return event ? event.toLocaleDateString("fr-FR", options) : "";
+  const options: DateTimeFormatOptions = { year: "2-digit", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" };
+  return event ? event.toLocaleString("fr-FR", options) : "";
   // return value ? value.toLocaleString(DateTime.DATE_MED, { locale: "fr-fr" }) : "";
 };
 

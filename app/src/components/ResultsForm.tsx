@@ -1,9 +1,10 @@
-import React from "react";
+import { map } from "lodash";
+import React, { ChangeEvent } from "react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
-import { sfAnd, sfEqual } from "spring-filter-query-builder";
+import { sfAnd, sfEqual, sfIn, sfLike, sfOr } from "spring-filter-query-builder";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Table from "@mui/material/Table";
@@ -12,27 +13,38 @@ import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 import TableBody from "@mui/material/TableBody";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import Skeleton from "@mui/material/Skeleton";
 import { AnswerAPI, User } from "../gec-tripetto";
 import { displayAlert } from "../atomState";
 import { useFormulaire } from "../pages/IndexForm";
 import manageError from "../utils/manageError";
-import { getAnswers } from "../utils/apiCall";
+import { getFormsInit, getAnswers } from "../utils/apiCall";
 import { formatDateTime } from "../utils/format";
-import SearchUser from "./SearchUser";
+import SearchAnswers from "./SearchAnswers";
+import { TablePagination } from "@mui/material";
 
 /**
  * Composant de présentation des résultats d'un formulaire
  * @returns JSX
  */
 const ResultsForm = () => {
+  const itemsPerPage = 10;
+
   const setAlerte = useSetAtom(displayAlert);
-  
+
   const navigate = useNavigate();
   // récupération du formulaire via le contexte de la route
   const { form } = useFormulaire();
 
   const [user, setUser] = useState<User | null>(null);
+  const [search, setSearch] = useState<String>("");
+  const [page, setPage] = useState(0);
+
+  // query de récupération des formulaires précédent
+  const { data: formulaires } = useQuery({
+    queryKey: ["getForms"],
+    queryFn: () => getFormsInit(form?.formulaireInitial || 0),
+    refetchOnWindowFocus: false,
+  })
 
   // query de récupération des réponses au formulaire
   const {
@@ -41,16 +53,20 @@ const ResultsForm = () => {
     isError,
     error,
   } = useQuery({
-    queryKey: ["getAnswersTable", user],
+    queryKey: ["getAnswersTable", user, search, page],
     queryFn: () => {
-      let query = user
-        ? sfAnd([sfEqual("courante", "true"), sfEqual("formulaire", form?.id || 0), sfEqual("createur", user.id)])
-        : sfAnd([sfEqual("courante", "true"), sfEqual("formulaire", form?.id || 0)]);
-      return getAnswers(`filter=${query.toString()}&page=1`);
+      let query = [sfEqual("courante", "true"), sfIn("formulaire", [...map(formulaires?.data.data, "id"), form?.formulaireInitial || 0])];
+      if (user) query = [...query, sfEqual("createur", user.id)];
+      if (search.trim().length) query = [...query, sfLike("reponse", `%${search}%`)];
+      //let query = user
+      //  ? sfAnd([sfEqual("courante", "true"), sfIn("formulaire", [...map(formulaires?.data.data, "id"), form?.formulaireInitial || 0]), ])
+      //  : sfAnd();
+      return getAnswers(`filter=${sfAnd(query).toString()}&page=${page + 1}&size=${itemsPerPage}`);
     },
     refetchOnWindowFocus: false,
+    enabled: !!formulaires,
   });
-  
+
   // gestion des erreurs de chargement des données
   useEffect(() => {
     if (isError) setAlerte({ severite: "error", message: manageError(error) });
@@ -61,29 +77,23 @@ const ResultsForm = () => {
     setUser(newUser);
   };
 
-  // Affichage lors du chargement des données
-  if (isLoading)
-    return (
-      <>
-        <Skeleton variant="text" />
-        <Skeleton variant="text" />
-        <Skeleton variant="text" />
-        <Skeleton variant="text" />
-        <Skeleton variant="text" />
-      </>
-    );
+  // Gestion du changement de page du tableau de résultat
+  const handleChangePage = (_event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
 
   return (
     <Paper
       sx={{
-        marginTop: "10px",
+        marginTop: "30px",
       }}
     >
       <Box sx={{ minWidth: 400, maxWidth: "80%", margin: "auto" }}>
-        <SearchUser onUserChange={onUserChange} />
+        <SearchAnswers onUserChange={onUserChange} onSearchChange={(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setSearch(event.target.value)} loading={isLoading} />
         <Table aria-label="table-resultats">
           <TableHead>
             <TableRow>
+              <TableCell>Ref</TableCell>
               <TableCell>Voir</TableCell>
               <TableCell>Utilisateur</TableCell>
               <TableCell>Date</TableCell>
@@ -97,6 +107,7 @@ const ResultsForm = () => {
             {reponses &&
               reponses.data.data.map((reponse: AnswerAPI) => (
                 <TableRow key={reponse.id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
+                  <TableCell>{reponse.id}</TableCell>
                   <TableCell>
                     <VisibilityIcon sx={{ cursor: "pointer" }} onClick={() => navigate({ pathname: `${reponse.uuid}/${reponse.version}` })} />
                   </TableCell>
@@ -104,7 +115,7 @@ const ResultsForm = () => {
                     {reponse.createur.nom} {reponse.createur.prenom}
                   </TableCell>
                   <TableCell>{formatDateTime(reponse.createdAt)}</TableCell>
-                  <TableCell>{reponse.version}</TableCell>
+                  <TableCell>{reponse.formulaire.version}</TableCell>
                   <TableCell>{reponse.statut}</TableCell>
                   <TableCell>{reponse.demande ? `DEM${reponse.demande}` : ""}</TableCell>
                   <TableCell>{reponse.opportunite ? `OPP${reponse.opportunite}` : ""}</TableCell>
@@ -112,6 +123,15 @@ const ResultsForm = () => {
               ))}
           </TableBody>
         </Table>
+        {(reponses?.data.hasPrevious || reponses?.data.hasNext) &&
+          <TablePagination
+            rowsPerPageOptions={[itemsPerPage]}
+            component="div"
+            count={reponses?.data.nombreReponses}
+            rowsPerPage={itemsPerPage}
+            page={page}
+            onPageChange={handleChangePage} />
+        }
       </Box>
     </Paper>
   );

@@ -17,7 +17,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import AddIcon from "@mui/icons-material/Add";
 import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
-import { Form } from "gec-tripetto";
+import { Form } from "../gec-tripetto";
 import { displayAlert } from "../atomState";
 import { getForms } from "../utils/apiCall";
 import manageError from "../utils/manageError";
