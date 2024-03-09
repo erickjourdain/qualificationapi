@@ -214,11 +214,19 @@ const resetPassword = (payload: { password: string, token: string}) => {
   })
 }
 
+const logout = () => {
+  return instance.request({
+    method: "GET",
+    url: "/auth/logout",
+  })
+}
+
 export {
   apiRequest,
   setAuthorisation,
   delAuthorisation,
   login,
+  logout,
   getCurrentUser,
   getForms,
   getFormsInit,

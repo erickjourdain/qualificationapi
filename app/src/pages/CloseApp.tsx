@@ -1,13 +1,31 @@
-import React from "react";
-import Box from "@mui/material/Box";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router";
+import { useQuery } from "@tanstack/react-query";
+import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import CssBaseline from "@mui/material/CssBaseline";
 import Typography from "@mui/material/Typography";
+import { delAuthorisation, logout } from "../utils/apiCall";
+import manageError from "../utils/manageError";
 
 const CloseApp = () => {
   const navigate = useNavigate();
+
+  const {error, isError, isSuccess} = useQuery({
+    queryKey: ["logout"],
+    queryFn: logout
+  })
+  
+  // fin du processus de déconnexion
+  useEffect(() => {
+    delAuthorisation();
+    localStorage.removeItem("token");
+  }, [isSuccess]);
+  // gestion des erreurs de déconnexion
+  useEffect(() => {
+    if (isError) setAlerte({ severite: "error", message: manageError(error) });
+  }, [isError]);
 
   return (
     <Container component="main" maxWidth="sm">
@@ -24,7 +42,7 @@ const CloseApp = () => {
         <Typography sx={{ mb: 3, textAlign: "center" }} variant="h5">
           L'application est fermée, cliquez sur le bouton ci-dessous pour la relancer.
         </Typography>
-        <Button color="primary" variant="contained" onClick={() => navigate("/")}>
+        <Button color="primary" variant="contained" onClick={() => navigate("/login")}>
           Relancer l'application
         </Button>
       </Box>
@@ -33,3 +51,7 @@ const CloseApp = () => {
 }
 
 export default CloseApp;
+
+function setAlerte(arg0: { severite: string; message: any; }) {
+  throw new Error("Function not implemented.");
+}
