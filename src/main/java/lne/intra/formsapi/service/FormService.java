@@ -94,6 +94,7 @@ public class FormService {
    * @return Liste des champs du formulaire à retourner
    * @throws AppException
    */
+  @SuppressWarnings("null")
   public Form saveForm(FormRequest request, UserDetails userDetails)
       throws AppException {
     final Slugify slug = Slugify.builder().build();
@@ -120,6 +121,7 @@ public class FormService {
    * @return Liste des champs du formulaire à retourner
    * @throws AppException
    */
+  @SuppressWarnings("null")
   public Form partialUpdateForm(Integer id, FormRequest request, UserDetails userDetails)
       throws AppException {
     final Slugify slug = Slugify.builder().build();
@@ -170,6 +172,7 @@ public class FormService {
    * @return Liste des champs du formulaire à retourner
    * @throws AppException
    */
+  @SuppressWarnings("null")
   public Form getForm(Integer id) throws AppException {
     Form form = repository.findById(id)
         .orElseThrow(() -> new AppException(400, "Le formuaire n'existe pas"));
@@ -184,6 +187,7 @@ public class FormService {
    *                page, tri)
    * @return <FormsResponse>
    */
+  @SuppressWarnings("null")
   public Page<Form> search(@Filter Specification<Form> spec, Pageable paging) {
     // Récupération des formulaires
     return repository.findAll(spec, paging);

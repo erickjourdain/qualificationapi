@@ -28,6 +28,7 @@ public class FileService {
    * @return objet représentant le fichier sauvegardé <UploadResponse>
    * @throws AppException
    */
+  @SuppressWarnings("null")
   public UploadResponse saveFile(String fileName, String initialName, UserDetails userDetails) throws AppException {
     // recherche de l'utilisateur courant
     User proprietaire = userRepository.findByLogin(userDetails.getUsername())
@@ -59,6 +60,7 @@ public class FileService {
    * @param userDetails <UserDetails>
    * @return le fichier supprimé <File>
    */
+  @SuppressWarnings("null")
   public File deleteFile(Integer id, UserDetails userDetails) {
     // recherche du fichier dans la base
     File file = repository.findById(id)

@@ -142,6 +142,7 @@ public class AnswerService {
    * @return
    * @throws AppException
    */
+  @SuppressWarnings("null")
   public Answer getAnswer(Integer id) throws AppException {
     Answer answer = answerRepository.findById(id)
         .orElseThrow(() -> new AppException(400, "La réponse n'existe pas"));
@@ -156,6 +157,7 @@ public class AnswerService {
    * @return
    * @throws AppException
    */
+  @SuppressWarnings("null")
   public Answer saveAnswer(AnswerRequest request, UserDetails userDetails)
       throws AppException {
     // récupération des informations sur l'utilisateur connecté
@@ -183,6 +185,7 @@ public class AnswerService {
    * @return
    * @throws AppException
    */
+  @SuppressWarnings("null")
   public Answer updateAnswer(Integer id, AnswerRequest request, UserDetails userDetails)
       throws AppException {
 
@@ -242,6 +245,7 @@ public class AnswerService {
    * @param paging
    * @return
    */
+  @SuppressWarnings("null")
   public Page<Answer> search(@Filter Specification<Answer> spec, Pageable paging) {
     // Récupération des réponses
     return answerRepository.findAll(spec, paging);

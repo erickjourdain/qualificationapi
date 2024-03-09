@@ -16,6 +16,7 @@ public class ResourceWebConfig implements WebMvcConfigurer {
 
   private final Environment env;
 
+  @SuppressWarnings("null")
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
     String location = env.getProperty("lne.intra.formsapi.storage-mapping");

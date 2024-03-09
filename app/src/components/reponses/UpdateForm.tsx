@@ -248,7 +248,7 @@ const UpdateForm = ({ courante, locked, answer, onUpdated }: UpdateFormProps) =>
             onSubmit={handleTrippetoChange}
           />
         </div>
-        {disabled() && (
+        {!disabled() && (
           <Box mt={3}>
             <Stack spacing={2} direction="row">
               <Button variant="contained" color="primary" disabled={!isValid || !isChanged() || isPending} onClick={handleSubmit}>

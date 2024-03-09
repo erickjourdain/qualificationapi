@@ -42,15 +42,17 @@ const UserForm = () => {
     refetchOnWindowFocus: false,
   });
 
+  // Récupération du token de MAJ du mot de passe
   const { data: dataToken } = useQuery({
     queryKey: ["resetPwdToken"],
     queryFn: () => {
       if (user) return getResetPwdToken(user?.id)
       else return Promise.resolve(null);
     },
-    enabled: pwdToken && !!user,
+    enabled: pwdToken && !!user && (token !== null),
   })
 
+  // Mise à jour des données suite récupération de l'utilisateur
   useEffect(() => {
     if (dataUser) {
       if (dataUser?.data.data.length !== 1)
@@ -58,23 +60,34 @@ const UserForm = () => {
       if (currentUser?.role === "ADMIN" || dataUser?.data.data[0].id !== currentUser?.id) {
         const us = dataUser?.data.data[0] as User;
         setUser(us);
+        if (us.resetPwdToken !== null) {
+          setToken(us.resetPwdToken || null);
+          setPwdToken(true);
+        }
       } else
         setAlerte({ severite: "warning", message: "Vous ne disposez pas des droits pour accéder à cette page" });
     }
   }, [dataUser]);
+  // Mise à jour du token
   useEffect(() => {
     if (dataToken) setToken(dataToken.data.token);
   }, [dataToken]);
-
-  // gestion des erreurs de chargement des données
+  // Gestion des erreurs de chargement des données
   useEffect(() => {
     if (isError) setAlerte({ severite: "error", message: manageError(error) });
   }, [isError]);
+  // 
+  useEffect(() => {
+      setToken(null);
+      setPwdToken(false);
+      setTokenCopy(false);
+  },[]);
 
+  // Lancement de la mise à jour des données de l'utilisateur
   const handleUpdate = (newUser: User) => {
     setUser(newUser);
   }
-
+  
   if (isLoading)
     return (
       <>
