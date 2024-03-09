@@ -1,17 +1,22 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useSetAtom } from "jotai";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import CssBaseline from "@mui/material/CssBaseline";
 import Typography from "@mui/material/Typography";
+import { displayAlert } from "../atomState";
 import { delAuthorisation, logout } from "../utils/apiCall";
 import manageError from "../utils/manageError";
 
 const CloseApp = () => {
   const navigate = useNavigate();
 
+  // Chargement de l'état Atom des alertes et de la sauvegarde des données
+  const setAlerte = useSetAtom(displayAlert);
+  
   const {error, isError, isSuccess} = useQuery({
     queryKey: ["logout"],
     queryFn: logout
@@ -51,7 +56,3 @@ const CloseApp = () => {
 }
 
 export default CloseApp;
-
-function setAlerte(arg0: { severite: string; message: any; }) {
-  throw new Error("Function not implemented.");
-}
