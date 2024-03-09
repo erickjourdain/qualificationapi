@@ -7,7 +7,7 @@ import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import CssBaseline from "@mui/material/CssBaseline";
 import Typography from "@mui/material/Typography";
-import { displayAlert } from "../atomState";
+import { displayAlert, loggedUser } from "../atomState";
 import { delAuthorisation, logout } from "../utils/apiCall";
 import manageError from "../utils/manageError";
 
@@ -16,6 +16,7 @@ const CloseApp = () => {
 
   // Chargement de l'état Atom des alertes et de la sauvegarde des données
   const setAlerte = useSetAtom(displayAlert);
+  const setUser = useSetAtom(loggedUser);
   
   const {error, isError, isSuccess} = useQuery({
     queryKey: ["logout"],
@@ -26,6 +27,7 @@ const CloseApp = () => {
   useEffect(() => {
     delAuthorisation();
     localStorage.removeItem("token");
+    setUser(null);
   }, [isSuccess]);
   // gestion des erreurs de déconnexion
   useEffect(() => {
