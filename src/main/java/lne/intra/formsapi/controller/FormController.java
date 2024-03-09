@@ -48,7 +48,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v${lne.intra.formsapi.api}/data/forms")
-@PreAuthorize("hasAnyRole('ADMIN','USER')")
+@PreAuthorize("hasAnyRole('ADMIN','CREATOR','USER','READER')")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "BearerAuth")
 @Tag(name = "formulaires endpoint")
@@ -142,7 +142,7 @@ public class FormController {
   @ApiResponse(responseCode = "404", description = "Createur non trouvé dans la base", content = @Content(mediaType = "application/text"))
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @GetMapping
-  @PreAuthorize("hasAnyAuthority('admin:read','creator:read','user:read')")
+  @PreAuthorize("hasAnyAuthority('admin:read','creator:read','user:read', 'reader:read')")
   public ResponseEntity<FormsResponse> get(
       @RequestParam(defaultValue = "1") Integer page,
       @RequestParam(defaultValue = "10") Integer size,
@@ -203,7 +203,7 @@ public class FormController {
   @ApiResponse(responseCode = "404", description = "Formuliare ou Createur non trouvé dans la base", content = @Content(mediaType = "application/text"))
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @GetMapping("/{id}")
-  @PreAuthorize("hasAnyAuthority('admin:read','creator:read','user:read')")
+  @PreAuthorize("hasAnyAuthority('admin:read','creator:read','user:read','reader:read')")
   public ResponseEntity<Map<String, Object>> getForm(
       @PathVariable Integer id,
       @RequestParam(required = false) String include) throws NotFoundException {

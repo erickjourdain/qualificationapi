@@ -152,7 +152,7 @@ const UpdateForm = ({ courante, locked, answer, onUpdated }: UpdateFormProps) =>
   };
 
   const disabled = () => {
-    return !isUser || !courante || locked;
+    return !isUser() || !courante || locked;
   }
 
   if (answer) {
@@ -223,7 +223,7 @@ const UpdateForm = ({ courante, locked, answer, onUpdated }: UpdateFormProps) =>
             {errors.opportunite?.message}
           </Typography>
         </Box>
-        {disabled() && (
+        {!disabled() && (
           <Box>
             <Button
               disabled={!answer?.courante || dialog}
@@ -252,7 +252,7 @@ const UpdateForm = ({ courante, locked, answer, onUpdated }: UpdateFormProps) =>
           <Box mt={3}>
             <Stack spacing={2} direction="row">
               <Button variant="contained" color="primary" disabled={!isValid || !isChanged() || isPending} onClick={handleSubmit}>
-                {isPending ? "Sauvegare en cours" : "Mettre à jour"}
+                {isPending ? "Sauvegare en cours" : "Enregistrer"}
               </Button>
               <Button variant="contained" color="warning" onClick={handleReset}>
                 Reset
