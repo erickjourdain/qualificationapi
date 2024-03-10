@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
@@ -14,20 +14,26 @@ import manageError from "../utils/manageError";
 const CloseApp = () => {
   const navigate = useNavigate();
 
+  const [disconnect, setDisconnect] = useState<boolean>(false);
+
   // Chargement de l'état Atom des alertes et de la sauvegarde des données
   const setAlerte = useSetAtom(displayAlert);
   const setUser = useSetAtom(loggedUser);
-  
-  const {error, isError, isSuccess} = useQuery({
+
+  const { error, isError, isSuccess } = useQuery({
     queryKey: ["logout"],
-    queryFn: logout
+    queryFn: logout,
+    enabled: disconnect,
   })
-  
+
   // fin du processus de déconnexion
   useEffect(() => {
-    delAuthorisation();
-    localStorage.removeItem("token");
-    setUser(null);
+    if (isSuccess) {
+      delAuthorisation();
+      localStorage.removeItem("token");
+      setUser(null);
+      navigate("/login");
+    }
   }, [isSuccess]);
   // gestion des erreurs de déconnexion
   useEffect(() => {
@@ -47,10 +53,10 @@ const CloseApp = () => {
         }}
       >
         <Typography sx={{ mb: 3, textAlign: "center" }} variant="h5">
-          L'application est fermée, cliquez sur le bouton ci-dessous pour la relancer.
+          Souhaitez-vous vous déconnecter de l'application?
         </Typography>
-        <Button color="primary" variant="contained" onClick={() => navigate("/login")}>
-          Relancer l'application
+        <Button color="primary" variant="contained" onClick={() => setDisconnect(true)}>
+          Me deconnecter.
         </Button>
       </Box>
     </Container>
