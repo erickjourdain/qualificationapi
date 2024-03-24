@@ -36,19 +36,18 @@ const SearchAnswers = ({ onUserChange, onSearchChange, loading }: SearchUserProp
   const [options, setOptions] = useState<readonly User[]>([]);
 
   // query de récupération des utilisateurs
-  const { data, error, refetch, isError, isSuccess } = useQuery({
-    queryKey: ["getUsers"],
+  const { data, error, isError, isSuccess } = useQuery({
+    queryKey: ["getUsers", search],
     queryFn: () => {
-      const filter = `filter=${sfOr([sfLike("nom", search ? search : ""), sfLike("prenom", search ? search : "")])}`;
-      return getUsers(filter, ["id", "nom", "prenom"]);
+      if (search && !isEmpty(search)) {
+        const filter = `filter=${sfOr([sfLike("nom", search ? search : ""), sfLike("prenom", search ? search : "")])}`;
+        return getUsers(filter, ["id", "nom", "prenom"]);
+      } else {
+        return getUsers("", ["id", "nom", "prenom"]);
+      }
     },
-    enabled: false,
     refetchOnWindowFocus: false,
   });
-
-  useEffect(() => {
-    if (search && !isEmpty(search)) refetch();
-  }, [search]);
 
   useEffect(() => {
     const users = isSuccess && data ? data.data.data : [];
@@ -59,6 +58,15 @@ const SearchAnswers = ({ onUserChange, onSearchChange, loading }: SearchUserProp
   useEffect(() => {
     if (isError) setAlerte({ severite: "error", message: manageError(error) });
   }, [isError]);
+
+  // remise à zéro de l'état lors du déchargement du composant
+  useEffect(() => {
+    return () => {
+      setSearch(null);
+      setValue(null);
+      setOptions([]);
+    }
+  }, []);
 
   return (
     <Grid container spacing={2}>
@@ -87,7 +95,7 @@ const SearchAnswers = ({ onUserChange, onSearchChange, loading }: SearchUserProp
               return <Typography>Erreur chargement données</Typography>;
             } else
               return (
-                <li {...props}>
+                <li {...props} key={option.id}>
                   <Typography variant="body2" color="text.secondary">
                     {option.prenom} {option.nom}
                   </Typography>
