@@ -29,6 +29,7 @@ const Settings = () => {
 
   const handleClick = (i: number) => {
     setTripettoRunner(options[i] as Runner);
+    localStorage.setItem("runner", options[i]);
     handleClose();
   };
 
