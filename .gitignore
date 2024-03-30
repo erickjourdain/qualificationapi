@@ -44,3 +44,7 @@ build/
 
 ### Application configuration ###
 src/main/resources/application-prod.yml
+
+### node 
+/app/node
+/app/node_modules
