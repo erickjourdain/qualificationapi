@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -25,7 +26,6 @@ public class JwtService {
 
   /**
    * Extraction du nom de l'utilisateur
-   * 
    * @param token String le token
    * @return String le nom de l'utilisateur
    */
@@ -35,7 +35,6 @@ public class JwtService {
 
   /**
    * Extraction d'un élément du token
-   * 
    * @param token          String le token
    * @param claimsResolver la fonction d'extraction
    * @return valeur du paramètre extrait
@@ -47,7 +46,6 @@ public class JwtService {
 
   /**
    * Génération d'un token à partir des informations de l'utilisateur
-   * 
    * @param userDetails les informations de l'utilisateur
    * @return String le token généré
    */
@@ -56,9 +54,21 @@ public class JwtService {
   }
 
   /**
+   * Génération d'un token basique sans extra claim
+   * @return String le token généré
+   */
+  public String generateToken() {
+    return Jwts
+    .builder()
+    .setIssuedAt(new Date(System.currentTimeMillis()))
+    .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
+    .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+    .compact();
+  }
+
+  /**
    * Génération d'un token à partir des informations de l'utilisateur courant
    * et d'informations complémentaires
-   * 
    * @param extraClaims Map<String, Object> Map des informations complémentaires à
    *                    ajouter au token
    * @param userDetails les informations de l'utilisateur
@@ -79,7 +89,6 @@ public class JwtService {
 
   /**
    * Etxraction des revendications du token
-   * 
    * @param token String le token
    * @return les reveendications du token
    */
@@ -94,7 +103,6 @@ public class JwtService {
 
   /**
    * Extraction de la date d'expiration du token
-   * 
    * @param token le token
    * @return Date la date d'expiration du token
    */
@@ -104,7 +112,6 @@ public class JwtService {
 
   /**
    * Vérification de la validité du token
-   * 
    * @param token       String le token
    * @param userDetails UserDetails l'utilisateur connecté
    * @return Boolean état du token
@@ -118,17 +125,28 @@ public class JwtService {
 
   /**
    * Vérification de la date d'expiration du token
-   * 
    * @param token String le token
    * @return Boolean état du token
    */
-  private boolean isTokenExpired(String token) {
+  public boolean isTokenExpired(String token) {
     return extractExpiration(token).before(new Date());
   }
 
   /**
+   * Vérification de la date d'expiration du token sans lever d'exception
+   * @param token String le token
+   * @return Boolean état du token
+   */
+  public boolean isTokenExpiredWithoutException(String token) {
+    try {
+        return extractExpiration(token).before(new Date());
+    } catch (ExpiredJwtException e) {
+        return true;
+    }
+}
+
+  /**
    * Définition de la Clef de signature des tokens
-   * 
    * @return la clef de signature du token
    */
   private Key getSigningKey() {

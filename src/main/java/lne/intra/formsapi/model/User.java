@@ -65,6 +65,9 @@ public class User implements UserDetails{
   @Column(nullable = false, unique = true)
   private String slug;
 
+  @Column(name = "reset_pwd_token")
+  private String resetPwdToken;
+
   @Column(columnDefinition = "DATETIME DEFAULT CURRENT_DATE", nullable = false)
   @CreationTimestamp
   @Builder.Default private Date createdAt = new Date();

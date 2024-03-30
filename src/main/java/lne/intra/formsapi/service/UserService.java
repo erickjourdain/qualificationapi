@@ -19,6 +19,7 @@ import com.turkraft.springfilter.boot.Filter;
 import lne.intra.formsapi.model.Role;
 import lne.intra.formsapi.model.User;
 import lne.intra.formsapi.model.exception.AppException;
+import lne.intra.formsapi.model.request.ChangePwdRequest;
 import lne.intra.formsapi.model.request.UserRequest;
 import lne.intra.formsapi.repository.UserRepository;
 import lne.intra.formsapi.util.Slugify;
@@ -55,6 +56,8 @@ public class UserService {
       response.put("role", user.getRole());
     if ((fields.isEmpty() || fields.contains("validated")) && logUser.getRole() == Role.ADMIN)
       response.put("validated", user.getValidated());
+    if ((fields.isEmpty() || fields.contains("resetPwdToken")) && logUser.getRole() == Role.ADMIN)
+      response.put("resetPwdToken", user.getResetPwdToken());
     if ((fields.isEmpty() || fields.contains("locked")) && logUser.getRole() == Role.ADMIN)
       response.put("locked", user.getLocked());
     if (fields.isEmpty() || fields.contains("slug"))
@@ -73,6 +76,7 @@ public class UserService {
    * @return
    * @throws AppException
    */
+  @SuppressWarnings("null")
   public User getUser(Integer id) throws AppException {
     User user = repository.findById(id)
         .orElseThrow(() -> new AppException(404, "L'utilisateur recherché n'existe pas"));
@@ -95,6 +99,7 @@ public class UserService {
    * @param id      id de l'utilisateur
    * @return
    */
+  @SuppressWarnings("null")
   public User setAdmin(Integer id) {
     User user = repository.findById(id)
         .orElseThrow(() -> new AppException(404, "L'utilisateur recherché n'existe pas"));
@@ -118,6 +123,7 @@ public class UserService {
    * @param request RegisterRequest requête de création
    * @return Utilisateur réponse contenant le token de connexion
    */
+  @SuppressWarnings("null")
   public User register(UserRequest request) {
     final Slugify slug = Slugify.builder().build();
     // création du nouvel utilisatuer avec les données fournies
@@ -140,6 +146,7 @@ public class UserService {
    * @return
    * @throws AppException
    */
+  @SuppressWarnings("null")
   public User update(Integer id, UserRequest request) throws AppException {
     // vérification de l'existance de l'utilisateur à modifier
     User user = repository.findById(id)
@@ -175,6 +182,7 @@ public class UserService {
    * @return
    * @throws AppException
    */
+  @SuppressWarnings("null")
   public User validate(Integer id) throws AppException {
     // vérification de l'existance de l'utilisateur à modifier
     User user = repository.findById(id)
@@ -190,6 +198,7 @@ public class UserService {
    * @return
    * @throws AppException
    */
+  @SuppressWarnings("null")
   public User lock(Integer id) throws AppException {
     // vérification de l'existance de l'utilisateur à modifier
     User user = repository.findById(id)
@@ -197,6 +206,40 @@ public class UserService {
     user.setLocked(true);
     // réponse avec les données de l'utilisateur
     return repository.save(user);
+  }
+
+  /**
+   * Enregistrer le token de reset du mot de passe
+   * @param id
+   * @param token
+   * @return
+   * @throws AppException
+   */
+  @SuppressWarnings("null")
+  public Map<String, Object> setResetpwdToken(Integer id, String token) throws AppException {
+    Map<String, Object> response = new HashMap<>();
+    // vérification de l'existance de l'utilisateur à modifier
+    User user = repository.findById(id)
+        .orElseThrow(() -> new AppException(404, "L'utilisateur recherché n'existe pas"));
+    user.setResetPwdToken(token);
+    repository.save(user);
+    response.put("token", token);
+    return response;
+  }
+
+  /**
+   * Mise à jour du mot de passe
+   * @param request
+   * @return
+   * @throws AppException
+   */
+  public Boolean resetPassword(ChangePwdRequest request) throws AppException {
+    User user = repository.findByResetPwdToken(request.getToken())
+      .orElseThrow(() -> new AppException(404, "Le token est invalide"));
+    user.setPassword(passwordEncoder.encode(request.getPassword()));
+    user.setResetPwdToken(null);
+    repository.save(user);
+    return true;
   }
 
 }

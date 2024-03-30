@@ -37,10 +37,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lne.intra.formsapi.model.Role;
 import lne.intra.formsapi.model.User;
 import lne.intra.formsapi.model.exception.AppException;
+import lne.intra.formsapi.model.openApi.GetToken;
 import lne.intra.formsapi.model.openApi.GetUserId;
 import lne.intra.formsapi.model.openApi.GetUsers;
 import lne.intra.formsapi.model.request.UserRequest;
 import lne.intra.formsapi.model.response.UsersResponse;
+import lne.intra.formsapi.service.JwtService;
 import lne.intra.formsapi.service.UserService;
 import lne.intra.formsapi.util.ObjectsValidator;
 import lombok.RequiredArgsConstructor;
@@ -54,7 +56,25 @@ import lombok.RequiredArgsConstructor;
 public class UsersController {
 
   private final UserService service;
+  private final JwtService jwtService;
   private final ObjectsValidator<UserRequest> registerRequestValidator;
+
+  /**
+   * Générer un token pour reset du mot de passe d'un utilisateur
+   * @param id l'identifiant de l'utilisateur
+   * @return le token généré
+   * @throws AppException
+   */
+  @Operation(summary = "Générer un token pour reset du mot de passe", description = "Accès limité au rôle `ADMIN`")
+  @ApiResponse(responseCode = "200", description = "Token pour le reset du mot de passe", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetToken.class)))
+  @ApiResponse(responseCode = "400", description = "Données fournies incorrectes", content = @Content(mediaType = "application/json"))
+  @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
+  @GetMapping("/reset-token/{id}")
+  @PreAuthorize("hasAuthority('admin:update')")
+  public ResponseEntity<Map<String, Object>> resetToken(
+    @PathVariable Integer id) throws AppException {
+      return ResponseEntity.ok(service.setResetpwdToken(id, jwtService.generateToken()));
+  }
 
   /**
    * Création d'un nouvel utilisateur

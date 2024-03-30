@@ -1,0 +1,430 @@
+{
+  "$id": "https://tripetto.com/sdk/tripetto.schema.json",
+  "title": "Tripetto Form Definition",
+  "description": "Defines a form for Tripetto.",
+  "type": "object",
+  "properties": {
+    "builder": {
+      "description": "Specifies information about the builder.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Specifies the name of the builder.",
+          "type": "string"
+        },
+        "version": {
+          "description": "Specifies the version number of the builder.",
+          "type": "string"
+        }
+      },
+      "required": ["name", "version"]
+    },
+    "name": {
+      "description": "Specifies the name of the form.",
+      "type": "string"
+    },
+    "description": {
+      "description": "Specifies the description of the form.",
+      "type": "string"
+    },
+    "keywords": {
+      "description": "Specifies keywords for the form.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "language": {
+      "description": "Specifies the language of the form using the ISO 639-1 standard language codes.",
+      "type": "string"
+    },
+    "prologue": {
+      "description": "Specifies the prologue (welcome message) for the form.",
+      "type": "object",
+      "properties": {
+        "title": {
+          "description": "Specifies the title for the prologue (supports markdown).",
+          "type": "string"
+        },
+        "description": {
+          "description": "Specifies the description for the prologue (supports markdown).",
+          "type": "string"
+        },
+        "image": {
+          "description": "Specifies the URL of an image to show in the prologue.",
+          "type": "string"
+        },
+        "video": {
+          "description": "Specifies the URL of a video to show in the prologue. Currently, YouTube and Vimeo are supported. The shareable URL of the video needs to be supplied.",
+          "type": "string"
+        },
+        "button": {
+          "description": "Specifies the label of the button that starts the form.",
+          "type": "string"
+        }
+      }
+    },
+    "sections": {
+      "description": "Specifies the sections for the form.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/section" }
+    },
+    "epilogue": {
+      "description": "Specifies the epilogue (closing message) for the form.",
+      "$ref": "#/$defs/epilogue"
+    }
+  },
+  "required": ["builder", "sections"],
+  "$defs": {
+    "section": {
+      "description": "Defines a section.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Specifies the unique identifier of the section.",
+          "type": "string",
+          "pattern": "^[A-Fa-f0-9]{64}$"
+        },
+        "name": {
+          "description": "Specifies the name of the section.",
+          "type": "string"
+        },
+        "type": {
+          "description": "Specifies the section type.",
+          "type": "string",
+          "enum": ["nest", "branch"]
+        },
+        "reference": {
+          "description": "Specifies a reference for a section that is a nested branch (subform).",
+          "type": "string"
+        },
+        "version": {
+          "description": "Specifies a version indicator for a section that is a nested branch (subform).",
+          "type": "string"
+        },
+        "alias": {
+          "description": "Specifies an alias for the section or subform.",
+          "type": "string"
+        },
+        "readonly": {
+          "description": "Specifies if the nested branch (subform) is read-only. In that case, the subform cannot be edited in the builder.",
+          "type": "boolean"
+        },
+        "nodes": {
+          "description": "Specifies the nodes of the section.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "Specifies the unique identifier of the node.",
+                "type": "string",
+                "pattern": "^[A-Fa-f0-9]{64}$"
+              },
+              "name": {
+                "description": "Specifies the name of the node.",
+                "type": "string"
+              },
+              "nameVisible": {
+                "description": "Specifies if the name of the node should be visible in the runner.",
+                "type": "boolean"
+              },
+              "disabled": {
+                "description": "Specifies if the node is disabled. Disabled nodes are ignored by the runners as if they did not exist.",
+                "type": "boolean"
+              },
+              "placeholder": {
+                "description": "Specifies the placeholder of the node.",
+                "type": "string"
+              },
+              "description": {
+                "description": "Specifies the description of the node (supports markdown).",
+                "type": "string"
+              },
+              "explanation": {
+                "description": "Specifies the explanation of the node (supports markdown) which is an additional help text that runners can show along with the node.",
+                "type": "string"
+              },
+              "block": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "description": "Specifies the node block type identifier.",
+                    "type": "string"
+                  },
+                  "version": {
+                    "description": "Specifies the version of the block.",
+                    "type": "string"
+                  }
+                },
+                "required": ["type", "version"]
+              },
+              "slots": {
+                "description": "Specifies the slots for the node. Slots serve as the data transporters for the form. Each node block defines the slots required for the data collection of that block.",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "description": "Specifies the unique identifier of the slot.",
+                      "type": "string",
+                      "pattern": "^[A-Fa-f0-9]{64}$"
+                    },
+                    "type": {
+                      "description": "Specifies the slot type identifier.",
+                      "type": "string"
+                    },
+                    "kind": {
+                      "description": "Specifies the kind of slot.",
+                      "type": "string",
+                      "enum": ["static", "dynamic", "feature", "meta"]
+                    },
+                    "reference": {
+                      "description": "Specifies the slot reference which is a unique identifier for the slot within the node block.",
+                      "type": "string"
+                    },
+                    "sequence": {
+                      "description": "Specifies the sequence of a slot (used to order the slots).",
+                      "type": "number"
+                    },
+                    "label": {
+                      "description": "Specifies a human readable label for the slot.",
+                      "type": "string"
+                    },
+                    "name": {
+                      "description": "Specifies the slot name.",
+                      "type": "string"
+                    },
+                    "placeholder": {
+                      "description": "Specifies the slot placeholder.",
+                      "type": "string"
+                    },
+                    "alias": {
+                      "description": "Specifies the alias for the slot. Aliases are used in the dataset to identify a certain value.",
+                      "type": "string"
+                    },
+                    "required": {
+                      "description": "Specifies if the slot is required and needs a value before a form can complete.",
+                      "type": "boolean"
+                    },
+                    "pipeable": {
+                      "description": "Specifies if the slot is pipeable. Pipeable slots can be used/referenced by other node blocks.",
+                      "type": ["boolean", "object"],
+                      "properties": {
+                        "pipe": {
+                          "description": "Optional name for the pipe.",
+                          "type": "string"
+                        },
+                        "label": {
+                          "description": "Optional localized label for the pipe.",
+                          "type": "string"
+                        },
+                        "alias": {
+                          "description": "Optional alias for the pipe.",
+                          "type": "string"
+                        },
+                        "content": {
+                          "description": "Specifies the field or content that should be used as the pipe value (defaults to `value` which is the current value of the slot).",
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "enum": ["value", "label", "name"]
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "string": {
+                                  "description": "Contains the content to use as pipe value without support for any markup or variables.",
+                                  "type": "string"
+                                },
+                                "text": {
+                                  "description": "Contains the content to use as pipe value with support for variables.",
+                                  "type": "string"
+                                },
+                                "markdown": {
+                                  "description": "Contains markdown content to use as pipe value with support for basic formatting, hyperlinks, and variables.",
+                                  "type": "string"
+                                }
+                              },
+                              "required": ["string"]
+                            }
+                          ]
+                        },
+                        "legacy": {
+                          "description": "Specifies the name of a legacy pipe. Only here for backward compatibility. Don't use!",
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "default": {
+                      "description": "Specifies the default value for the slot."
+                    },
+                    "exportable": {
+                      "description": "Specifies if the slot is exportable. Exportable slots are part of the dataset that contains all the collected values of a form.",
+                      "type": "boolean"
+                    },
+                    "actionable": {
+                      "description": "Specifies if the slot is actionable. Actionable slots are special slots used to perform certain actions.",
+                      "type": "boolean"
+                    },
+                    "protected": {
+                      "description": "Specifies if the slot is protected. When a slot is protected, the value of that slot can only be set by the node block that created the slot.",
+                      "type": "boolean"
+                    }
+                  },
+                  "required": ["id", "type", "kind", "reference"]
+                }
+              }
+            },
+            "required": ["id"]
+          }
+        },
+        "branches": {
+          "description": "Specifies the branches of the section.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "Specifies the unique identifier of the branch.",
+                "type": "string",
+                "pattern": "^[A-Fa-f0-9]{64}$"
+              },
+              "name": {
+                "description": "Specifies the name of the branch.",
+                "type": "string"
+              },
+              "conditions": {
+                "description": "Specifies the conditions of the branch.",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "description": "Specifies the unique identifier of the condition.",
+                      "type": "string",
+                      "pattern": "^[A-Fa-f0-9]{64}$"
+                    },
+                    "disabled": {
+                      "description": "Specifies if the condition is disabled. Disabled conditions are ignored by the runners as if they did not exist.",
+                      "type": "boolean"
+                    },
+                    "block": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "description": "Specifies the condition block type identifier.",
+                          "type": "string"
+                        },
+                        "version": {
+                          "description": "Specifies the version of the block.",
+                          "type": "string"
+                        },
+                        "branch": {
+                          "description": "Specifies the id of a related branch.",
+                          "type": "string",
+                          "pattern": "^[A-Fa-f0-9]{64}$"
+                        },
+                        "section": {
+                          "description": "Specifies the id of a related section.",
+                          "type": "string",
+                          "pattern": "^[A-Fa-f0-9]{64}$"
+                        },
+                        "node": {
+                          "description": "Specifies the id of a related node.",
+                          "type": "string",
+                          "pattern": "^[A-Fa-f0-9]{64}$"
+                        },
+                        "slot": {
+                          "description": "Specifies the id of a related slot.",
+                          "type": "string",
+                          "pattern": "^[A-Fa-f0-9]{64}$"
+                        }
+                      },
+                      "required": ["type", "version"]
+                    }
+                  },
+                  "required": ["id"]
+                }
+              },
+              "sections": {
+                "description": "Specifies the sections of the branch.",
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/section"
+                }
+              },
+              "culling": {
+                "description": "Specifies the culling mode of the branch.",
+                "type": "string",
+                "enum": ["first", "each", "all", "none"]
+              },
+              "jump": {
+                "description": "Specifies if a branch should jump to another section or abort (terminate) the whole form.",
+                "type": "string",
+                "pattern": "^[A-Fa-f0-9]{64}$|^abort$"
+              },
+              "epilogue": {
+                "description": "Specifies the epilogue (closing message) for the branch.",
+                "$ref": "#/$defs/epilogue"
+              }
+            },
+            "required": ["id"]
+          }
+        }
+      },
+      "required": ["id"]
+    },
+    "epilogue": {
+      "description": "Specifies the form epilogue (closing message).",
+      "type": "object",
+      "properties": {
+        "title": {
+          "description": "Specifies the title for the epilogue (supports markdown).",
+          "type": "string"
+        },
+        "description": {
+          "description": "Specifies the description for the epilogue (supports markdown).",
+          "type": "string"
+        },
+        "image": {
+          "description": "Specifies the URL of an image to show in the epilogue.",
+          "type": "string"
+        },
+        "video": {
+          "description": "Specifies the URL of a video to show in the epilogue. Currently, YouTube and Vimeo are supported. The shareable URL of the video needs to be supplied.",
+          "type": "string"
+        },
+        "button": {
+          "description": "Specifies the label of the button that starts the form.",
+          "type": "object",
+          "properties": {
+            "label": {
+              "description": "Specifies the label for the button.",
+              "type": "string"
+            },
+            "url": {
+              "description": "Specifies the URL for the button.",
+              "type": "string"
+            },
+            "target": {
+              "description": "Specifies if the button should open a new window/tab.",
+              "type": "string",
+              "enum": ["self", "blank"]
+            }
+          },
+          "required": ["label", "url", "target"]
+        },
+        "repeatable": {
+          "description": "Specifies if the form is repeatable.",
+          "type": "boolean"
+        },
+        "redirectUrl": {
+          "description": "Specifies an URL to redirect to when the form ends.",
+          "type": "string"
+        }
+      }
+    }
+  }
+}

@@ -10,6 +10,7 @@ import lne.intra.formsapi.model.Form;
 
 public interface FormRepository extends JpaRepository<Form, Integer>, JpaSpecificationExecutor<Form> {
 
+  @SuppressWarnings("null")
   Page<Form> findAll(Pageable pageable);
 
   @Query("""

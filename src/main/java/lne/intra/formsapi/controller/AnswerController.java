@@ -81,7 +81,7 @@ public class AnswerController {
   @ApiResponse(responseCode = "400", description = "Données fournies incorrectes", content = @Content(mediaType = "application/json"))
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @PostMapping()
-  @PreAuthorize("hasAnyAuthority('admin:create','creator:create','user:create')")
+  @PreAuthorize("hasAnyAuthority('admin:create','creator:create','user:create','reader:read')")
   public ResponseEntity<Map<String, Object>> save(
       @AuthenticationPrincipal UserDetails userDetails,
       @RequestBody AnswerRequest request,
@@ -115,7 +115,7 @@ public class AnswerController {
   @ApiResponse(responseCode = "404", description = "Createur non trouvé dans la base", content = @Content(mediaType = "application/text"))
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @GetMapping
-  @PreAuthorize("hasAnyAuthority('admin:read','creator:read','user:read')")
+  @PreAuthorize("hasAnyAuthority('admin:read','creator:read','user:read','reader:read')")
   public ResponseEntity<AnswersResponse> search(
       @RequestParam(defaultValue = "1") Integer page,
       @RequestParam(defaultValue = "10") Integer size,
@@ -174,7 +174,7 @@ public class AnswerController {
   @ApiResponse(responseCode = "404", description = "Formuliare ou Createur non trouvé dans la base", content = @Content(mediaType = "application/text"))
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @GetMapping("/{id}")
-  @PreAuthorize("hasAnyAuthority('admin:read','creator:read','user:read')")
+  @PreAuthorize("hasAnyAuthority('admin:read','creator:read','user:read','reader:read')")
   public ResponseEntity<Map<String, Object>> getAnswer(
       @AuthenticationPrincipal UserDetails userDetails,
       @PathVariable Integer id,

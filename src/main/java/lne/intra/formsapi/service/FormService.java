@@ -70,6 +70,8 @@ public class FormService {
       response.put("formulaire", form.getFormulaire());
     if (fields.isEmpty() || fields.contains("version"))
       response.put("version", form.getVersion());
+    if (fields.isEmpty() || fields.contains("formulaireInitial"))
+      response.put("formulaireInitial", form.getInitForm());
     if (fields.isEmpty() || fields.contains("valide"))
       response.put("valide", form.getValide());
     if (fields.isEmpty() || fields.contains("slug"))
@@ -92,6 +94,7 @@ public class FormService {
    * @return Liste des champs du formulaire à retourner
    * @throws AppException
    */
+  @SuppressWarnings("null")
   public Form saveForm(FormRequest request, UserDetails userDetails)
       throws AppException {
     final Slugify slug = Slugify.builder().build();
@@ -118,6 +121,7 @@ public class FormService {
    * @return Liste des champs du formulaire à retourner
    * @throws AppException
    */
+  @SuppressWarnings("null")
   public Form partialUpdateForm(Integer id, FormRequest request, UserDetails userDetails)
       throws AppException {
     final Slugify slug = Slugify.builder().build();
@@ -150,7 +154,8 @@ public class FormService {
           .description(form.getDescription())
           .formulaire(request.getFormulaire())
           .version(form.getVersion() + 1)
-          .slug(slug.slugify(form.getTitre() + " v" + form.getVersion() + 1))
+          .initForm((form.getInitForm() == null) ? form.getId() : form.getInitForm())
+          .slug(slug.slugify(form.getTitre() + " v" + (form.getVersion() + 1)))
           .createur(form.getCreateur())
           .build();
     }
@@ -167,6 +172,7 @@ public class FormService {
    * @return Liste des champs du formulaire à retourner
    * @throws AppException
    */
+  @SuppressWarnings("null")
   public Form getForm(Integer id) throws AppException {
     Form form = repository.findById(id)
         .orElseThrow(() -> new AppException(400, "Le formuaire n'existe pas"));
@@ -181,6 +187,7 @@ public class FormService {
    *                page, tri)
    * @return <FormsResponse>
    */
+  @SuppressWarnings("null")
   public Page<Form> search(@Filter Specification<Form> spec, Pageable paging) {
     // Récupération des formulaires
     return repository.findAll(spec, paging);
