@@ -9,6 +9,8 @@ public class HeaderResponse {
   private Integer id;
   private String uuid;
   private String societe;
+  private String email;
+  private String telephone;
   private String nom;
   private String prenom;
   private String produit;
