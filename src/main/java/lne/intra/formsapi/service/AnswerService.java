@@ -18,6 +18,7 @@ import com.turkraft.springfilter.boot.Filter;
 
 import lne.intra.formsapi.model.Answer;
 import lne.intra.formsapi.model.Form;
+import lne.intra.formsapi.model.Header;
 import lne.intra.formsapi.model.LockedAnswer;
 import lne.intra.formsapi.model.User;
 import lne.intra.formsapi.model.exception.AppException;
@@ -32,6 +33,7 @@ public class AnswerService {
   private final AnswerRepository answerRepository;
   private final UserService userService;
   private final FormService formService;
+  private final HeaderService headerService;
   private final LockedAnswerService lockedAnswerService;
 
   /**
@@ -46,6 +48,7 @@ public class AnswerService {
     Map<String, Object> user = new HashMap<>();
     Map<String, Object> form = new HashMap<>();
     Map<String, Object> response = new HashMap<>();
+    Map<String, Object> header = new HashMap<>();
     Map<String, Object> lock = new HashMap<>();
 
     // création de la liste des champs à retourner par la requête
@@ -109,6 +112,17 @@ public class AnswerService {
       response.put("formulaire", form);
     }
 
+    // ajout du champ header
+    if (fields.isEmpty() || fields.contains("entete")) {
+      // recherche du formulaire dans la base
+      Header entete = headerService.getHeader(answer.getHeader().getId());
+      header.put("id", entete.getId());
+      header.put("uuid", entete.getUuid());
+      header.put("societe", entete.getSociete());
+      form.put("opportunite", entete.getOpportunite());
+      response.put("entete", header);
+    }
+
     // ajout des différents champs à retourner en fonction de la demande exposée
     // dans la requêtes d'interrogation
     if (fields.isEmpty() || fields.contains("id"))
@@ -119,10 +133,8 @@ public class AnswerService {
       response.put("reponse", answer.getReponse());
     if (fields.isEmpty() || fields.contains("statut"))
       response.put("statut", answer.getStatut());
-    if (fields.isEmpty() || fields.contains("demande"))
-      response.put("demande", answer.getDemande());
-    if (fields.isEmpty() || fields.contains("opportunite"))
-      response.put("opportunite", answer.getOpportunite());
+    if (fields.isEmpty() || fields.contains("devis"))
+      response.put("devis", answer.getDevis());
     if (fields.isEmpty() || fields.contains("version"))
       response.put("version", answer.getVersion());
     if (fields.isEmpty() || fields.contains("courante"))
@@ -142,7 +154,6 @@ public class AnswerService {
    * @return
    * @throws AppException
    */
-  @SuppressWarnings("null")
   public Answer getAnswer(Integer id) throws AppException {
     Answer answer = answerRepository.findById(id)
         .orElseThrow(() -> new AppException(400, "La réponse n'existe pas"));
@@ -157,7 +168,6 @@ public class AnswerService {
    * @return
    * @throws AppException
    */
-  @SuppressWarnings("null")
   public Answer saveAnswer(AnswerRequest request, UserDetails userDetails)
       throws AppException {
     // récupération des informations sur l'utilisateur connecté
@@ -185,7 +195,6 @@ public class AnswerService {
    * @return
    * @throws AppException
    */
-  @SuppressWarnings("null")
   public Answer updateAnswer(Integer id, AnswerRequest request, UserDetails userDetails)
       throws AppException {
 
@@ -195,15 +204,10 @@ public class AnswerService {
     Answer answer = answerRepository.findById(id)
         .orElseThrow(() -> new AppException(404, "Impossible de trouver la réponse à modifier"));
 
-    // Mise à jour de la demande
-    Optional.ofNullable(request.getDemande())
+    // Mise à jour du devis
+    Optional.ofNullable(request.getDevis())
         .ifPresent(res -> {
-          answer.setDemande(res);
-        });
-    // Mise à jour de l'opportunité
-    Optional.ofNullable(request.getOpportunite())
-        .ifPresent(res -> {
-          answer.setOpportunite(res);
+          answer.setDevis(res);
         });
     // Mise à jour du statut
     Optional.ofNullable(request.getStatut())
@@ -228,8 +232,7 @@ public class AnswerService {
           .version(answer.getVersion() + 1)
           .createur(user)
           .gestionnaire(user)
-          .demande(answer.getDemande())
-          .opportunite(answer.getOpportunite())
+          .devis(answer.getDevis())
           .statut(answer.getStatut())
           .build();
     }
@@ -245,7 +248,6 @@ public class AnswerService {
    * @param paging
    * @return
    */
-  @SuppressWarnings("null")
   public Page<Answer> search(@Filter Specification<Answer> spec, Pageable paging) {
     // Récupération des réponses
     return answerRepository.findAll(spec, paging);

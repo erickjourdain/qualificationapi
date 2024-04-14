@@ -65,7 +65,6 @@ public class AuthentificationService {
    * @param user User l'utilisateur connecté
    * @param jwtToken String le token généré lors de la connexion
    */
-  @SuppressWarnings("null")
   private void saveUserToken(User user, String jwtToken) {
     // création du nouveau token
     var token = Token.builder()

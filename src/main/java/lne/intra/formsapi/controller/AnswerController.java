@@ -54,7 +54,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v${lne.intra.formsapi.api}/data/answers")
-@PreAuthorize("hasAnyRole('ADMIN','USER')")
+@PreAuthorize("hasAnyRole('ADMIN','CREATOR','USER','READER')")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "BearerAuth")
 @Tag(name = "reponses endpoint")
@@ -81,7 +81,7 @@ public class AnswerController {
   @ApiResponse(responseCode = "400", description = "Données fournies incorrectes", content = @Content(mediaType = "application/json"))
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @PostMapping()
-  @PreAuthorize("hasAnyAuthority('admin:create','creator:create','user:create','reader:read')")
+  @PreAuthorize("hasAnyAuthority('admin:create','creator:create','user:create')")
   public ResponseEntity<Map<String, Object>> save(
       @AuthenticationPrincipal UserDetails userDetails,
       @RequestBody AnswerRequest request,
@@ -105,14 +105,14 @@ public class AnswerController {
    * @return ResponseEntity<AnswersResponse>
    * @throws NotFoundException
    */
-  @Operation(summary = "Récupération des réponses apportées à un formulaire avec pagination et filtre", description = "Accès limité aux rôles `ADMIN`, `CREATOR` et `USER`")
+  @Operation(summary = "Récupération des réponses apportées à un formulaire avec pagination et filtre", description = "Accès limité aux personnes connectées")
   @Parameter(in = ParameterIn.QUERY, name = "page", description = "Numéro de la page à retourner", required = false)
   @Parameter(in = ParameterIn.QUERY, name = "size", description = "Nombre d'éléments à retourner", required = false)
   @Parameter(in = ParameterIn.QUERY, name = "sortBy", description = "Champ de tri ex: asc(id) ou desc(createdAt)", required = false)
   @Parameter(in = ParameterIn.QUERY, name = "include", description = "Liste des champs à retourner", required = false, example = "id, titre, version, createur")
   @Parameter(in = ParameterIn.QUERY, name = "filter", description = "Filtre au format défini dans le package [turkraft/springfilter](https://github.com/turkraft/springfilter)", required = false, schema = @Schema(implementation = String.class), example = "valide:true and titre ~~ '*formulaire*'")
   @ApiResponse(responseCode = "200", description = "Les réponses et informations sur la pagination", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetAnswers.class)))
-  @ApiResponse(responseCode = "404", description = "Createur non trouvé dans la base", content = @Content(mediaType = "application/text"))
+  @ApiResponse(responseCode = "404", description = "Formulaire, Créateur ou Gestionnaire non trouvés dans la base", content = @Content(mediaType = "application/text"))
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @GetMapping
   @PreAuthorize("hasAnyAuthority('admin:read','creator:read','user:read','reader:read')")
@@ -168,10 +168,10 @@ public class AnswerController {
    * @return ResponseEntity<GetAnswerId>
    * @throws NotFoundException
    */
-  @Operation(summary = "Récupération d'une réponse via son id", description = "Accès limité aux rôles `ADMIN`, `CREATOR` et `USER`")
+  @Operation(summary = "Récupération d'une réponse via son id", description = "Accès limité aux personnes connectées")
   @Parameter(in = ParameterIn.QUERY, name = "include", description = "Liste des champs à retourner", required = false, example = "id, titre, version, createur")
   @ApiResponse(responseCode = "200", description = "Réponse recherchée", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetAnswerId.class)))
-  @ApiResponse(responseCode = "404", description = "Formuliare ou Createur non trouvé dans la base", content = @Content(mediaType = "application/text"))
+  @ApiResponse(responseCode = "404", description = "Formulaire, Créateur ou Gestionnaire non trouvés dans la base", content = @Content(mediaType = "application/text"))
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @GetMapping("/{id}")
   @PreAuthorize("hasAnyAuthority('admin:read','creator:read','user:read','reader:read')")
@@ -205,7 +205,7 @@ public class AnswerController {
    * @throws NotFoundException
    */
   @Operation(summary = "Mise à jour d'une réponse apportée à un formulaire", description = "Accès limité aux rôles `ADMIN`, `CREATOR` et `USER`")
-  @ApiResponse(responseCode = "200", description = "La réponse mise à jour", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetAnswers.class)))
+  @ApiResponse(responseCode = "200", description = "La réponse mise à jour", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetAnswerId.class)))
   @ApiResponse(responseCode = "400", description = "Requête incorrecte", content = @Content(mediaType = "application/text"))
   @ApiResponse(responseCode = "404", description = "Réponse ou Créateur non trouvé dans la base", content = @Content(mediaType = "application/text"))
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
@@ -239,14 +239,6 @@ public class AnswerController {
     // test de cohérence des données fournies pour mise à jour de la réponse
     if (request.getFormulaire() != null) {
       throw new AppException(400, "Le formulaire ne peut être modifiée");
-    }
-    if (statut == Statut.DEVIS || statut == Statut.GAGNE
-        || statut == Statut.PERDU || statut == Statut.TERMINE && request.getOpportunite() != null) {
-      throw new AppException(400, "L'opportunité ne peut être modifiée");
-    }
-    if (statut == Statut.DEVIS || statut == Statut.GAGNE
-        || statut == Statut.PERDU || statut == Statut.TERMINE && request.getDemande() != null) {
-      throw new AppException(400, "La demande ne peut être modifiée");
     }
     if (statut == Statut.TERMINE && request.getStatut() != null) {
       throw new AppException(400, "La réponse est clôturée");

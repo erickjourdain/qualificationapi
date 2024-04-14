@@ -8,15 +8,15 @@ import lombok.Data;
 @Data
 public class AnswerResponse {
   private Integer id;
-  private Integer uuid;
+  private String uuid;
   private String reponse;
   private Integer version;
   private Boolean courante;
   private UtilisateurResponse createur;
   private UtilisateurResponse gestionnaire;
+  private HeaderResponse entete;
   private FormResponse formulaire;
-  private Integer demande;
-  private Integer opportunite;
+  private Integer devis;
   private Statut statut;
   private LockedResponse lock;
   private Date createdAt;
