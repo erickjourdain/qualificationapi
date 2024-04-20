@@ -54,7 +54,7 @@ const AddForm = () => {
     <>
       <Paper>
         <Box px={3} py={2}>
-          <Typography variant="h6" align="center" margin="dense">
+          <Typography variant="h6" sx={{ m: 2 }}>
             Création d'un nouveau formulaire de qualification
           </Typography>
           <FormInputs

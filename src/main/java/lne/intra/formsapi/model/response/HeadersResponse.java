@@ -16,7 +16,7 @@ public class HeadersResponse {
   private List<Map<String, Object>> data;
   private Integer page;
   private Integer size;
-  private Long nombreReponses;
+  private Long nombreHeaders;
   private Boolean hasPrevious;
   private Boolean hasNext;
 }

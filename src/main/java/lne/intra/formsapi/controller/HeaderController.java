@@ -141,7 +141,7 @@ public class HeaderController {
     }
 
     HeadersResponse response = HeadersResponse.builder()
-        .nombreReponses(headers.getTotalElements())
+        .nombreHeaders(headers.getTotalElements())
         .data(headersList)
         .page(paging.getPageNumber() + 1)
         .size(paging.getPageSize())

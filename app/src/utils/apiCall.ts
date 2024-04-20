@@ -53,14 +53,13 @@ const delAuthorisation = () => {
  * @param page numéro de la page première page par défaut
  * @returns Promise retournant une réponse de type AxiosResponse
  */
-const getForms = (titre: string | null = null, page = 1) => {
+const getForms = (titre: string | null = null, page = 0, include = ["id", "titre", "slug"], size = 10) => {
   // construction du chemin d'interrogation de l'API
   const searchParams = titre ? sfAnd([sfEqual("valide", "true"), sfLike("titre", `*${titre}*`)]) : sfEqual("valide", "true");
-  const include = ["id", "titre", "slug"];
   // lancement de la requête
   return instance.request({
     method: "GET",
-    url: encodeURI(`/data/forms?filter=${searchParams}&page=${page}&include=${include.join(",")}`),
+    url: encodeURI(`/data/forms?filter=${searchParams}&page=${page + 1}&size=${size}&include=${include.join(",")}`),
   });
 };
 
@@ -72,11 +71,13 @@ const getFormsInit = (initForm: number, page = 1) => {
   });
 }
 
-const getForm = (slug: string | undefined) => {
+const getForm = (slug: string | undefined, include = []) => {
   const searchParams = slug ? sfEqual("slug", slug) : "";
+  let url = `data/forms?filter=${searchParams}`;
+  if (include.length) url += `&include=${include.join(",")}`;
   return instance.request({
     method: "GET",
-    url: encodeURI(`data/forms?filter=${searchParams}`),
+    url: encodeURI(url),
   });
 };
 
@@ -206,7 +207,7 @@ const getResetPwdToken = (id: number) => {
   })
 }
 
-const resetPassword = (payload: { password: string, token: string}) => {
+const resetPassword = (payload: { password: string, token: string }) => {
   return instance.request({
     method: "POST",
     url: "/reset-password",

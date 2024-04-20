@@ -1,6 +1,6 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useSetAtom, useAtomValue } from "jotai";
 import { sfEqual } from "spring-filter-query-builder";
@@ -18,7 +18,6 @@ import UpdateForm from "../components/users/UpdateForm";
 import Alert from "@mui/material/Alert";
 
 const UserForm = () => {
-  const navigate = useNavigate();
   // Chargement de l'état Atom des alertes
   const setAlerte = useSetAtom(displayAlert);
   // Chargement de l'état Atom des alertes
@@ -107,8 +106,7 @@ const UserForm = () => {
         }}
       >
         <Box px={3} py={2}>
-          <Button onClick={() => navigate("/admin")}>Administration</Button>
-          <Typography variant="h6" margin="dense">
+          <Typography variant="h6" sx={{ m: 2 }}>
             Profil {user.prenom} {user.nom}
           </Typography>
           <UpdateForm user={user} onUpdated={handleUpdate} />

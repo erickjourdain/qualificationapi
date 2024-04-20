@@ -9,6 +9,7 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import SettingsIcon from "@mui/icons-material/Settings";
+import DoneIcon from '@mui/icons-material/Done';
 import { selectedRunner } from "../atomState";
 import { isAdmin } from "../utils/auth";
 import { Runner } from "../gec-tripetto";
@@ -39,7 +40,7 @@ const Settings = () => {
 
   return (
     <Box sx={{ display: { xs: "none", sm: "block" } }}>
-      {tripettoRunner}
+
       <IconButton
         size="large"
         aria-label="paramètres"
@@ -69,6 +70,9 @@ const Settings = () => {
           return (
             <MenuItem onClick={() => handleClick(ind)} key={ind}>
               {value}
+              {
+                (value === tripettoRunner) && <DoneIcon />
+              }
             </MenuItem>
           );
         })}

@@ -1,21 +1,24 @@
-import React, { useEffect } from "react";
+import React from "react";
+import { useEffect, useState } from "react";
 import { Navigate, Outlet } from "react-router";
-import { useSetAtom } from "jotai";
 import { useQuery } from "@tanstack/react-query";
+import { useSetAtom } from "jotai";
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
+import CssBaseline from "@mui/material/CssBaseline";
 import Container from "@mui/material/Container";
+import Typography from "@mui/material/Typography";
 import { loggedUser } from "../atomState";
 import { getCurrentUser } from "../utils/apiCall";
-import Settings from "./Settings";
+import Menu from "./Menu";
+import Sidebar from "./Sidebar";
 
 const MainBox = () => {
+  const drawerWidth: number = 240;
+
   // Chargement de l'état Atom de l'utilisateur courant
   const setUser = useSetAtom(loggedUser);
+  // Création état local pour affichage du menu latéral
+  const [showSidebar, setSidebar] = useState<boolean>(true);
 
   // Chargement de l'utilisateur connecté
   const {
@@ -46,24 +49,22 @@ const MainBox = () => {
 
   return (
     <Box sx={{ display: "flex" }}>
-      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-        <Toolbar>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ mr: 2 }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Qualification
-          </Typography>
-          <Settings />
-        </Toolbar>
-      </AppBar>
-      <Outlet />
+      <CssBaseline />
+      <Menu open={showSidebar} drawerwidth={drawerWidth} onToggleDrawer={() => setSidebar(!showSidebar)} />
+      <Sidebar open={showSidebar} drawerwidth={drawerWidth} onToggleDrawer={() => setSidebar(!showSidebar)} />
+      <Box
+        component="main"
+        sx={{
+          backgroundColor: (theme) => (theme.palette.mode === "light" ? theme.palette.grey[100] : theme.palette.grey[900]),
+          flexGrow: 1,
+          height: "100vh",
+          overflow: "auto",
+        }}
+      >
+        <Container maxWidth="lg" sx={{ mt: 10, mb: 4 }}>
+          <Outlet />
+        </Container>
+      </Box>
     </Box>
   )
 }

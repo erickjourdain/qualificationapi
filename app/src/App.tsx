@@ -4,22 +4,24 @@ import { createBrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { setAuthorisation } from "./utils/apiCall";
 import { isAdmin, isCreator } from "./utils/auth";
-import Layout from "./pages/Layout";
-import Index from "./pages/Index";
+import Layout from "./layout/Layout";
+//import Index from "./pages/Index";
 import Login from "./pages/Login";
-import IndexForm from "./pages/IndexForm";
+//import IndexForm from "./pages/IndexForm";
 import AddForm from "./pages/AddForm";
-import Error from "./components/Error";
-import EditForm from "./components/EditForm";
-import PlayForm from "./components/PlayForm";
-import ResultsForm from "./components/ResultsForm";
+//import Error from "./components/Error";
+//import EditForm from "./components/EditForm";
+//import PlayForm from "./components/PlayForm";
+//import ResultsForm from "./components/ResultsForm";
 import NotAllowed from "./components/NotAllowed";
-import IndexReponse from "./pages/IndexReponse";
+//import IndexReponse from "./pages/IndexReponse";
 import SignIn from "./pages/SignIn";
 import Admin from "./pages/Admin";
 import UserForm from "./pages/UserForm";
 import CloseApp from "./pages/CloseApp";
 import ResetPwd from "./pages/ResetPwd";
+import FormForm from "./pages/FormForm";
+import AdminLayout from "./layout/AdminLayout";
 
 // création d'un instance de QueryClient
 const queryClient = new QueryClient({});
@@ -37,24 +39,33 @@ function App() {
       path: "/",
       element: <Layout />,
       children: [
-        {
+    /*    {
           index: true,
           element: <Index />,
         },
-        {
+    */    {
           path: "admin",
+          element: isAdmin() ? <AdminLayout /> : <NotAllowed />,
           children: [
             {
               index: true,
-              element: isAdmin() ? <Admin /> : <NotAllowed />,
+              element: <Admin />
             },
             {
               path: "user/:slug",
-              element: isAdmin() ? <UserForm /> : <NotAllowed />,
+              element: <UserForm />,
+            },
+            {
+              path: "form/:slug",
+              element: <FormForm />,
+            },
+            {
+              path: "form/ajouter",
+              element: <AddForm />
             }
           ]
         },
-        {
+      /*  {
           path: "ajouter",
           element: <AddForm />,
           errorElement: <Error />,
@@ -80,7 +91,7 @@ function App() {
               element: <IndexReponse />,
             },
           ],
-        },
+        },*/
       ],
     },
     {
