@@ -24,10 +24,10 @@ import { formatDateTime } from "../../utils/format";
 const Formulaires = () => {
 
   const itemsPerPage = 5;
+  const navigate = useNavigate();
 
   // Chargement de l'état Atom des alertes
   const setAlerte = useSetAtom(displayAlert);
-  const navigate = useNavigate();
 
   // State: page du tableau
   const [page, setPage] = useState(0);

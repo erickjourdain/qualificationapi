@@ -11,6 +11,8 @@ import FeedIcon from "@mui/icons-material/Feed";
 import PersonIcon from "@mui/icons-material/Person";
 import Divider from "@mui/material/Divider";
 import ListSubheader from "@mui/material/ListSubheader";
+import ApplicationMainNav from "../components/ApplicationMainNav";
+import GeneralLayout from "./GeneralLayout";
 
 type typeMenu = "formulaires" | "utilisateurs";
 type typeContext = { menu: typeMenu };
@@ -21,15 +23,18 @@ const AdminLayout = () => {
 
   const navigate = useNavigate();
 
+  // State: sélection de l'affichage
   const [selected, setSelected] = useState<typeMenu>("formulaires");
 
+  // Sélection du menu
   const changedMenu = (menu: typeMenu) => {
     setSelected(menu);
     navigate("/admin");
   }
 
   return (
-    <>
+    <Box sx={{ display: "flex" }}>
+      <ApplicationMainNav />
       <Drawer
         variant="permanent"
         sx={{
@@ -57,11 +62,12 @@ const AdminLayout = () => {
           </List>
         </Box>
       </Drawer>
-        <Box component="main" sx={{ flexGrow: 1, p: 3, maxWidth: "lg" }}>
+      <Box component="main" sx={{ flexGrow: 1, p: 3, maxWidth: "lg" }}>
         <Toolbar />
-          <Outlet context={{ menu: selected } satisfies typeContext } />
-        </Box>
-    </>
+        <Outlet context={{ menu: selected } satisfies typeContext} />
+      </Box>
+      <GeneralLayout />
+    </Box>
   )
 }
 

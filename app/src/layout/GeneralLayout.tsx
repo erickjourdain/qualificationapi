@@ -1,18 +1,13 @@
-import React from "react";
-import { useCallback, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { BlockerFunction, useBlocker } from "react-router";
 import { useAtom } from "jotai";
-import { ThemeProvider, createTheme } from "@mui/material";
 import { changement } from "../atomState";
-import MessageInfo from "../components/MessageInfo";
 import QuitConfirmDialog from "../components/QuitConfirmDialog";
-import MainBox from "../components/MainBox";
 
-const defaultTheme = createTheme();
-
-const Layout = () => {
+const GeneralLayout = () => {
   // Chargement de l'état Atom pour gestion de la confirmation du changement de page
   const [notSaved, setNotSaved] = useAtom(changement);
+
   // Création de l'état local pour affichage du menu de confirmation du changement de page
   const [showQuitDialog, setQuitDialog] = useState<boolean>(false);
 
@@ -23,7 +18,7 @@ const Layout = () => {
       return true;
     } else return false
   }, [notSaved])
-
+  
   // Création du blocker de navigation
   const blocker = useBlocker(shouldBlock);
 
@@ -41,13 +36,7 @@ const Layout = () => {
     } else blocker.state === "unblocked";
   }
 
-  return (
-    <ThemeProvider theme={defaultTheme}>
-      <MainBox />
-      <MessageInfo />
-      <QuitConfirmDialog show={showQuitDialog} confirmQuit={confirmNavigation} />
-    </ThemeProvider>
-  )
+  return <QuitConfirmDialog show={showQuitDialog} confirmQuit={confirmNavigation} />
 }
 
-export default Layout;
+export default GeneralLayout;

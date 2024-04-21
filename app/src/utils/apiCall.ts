@@ -222,6 +222,17 @@ const logout = () => {
   })
 }
 
+const getHeaders = (page: number = 1, filter: string = "", include: string[] = []) => {
+  let url = "";
+  url = `/data/headers?page=${page}`;
+  if (filter.length) url += `&filter=${filter}`;
+  if (include.length) url += `&include=${include.join(",")}`;
+  return instance.request({
+    method: "GET",
+    url: encodeURI(url),
+  })
+}
+
 export {
   apiRequest,
   setAuthorisation,
@@ -246,4 +257,5 @@ export {
   updateUser,
   getResetPwdToken,
   resetPassword,
+  getHeaders
 };

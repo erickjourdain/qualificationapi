@@ -4,16 +4,14 @@ import { useSetAtom } from "jotai";
 import { useQuery } from "@tanstack/react-query";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
-import Container from "@mui/material/Container";
 import { loggedUser } from "../atomState";
 import { getCurrentUser } from "../utils/apiCall";
-import Settings from "./Settings";
+import ApplicationMainNav from "../components/ApplicationMainNav";
+import GeneralLayout from "./GeneralLayout";
 
-const MainBox = () => {
+const MainLayout = () => {
+
   // Chargement de l'état Atom de l'utilisateur courant
   const setUser = useSetAtom(loggedUser);
 
@@ -46,26 +44,14 @@ const MainBox = () => {
 
   return (
     <Box sx={{ display: "flex" }}>
-      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-        <Toolbar>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ mr: 2 }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Qualification
-          </Typography>
-          <Settings />
-        </Toolbar>
-      </AppBar>
-      <Outlet />
+      <ApplicationMainNav />
+      <Box component="main" sx={{ flexGrow: 1, p: 3, maxWidth: "lg" }}>
+        <Toolbar />
+        <Outlet />
+      </Box>
+      <GeneralLayout />
     </Box>
   )
 }
 
-export default MainBox;
+export default MainLayout;
