@@ -17,40 +17,42 @@ import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
 @Entity
 @AllArgsConstructor
-public class File {
+@NoArgsConstructor
+public class Produit {
   
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
   @Column(nullable = false)
-  private String fileName;
+  private String description;
 
-  @Column(nullable = false)
-  private String initialName;
-
-  @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
-  @Builder.Default
-  private Boolean confirmed = false;
-  
-  @Column(columnDefinition = "DATETIME DEFAULT CURRENT_DATE", nullable = false)
-  @CreationTimestamp
-  @Builder.Default
-  private Date createdAt = new Date();
-  
-  @Column(columnDefinition = "DATETIME DEFAULT CURRENT_DATE", nullable = false)
-  @UpdateTimestamp
-  @Builder.Default
-  private Date updatedAt = new Date();
-  
   @JsonBackReference
   @ManyToOne
-  @JoinColumn(name = "proprietaire")
-  private User proprietaire;
+  @JoinColumn(name = "header_id")
+  private Header header;
 
+  @JsonBackReference
+  @ManyToOne
+  @JoinColumn(name = "createur")
+  private User createur;
+
+  @JsonBackReference
+  @ManyToOne
+  @JoinColumn(name = "gestionnaire")
+  private User gestionnaire;
+
+  @Column(columnDefinition = "DATETIME DEFAULT CURRENT_DATE", nullable = false)
+  @CreationTimestamp
+  private Date createdAt;
+
+  @Column(columnDefinition = "DATETIME DEFAULT CURRENT_DATE", nullable = false)
+  @UpdateTimestamp
+  private Date updatedAt;
 }

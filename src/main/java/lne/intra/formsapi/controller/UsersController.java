@@ -41,7 +41,7 @@ import lne.intra.formsapi.model.openApi.GetToken;
 import lne.intra.formsapi.model.openApi.GetUserId;
 import lne.intra.formsapi.model.openApi.GetUsers;
 import lne.intra.formsapi.model.request.UserRequest;
-import lne.intra.formsapi.model.response.UsersResponse;
+import lne.intra.formsapi.model.response.ListDataResponse;
 import lne.intra.formsapi.service.JwtService;
 import lne.intra.formsapi.service.UserService;
 import lne.intra.formsapi.util.ObjectsValidator;
@@ -120,7 +120,7 @@ public class UsersController {
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @GetMapping
   @PreAuthorize("hasAnyAuthority('admin:read','creator:read','user:read','reader:read')")
-  public ResponseEntity<UsersResponse> search(
+  public ResponseEntity<ListDataResponse> search(
       @AuthenticationPrincipal UserDetails userDetails,
       @RequestParam(defaultValue = "1") Integer page,
       @RequestParam(defaultValue = "10") Integer size,
@@ -151,8 +151,8 @@ public class UsersController {
       usersData.add(service.setUserResponse(user, include, userDetails));
     }
     // Construction de la réponse
-    UsersResponse response = UsersResponse.builder()
-        .nombreUsers(users.getTotalElements())
+    ListDataResponse response = ListDataResponse.builder()
+        .nbElements(users.getTotalElements())
         .data(usersData)
         .page(paging.getPageNumber() + 1)
         .size(paging.getPageSize())

@@ -64,13 +64,13 @@ public class Answer {
 
   @JsonBackReference
   @ManyToOne
-  @JoinColumn(name = "form_id")
-  private Form formulaire;
+  @JoinColumn(name = "produit_id")
+  private Produit produit;
 
   @JsonBackReference
   @ManyToOne
-  @JoinColumn(name = "header_id")
-  private Header header;
+  @JoinColumn(name = "form_id")
+  private Form formulaire;
 
   @Column(columnDefinition = "DATETIME DEFAULT CURRENT_DATE", nullable = false)
   @CreationTimestamp

@@ -9,7 +9,7 @@ public class GetHeaders {
   private List<GetHeaderId> data;
   private Integer page;
   private Integer size;
-  private Long nombreReponses;
+  private Long nbElements;
   private Boolean hasPrevious;
   private Boolean hasNext;
 }

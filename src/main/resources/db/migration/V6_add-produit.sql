@@ -1,0 +1,45 @@
+ALTER TABLE IF EXISTS `file` DROP FOREIGN KEY IF EXISTS FKnn409o9v7agdo9fyihoe0x909;
+
+DROP TABLE IF EXISTS `file`;
+
+ALTER TABLE IF EXISTS `answer` DROP FOREIGN KEY IF EXISTS FKtusegszgjigdk1w7fdpmmq7at;
+
+ALTER TABLE IF EXISTS `produit` DROP FOREIGN KEY IF EXISTS FKeoq5f0my46yudbob5bghrsl3d;
+
+ALTER TABLE IF EXISTS `produit`DROP FOREIGN KEy IF EXISTS FKuo7s6nf1zizb8bmmvbxcev6q7;
+
+ALTER TABLE IF EXISTS `produit`DROP FOREIGN KEy IF EXISTS FKtlmflgcp0b7599xbjtpy3ikix;
+
+ALTER TABLE IF EXISTS `answer` DROP FOREIGN KEY IF EXISTS FK4peh7eeif9wwq25x8qdbctwha;
+
+ALTER TABLE IF EXISTS `answer` DROP COLUMN IF EXISTS `header_id`;
+
+ALTER TABLE IF EXISTS `answer` ADD COLUMN IF NOT EXISTS `produit_id` INTEGER;
+
+ALTER TABLE IF EXISTS `header` DROP COLUMN IF EXISTS `produit`;
+
+ALTER TABLE IF EXISTS `header` DROP COLUMN IF EXISTS `opportunite`;
+
+ALTER TABLE IF EXISTS `header` ADD COLUMN `opportunite` VARCHAR(255);
+
+ALTER TABLE IF EXISTS `header` DROP COLUMN IF EXISTS `projet`;
+
+ALTER TABLE IF EXISTS `header` ADD COLUMN `projet` VARCHAR(255);
+
+DROP TABLE IF EXISTS `produit`;
+
+CREATE TABLE `produit`(
+  id INTEGER NOT NULL AUTO_INCREMENT, description TEXT NOT NULL, header_id INTEGER, createur INTEGER, gestionnaire INTEGER, created_at DATETIME DEFAULT CURRENT_DATE not null, updated_at DATETIME DEFAULT CURRENT_DATE not null, primary key (id)
+) engine = InnoDB;
+
+ALTER TABLE IF EXISTS `answer` 
+ADD CONSTRAINT FKtusegszgjigdk1w7fdpmmq7at FOREIGN KEY (produit_id) REFERENCES produit (id);
+
+ALTER TABLE IF EXISTS `produit`
+ADD CONSTRAINT FKeoq5f0my46yudbob5bghrsl3d FOREIGN KEY (header_id) REFERENCES header (id);
+
+ALTER TABLE IF EXISTS `produit`
+ADD CONSTRAINT FKuo7s6nf1zizb8bmmvbxcev6q7 FOREIGN KEY (createur) REFERENCES user (id);
+
+ALTER TABLE IF EXISTS `produit`
+ADD CONSTRAINT FKtlmflgcp0b7599xbjtpy3ikix FOREIGN KEY (gestionnaire) REFERENCES user (id);

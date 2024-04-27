@@ -12,11 +12,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AnswersResponse {
+public class ListDataResponse {
   private List<Map<String, Object>> data;
   private Integer page;
   private Integer size;
-  private Long nombreReponses;
+  private Long nbElements;
   private Boolean hasPrevious;
   private Boolean hasNext;
 }

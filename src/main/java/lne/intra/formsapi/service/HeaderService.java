@@ -72,8 +72,6 @@ public class HeaderService {
       response.put("uuid", header.getUuid());
     if (fields.isEmpty() || fields.contains("societe"))
       response.put("societe", header.getSociete());
-    if (fields.isEmpty() || fields.contains("produit"))
-      response.put("produit", header.getProduit());
     if (fields.isEmpty() || fields.contains("email"))
       response.put("email", header.getEmail());
     if (fields.isEmpty() || fields.contains("telephone"))
@@ -125,7 +123,6 @@ public class HeaderService {
         .telephone(request.getTelephone())
         .nom(request.getNom())
         .prenom(request.getPrenom())
-        .produit(request.getProduit())
         .opportunite(request.getOpportunite())
         .createur(createur)
         .gestionnaire(createur)
@@ -173,16 +170,16 @@ public class HeaderService {
         .ifPresent(res -> {
           header.setPrenom(res);
         });
-    // Mise à jour du produit
-    Optional.ofNullable(request.getProduit())
-        .ifPresent(res -> {
-          header.setProduit(res);
-        });
     // mise à jour de l'entete
     return headerRepository.save(header);
   }
 
-  // Recherche d'une liste d'entete
+  /**
+   * Recherche d'entités
+   * @param spec
+   * @param paging
+   * @return
+   */
   public Page<Header> search(@Filter Specification<Header> spec, Pageable paging) {
     // Récupération des entetes
     return headerRepository.findAll(spec, paging);

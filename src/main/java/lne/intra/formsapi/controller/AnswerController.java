@@ -43,7 +43,7 @@ import lne.intra.formsapi.model.exception.AppException;
 import lne.intra.formsapi.model.openApi.GetAnswerId;
 import lne.intra.formsapi.model.openApi.GetAnswers;
 import lne.intra.formsapi.model.request.AnswerRequest;
-import lne.intra.formsapi.model.response.AnswersResponse;
+import lne.intra.formsapi.model.response.ListDataResponse;
 import lne.intra.formsapi.service.AnswerService;
 import lne.intra.formsapi.service.LockedAnswerService;
 import lne.intra.formsapi.service.UserService;
@@ -77,7 +77,7 @@ public class AnswerController {
    */
   @Operation(summary = "Création d'une nouvelle réponse", description = "Accès limité aux rôle `ADMIN`, `CREATOR` et `USER`")
   @Parameter(in = ParameterIn.QUERY, name = "include", description = "Liste des champs à retourner", required = false, example = "id, titre, version, createur")
-  @ApiResponse(responseCode = "200", description = "Le formulaire créé", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetAnswerId.class)))
+  @ApiResponse(responseCode = "200", description = "La réponse créée", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetAnswerId.class)))
   @ApiResponse(responseCode = "400", description = "Données fournies incorrectes", content = @Content(mediaType = "application/json"))
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @PostMapping()
@@ -102,7 +102,7 @@ public class AnswerController {
    * @param sortBy  String champ de tri
    * @param include String liste des champs à retourner
    * @param filter  Sting filtre à appliquer à la recherhce
-   * @return ResponseEntity<AnswersResponse>
+   * @return ResponseEntity<ListDataResponse>
    * @throws NotFoundException
    */
   @Operation(summary = "Récupération des réponses apportées à un formulaire avec pagination et filtre", description = "Accès limité aux personnes connectées")
@@ -116,7 +116,7 @@ public class AnswerController {
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @GetMapping
   @PreAuthorize("hasAnyAuthority('admin:read','creator:read','user:read','reader:read')")
-  public ResponseEntity<AnswersResponse> search(
+  public ResponseEntity<ListDataResponse> search(
       @RequestParam(defaultValue = "1") Integer page,
       @RequestParam(defaultValue = "10") Integer size,
       @RequestParam(defaultValue = "asc(id)") String sortBy,
@@ -147,8 +147,8 @@ public class AnswerController {
     for (Answer answer : answers) {
       AnswersWithCreateur.add(service.addFieldsToAnswer(answer, include));
     }
-    AnswersResponse response = AnswersResponse.builder()
-        .nombreReponses(answers.getTotalElements()) // nombre de formulaires totales
+    ListDataResponse response = ListDataResponse.builder()
+        .nbElements(answers.getTotalElements()) // nombre de formulaires totales
         .data(AnswersWithCreateur) // les réponses
         .page(paging.getPageNumber() + 1) // le numéro de la page retournée
         .size(paging.getPageSize()) // le nombre d'éléments retournées

@@ -18,7 +18,6 @@ import com.turkraft.springfilter.boot.Filter;
 
 import lne.intra.formsapi.model.Answer;
 import lne.intra.formsapi.model.Form;
-import lne.intra.formsapi.model.Header;
 import lne.intra.formsapi.model.LockedAnswer;
 import lne.intra.formsapi.model.User;
 import lne.intra.formsapi.model.exception.AppException;
@@ -33,7 +32,6 @@ public class AnswerService {
   private final AnswerRepository answerRepository;
   private final UserService userService;
   private final FormService formService;
-  private final HeaderService headerService;
   private final LockedAnswerService lockedAnswerService;
 
   /**
@@ -48,7 +46,6 @@ public class AnswerService {
     Map<String, Object> user = new HashMap<>();
     Map<String, Object> form = new HashMap<>();
     Map<String, Object> response = new HashMap<>();
-    Map<String, Object> header = new HashMap<>();
     Map<String, Object> lock = new HashMap<>();
 
     // création de la liste des champs à retourner par la requête
@@ -112,17 +109,6 @@ public class AnswerService {
       response.put("formulaire", form);
     }
 
-    // ajout du champ header
-    if (fields.isEmpty() || fields.contains("entete")) {
-      // recherche du formulaire dans la base
-      Header entete = headerService.getHeader(answer.getHeader().getId());
-      header.put("id", entete.getId());
-      header.put("uuid", entete.getUuid());
-      header.put("societe", entete.getSociete());
-      form.put("opportunite", entete.getOpportunite());
-      response.put("entete", header);
-    }
-
     // ajout des différents champs à retourner en fonction de la demande exposée
     // dans la requêtes d'interrogation
     if (fields.isEmpty() || fields.contains("id"))
@@ -131,14 +117,14 @@ public class AnswerService {
       response.put("uuid", answer.getUuid());
     if (fields.isEmpty() || fields.contains("reponse"))
       response.put("reponse", answer.getReponse());
-    if (fields.isEmpty() || fields.contains("statut"))
-      response.put("statut", answer.getStatut());
-    if (fields.isEmpty() || fields.contains("devis"))
-      response.put("devis", answer.getDevis());
     if (fields.isEmpty() || fields.contains("version"))
       response.put("version", answer.getVersion());
     if (fields.isEmpty() || fields.contains("courante"))
       response.put("courante", answer.getCourante());
+    if (fields.isEmpty() || fields.contains("devis"))
+      response.put("devis", answer.getDevis());
+    if (fields.isEmpty() || fields.contains("statut"))
+      response.put("statut", answer.getStatut());
     if (fields.isEmpty() || fields.contains("createdat"))
       response.put("createdAt", answer.getCreatedAt());
     if (fields.isEmpty() || fields.contains("updatedat"))

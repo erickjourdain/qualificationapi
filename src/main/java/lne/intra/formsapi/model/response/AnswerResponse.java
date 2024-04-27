@@ -12,12 +12,12 @@ public class AnswerResponse {
   private String reponse;
   private Integer version;
   private Boolean courante;
-  private UtilisateurResponse createur;
-  private UtilisateurResponse gestionnaire;
-  private HeaderResponse entete;
-  private FormResponse formulaire;
   private Integer devis;
   private Statut statut;
+  private UtilisateurResponse createur;
+  private UtilisateurResponse gestionnaire;
+  private ProduitResponse produit;
+  private FormResponse formulaire;
   private LockedResponse lock;
   private Date createdAt;
   private Date updatedAt;

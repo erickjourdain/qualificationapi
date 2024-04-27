@@ -5,16 +5,10 @@ import java.util.Date;
 import lombok.Data;
 
 @Data
-public class GetHeaderId {
+public class GetProduitId {
   private Integer id;
-  private String uuid;
-  private String societe;
-  private String email;
-  private String telephone;
-  private String nom;
-  private String prenom;
-  private String opportunite;
-  private String projet;
+  private String description;
+  private GetHeaderId header;
   private GetUserId createur;
   private GetUserId gestionnaire;
   private Date createdAt;

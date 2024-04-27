@@ -1,8 +1,6 @@
 package lne.intra.formsapi.model.request;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lne.intra.formsapi.util.ObjectCreate;
 import lne.intra.formsapi.util.ObjectUpdate;
@@ -31,10 +29,7 @@ public class HeaderRequest {
 
   private String prenom;
 
-  @NotBlank(groups = { ObjectCreate.class, ObjectUpdate.class }, message = "le champ 'produit' est obligatoire")
-  private String produit;
+  private String opportunite;
 
-  @Min(groups = { ObjectCreate.class, ObjectUpdate.class }, value = 1000000, message = "le champ 'devis' doit contenir 7 digits")
-  @Max(groups = { ObjectCreate.class, ObjectUpdate.class }, value = 9999999, message = "le champ 'devis' doit contenir 7 digits")
-  private Integer opportunite;
+  private String projet;
 }

@@ -30,4 +30,8 @@ public class AnswerRequest {
   @Min(groups = { ObjectCreate.class, ObjectUpdate.class }, value = 1000000, message = "le champ 'devis' doit contenir 7 digits")
   @Max(groups = { ObjectCreate.class, ObjectUpdate.class }, value = 9999999, message = "le champ 'devis' doit contenir 7 digits")
   private Integer devis;
+
+  @NotNull(groups = ObjectCreate.class, message = "le champ 'produit' est obligatoire")
+  @Min(groups = ObjectCreate.class, value = 1, message = "le champ 'produit' doit être positif")
+  private Integer produit;
 }

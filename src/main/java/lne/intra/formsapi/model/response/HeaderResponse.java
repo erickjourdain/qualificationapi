@@ -13,8 +13,8 @@ public class HeaderResponse {
   private String telephone;
   private String nom;
   private String prenom;
-  private String produit;
   private String opportunite;
+  private String projet;
   private UtilisateurResponse createur;
   private UtilisateurResponse gestionnaire;
   private Date createdAt;

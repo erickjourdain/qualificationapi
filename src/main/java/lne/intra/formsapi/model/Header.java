@@ -46,11 +46,10 @@ public class Header {
   private String nom;
 
   private String prenom;
-  
-  @Column(nullable = false)
-  private String produit;  
 
-  private Integer opportunite;
+  private String opportunite;
+
+  private String projet;
 
   @JsonBackReference
   @ManyToOne

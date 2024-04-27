@@ -9,7 +9,7 @@ public class GetUsers {
   private List<GetUserId> data;
   private Integer page;
   private Integer size;
-  private Long nombreFormulaires;
+  private Long nbElements;
   private Boolean hasPrevious;
   private Boolean hasNext;
 }

@@ -10,7 +10,7 @@ public class GetForms {
   private List<GetFormId> data;
   private Integer page;
   private Integer size;
-  private Long nombreFormulaires;
+  private Long nbElements;
   private Boolean hasPrevious;
   private Boolean hasNext;
 }

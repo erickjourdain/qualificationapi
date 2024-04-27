@@ -5,8 +5,8 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class GetAnswers {
-  private List<GetAnswerId> data;
+public class GetProduits {
+  private List<GetHeaderId> data;
   private Integer page;
   private Integer size;
   private Long nbElements;

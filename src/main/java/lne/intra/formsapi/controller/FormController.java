@@ -39,7 +39,7 @@ import lne.intra.formsapi.model.exception.AppException;
 import lne.intra.formsapi.model.openApi.GetFormId;
 import lne.intra.formsapi.model.openApi.GetForms;
 import lne.intra.formsapi.model.request.FormRequest;
-import lne.intra.formsapi.model.response.FormsResponse;
+import lne.intra.formsapi.model.response.ListDataResponse;
 import lne.intra.formsapi.service.FormService;
 import lne.intra.formsapi.util.ObjectCreate;
 import lne.intra.formsapi.util.ObjectUpdate;
@@ -143,7 +143,7 @@ public class FormController {
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @GetMapping
   @PreAuthorize("hasAnyAuthority('admin:read','creator:read','user:read', 'reader:read')")
-  public ResponseEntity<FormsResponse> get(
+  public ResponseEntity<ListDataResponse> get(
       @RequestParam(defaultValue = "1") Integer page,
       @RequestParam(defaultValue = "10") Integer size,
       @RequestParam(defaultValue = "asc(id)") String sortBy,
@@ -176,8 +176,8 @@ public class FormController {
       formsWithCreateur.add(service.addUserToForm(form, include));
     }
     // Création de la réponse 
-    FormsResponse response = FormsResponse.builder()
-        .nombreFormulaires(forms.getTotalElements()) // nombre de formulaires totales
+    ListDataResponse response = ListDataResponse.builder()
+        .nbElements(forms.getTotalElements()) // nombre de formulaires totales
         .data(formsWithCreateur) // les formulaires
         .page(paging.getPageNumber() + 1) // le numéro de la page retournée
         .size(paging.getPageSize()) // le nombre d'éléments retournées
