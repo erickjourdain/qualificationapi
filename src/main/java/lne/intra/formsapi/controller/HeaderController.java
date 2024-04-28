@@ -38,9 +38,12 @@ import lne.intra.formsapi.model.Header;
 import lne.intra.formsapi.model.exception.AppException;
 import lne.intra.formsapi.model.openApi.GetHeaderId;
 import lne.intra.formsapi.model.openApi.GetHeaders;
+import lne.intra.formsapi.model.request.HeaderProductsRequest;
 import lne.intra.formsapi.model.request.HeaderRequest;
+import lne.intra.formsapi.model.request.ProduitRequest;
 import lne.intra.formsapi.model.response.ListDataResponse;
 import lne.intra.formsapi.service.HeaderService;
+import lne.intra.formsapi.service.ProduitService;
 import lne.intra.formsapi.util.ObjectCreate;
 import lne.intra.formsapi.util.ObjectUpdate;
 import lne.intra.formsapi.util.ObjectsValidator;
@@ -55,7 +58,9 @@ import lombok.RequiredArgsConstructor;
 public class HeaderController {
 
   private final HeaderService headerService;
+  private final ProduitService produitService;
   private final ObjectsValidator<HeaderRequest> headerValidator;
+  private final ObjectsValidator<HeaderProductsRequest> headerProductsValidator;
 
   /**
    * Contrôleur de création d'une nouvelle entête
@@ -83,6 +88,47 @@ public class HeaderController {
     headerValidator.validateData(request, ObjectCreate.class);
     // Sauvegarde de l'entete
     Header header = headerService.saveHeader(request, userDetails);
+    return ResponseEntity.ok(headerService.addFieldsToHeader(header, include));
+  }
+
+  /**
+   * Contrôleur de création d'une nouvelle entête incluant des produits associés
+   * 
+   * @param userDetails
+   * @param request
+   * @param include
+   * @return
+   * @throws AppException
+   */
+  @Operation(summary = "Création d'une nouvelle entête avec des produits associés", description = "Accès limité aux rôle `ADMIN`, `CREATOR` et `USER`")
+  @Parameter(in = ParameterIn.QUERY, name = "include", description = "", required = false, example = "id, societe, email, produit, createur")
+  @ApiResponse(responseCode = "200", description = "L'entête créé", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetHeaderId.class)))
+  @ApiResponse(responseCode = "400", description = "Données fournies incorrectes", content = @Content(mediaType = "application/json"))
+  @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
+  @PostMapping("/with-products")
+  @PreAuthorize("hasAnyAuthority('admin:create','creator:create','user:create')")
+  public ResponseEntity<Map<String, Object>> saveWithProducts(
+      @AuthenticationPrincipal UserDetails userDetails,
+      @RequestBody HeaderProductsRequest request,
+      @RequestParam(required = false) String include) throws AppException {
+
+    // Validation des champs de la requête
+    headerProductsValidator.validateData(request, ObjectCreate.class);
+    HeaderRequest headerRequest = HeaderRequest.builder()
+        .societe(request.getSociete())
+        .email(request.getEmail())
+        .nom(request.getNom())
+        .prenom(request.getPrenom())
+        .telephone(request.getTelephone())
+        .build();
+    Header header = headerService.saveHeader(headerRequest, userDetails);
+    for (String description : request.getProduits()) {
+      ProduitRequest produit = ProduitRequest.builder()
+          .description(description)
+          .header(header.getId())
+          .build();
+      produitService.saveProduit(produit, userDetails);
+    }
     return ResponseEntity.ok(headerService.addFieldsToHeader(header, include));
   }
 
@@ -193,11 +239,10 @@ public class HeaderController {
   @PatchMapping("/{id}")
   @PreAuthorize("hasAnyAuthority('admin:update','creator:update','user:update')")
   public ResponseEntity<Map<String, Object>> update(
-    @AuthenticationPrincipal UserDetails userDetails,
-    @PathVariable Integer id,
-    @RequestBody HeaderRequest request,
-    @RequestParam(required = false) String include
-  ) throws NotFoundException {
+      @AuthenticationPrincipal UserDetails userDetails,
+      @PathVariable Integer id,
+      @RequestBody HeaderRequest request,
+      @RequestParam(required = false) String include) throws NotFoundException {
     // Validation des champs fournis dans la requête
     headerValidator.validateData(request, ObjectUpdate.class);
     // Récupération de l'entête à modifier
