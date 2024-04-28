@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosError } from "axios";
-import { AnwserUpdate, FormCreation, User, UserCreation } from "../gec-tripetto";
+import { AnwserUpdate, FormCreation, HeaderCreation, User, UserCreation } from "../gec-tripetto";
 import { sfAnd, sfEqual, sfLike } from "spring-filter-query-builder";
 
 // Création de l'instance Axios pour les requêtes vers l'API
@@ -233,6 +233,14 @@ const getHeaders = (page: number = 1, filter: string = "", include: string[] = [
   })
 }
 
+const createHeadersWithProducts = (payload: HeaderCreation) => {
+  return instance.request({
+    method: "POST",
+    url: "/data/headers/with-products",
+    data: payload,
+  })
+}
+
 export {
   apiRequest,
   setAuthorisation,
@@ -257,5 +265,6 @@ export {
   updateUser,
   getResetPwdToken,
   resetPassword,
-  getHeaders
+  getHeaders,
+  createHeadersWithProducts,
 };

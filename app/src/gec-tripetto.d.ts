@@ -17,6 +17,7 @@ import { HeaderAPI } from "./types/headerAPI";
 import { HeadersAPI } from "./types/headersAPI";
 import { ProduitAPI } from "./types/produitAPI";
 import { ProduitsAPI } from "./types/produitsAPI";
+import { HeaderCreation } from "./types/headerCreation";
 
 export {
   Info,
@@ -38,5 +39,6 @@ export {
   HeadersAPI,
   ProduitAPI,
   ProduitsAPI,
+  HeaderCreation
 }
 
