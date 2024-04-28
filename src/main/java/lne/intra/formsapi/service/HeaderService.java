@@ -82,6 +82,8 @@ public class HeaderService {
       response.put("prenom", header.getPrenom());
     if (fields.isEmpty() || fields.contains("opportunite"))
       response.put("opportunite", header.getOpportunite());
+    if (fields.isEmpty() || fields.contains("projet"))
+      response.put("projet", header.getProjet());
     if (fields.isEmpty() || fields.contains("createdat"))
       response.put("createdAt", header.getCreatedAt());
     if (fields.isEmpty() || fields.contains("updatedat"))
