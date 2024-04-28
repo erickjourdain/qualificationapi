@@ -120,6 +120,8 @@ public class HeaderController {
         .nom(request.getNom())
         .prenom(request.getPrenom())
         .telephone(request.getTelephone())
+        .projet(request.getProjet())
+        .opportunite(request.getOpportunite())
         .build();
     Header header = headerService.saveHeader(headerRequest, userDetails);
     for (String description : request.getProduits()) {
