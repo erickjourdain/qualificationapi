@@ -13,7 +13,7 @@ import { displayAlert, loggedUser } from "../atomState";
 import { HeadersAPI } from "../types/headersAPI";
 import { getHeaders } from "../utils/apiCall";
 import manageError from "../utils/manageError";
-import { isUser } from "../utils/auth";
+import Tableau from "../components/headers/Tableau";
 
 const Headers = () => {
 
@@ -82,9 +82,10 @@ const Headers = () => {
         <Typography variant="h5" gutterBottom>
           Opportunités
         </Typography>
-        <Button color="primary" variant="contained" startIcon={<AddCircleIcon />} >
+        <Button color="primary" variant="contained" startIcon={<AddCircleIcon />} sx={{ mb: 2 }} onClick={() => navigate("/opportunite/new")}>
           Nouvelle Opportunité
         </Button>
+        <Tableau headers={data} onPageChange={handleChangePage}/>
       </Box>
     </Paper>
   )

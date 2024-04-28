@@ -26,6 +26,7 @@ import FormForm from "./pages/FormForm";
 import AdminLayout from "./layout/AdminLayout";
 import Headers from "./pages/Headers";
 import AddHeader from "./pages/AddHeader";
+import Header from "./pages/Header";
 
 // création d'un instance de QueryClient
 const queryClient = new QueryClient({});
@@ -52,6 +53,10 @@ function App() {
         {
           path: "opportunite/new",
           element: isUser() ? <AddHeader /> : <NotAllowed />,
+        },
+        {
+          path: "opportunite/:id",
+          element: <Header/>
         }
       ]
     },

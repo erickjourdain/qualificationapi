@@ -224,7 +224,7 @@ const logout = () => {
 
 const getHeaders = (page: number = 1, filter: string = "", include: string[] = []) => {
   let url = "";
-  url = `/data/headers?page=${page}`;
+  url = `/data/headers?page=${page}&order=desc(id)`;
   if (filter.length) url += `&filter=${filter}`;
   if (include.length) url += `&include=${include.join(",")}`;
   return instance.request({
