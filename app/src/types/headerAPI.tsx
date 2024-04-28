@@ -7,8 +7,8 @@ export type HeaderAPI = {
   telephone: string;
   nom: string;
   prenom: string;
-  produit: string;
   opportunite: string;
+  projet: string;
   createur: User;
   gestionnaire: User;
   createdAt?: number;

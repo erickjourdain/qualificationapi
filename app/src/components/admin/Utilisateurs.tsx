@@ -16,7 +16,7 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import Typography from "@mui/material/Typography";
 import TableHead from "@mui/material/TableHead";
-import { User } from "../../gec-tripetto";
+import { User, UsersAPI } from "../../gec-tripetto";
 import { displayAlert } from "../../atomState";
 import { getUsers } from "../../utils/apiCall";
 import manageError from "../../utils/manageError";
@@ -39,12 +39,15 @@ const Utilisateurs = () => {
   const { data, error, isError, isLoading } = useQuery({
     queryKey: ["users", page],
     queryFn: () => getUsers(null, ["id", "prenom", "nom", "validated", "role", "locked", "slug"], page + 1, itemsPerPage),
+    select: (response) => response.data as UsersAPI,
     refetchOnWindowFocus: false,
   });
 
   useEffect(() => {
-    setUsers(data?.data.data);
-    setNbUsers(data?.data.nombreUsers);
+    if (data) {
+      setUsers(data?.data);
+      setNbUsers(data?.nbElements);
+    }
   }, [data]);
 
   // gestion des erreurs de chargement des données

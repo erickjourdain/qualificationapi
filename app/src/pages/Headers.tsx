@@ -1,5 +1,6 @@
-import { useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import Skeleton from "@mui/material/Skeleton";
 import Paper from "@mui/material/Paper";
@@ -8,15 +9,18 @@ import Alert from "@mui/material/Alert";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import { displayAlert } from "../atomState";
+import { displayAlert, loggedUser } from "../atomState";
 import { HeadersAPI } from "../types/headersAPI";
 import { getHeaders } from "../utils/apiCall";
 import manageError from "../utils/manageError";
+import { isUser } from "../utils/auth";
 
 const Headers = () => {
 
   const itemsPerPage = 5;
+  const navigate = useNavigate();
 
+  const user = useAtomValue(loggedUser);
   // Chargement de l'état Atom des alertes
   const setAlerte = useSetAtom(displayAlert);
 
@@ -50,16 +54,19 @@ const Headers = () => {
       </>
     );
 
-  if (!data || data.nombreHeaders === 0) return (
+  if (!data || data.nbElements === 0) return (
     <Paper
       sx={{
         marginTop: "10px",
       }}
     >
-      <Box sx={{ minWidth: 400, maxWidth: "80%", margin: "auto", pt: 2, pb: 2 }}>
-        <Button color="primary" variant="contained" startIcon={<AddCircleIcon />} sx={{ mb: 2 }}>
-          Nouvelle Opportunité
-        </Button>
+      <Box px={3} py={2}>
+        {
+          user && user.role !== "USER" &&
+          <Button color="primary" variant="contained" startIcon={<AddCircleIcon />} sx={{ mb: 2 }} onClick={() => navigate("/opportunite/new")}>
+            Nouvelle Opportunité
+          </Button>
+        }
         <Alert severity="error">Aucune donnée disponible</Alert>
       </Box>
     </Paper>
@@ -71,7 +78,7 @@ const Headers = () => {
         marginTop: "10px",
       }}
     >
-      <Box sx={{ minWidth: 400, maxWidth: "80%", margin: "auto" }}>
+      <Box px={3} py={2}>
         <Typography variant="h5" gutterBottom>
           Opportunités
         </Typography>

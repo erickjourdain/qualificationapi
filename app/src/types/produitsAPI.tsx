@@ -1,10 +1,10 @@
-import { AnswerAPI } from "./answerAPI";
+import { ProduitAPI } from "./produitAPI"
 
-export type AnswersAPI = {
-  data: AnswerAPI[];
+export type ProduitsAPI = {
+  data: ProduitAPI[];
   page: number;
   size: number;
   nbElements: number;
   hasPrevious: boolean;
   hasNext: boolean;
-};
+}

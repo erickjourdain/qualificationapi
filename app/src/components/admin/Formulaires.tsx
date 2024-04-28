@@ -18,7 +18,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { getForms } from "../../utils/apiCall";
 import manageError from "../../utils/manageError";
 import { displayAlert } from "../../atomState";
-import { Form } from "../../gec-tripetto";
+import { FormAPI, FormsAPI } from "../../gec-tripetto";
 import { formatDateTime } from "../../utils/format";
 
 const Formulaires = () => {
@@ -32,18 +32,21 @@ const Formulaires = () => {
   // State: page du tableau
   const [page, setPage] = useState(0);
   // State: formulaires
-  const [formulaires, serFormulaires] = useState<Form[]>([]);
+  const [formulaires, setFormulaires] = useState<FormAPI[]>([]);
   // State: nombre formulaires
   const [nbFormulaires, setNbFormulaires] = useState<number>(0);
 
   const { data, error, isError, isLoading } = useQuery({
     queryKey: ["getForms", page],
     queryFn: () => getForms(null, page, ["id", "titre", "version", "createur", "updatedAt", "slug"], itemsPerPage),
+    select: (response) => response.data as FormsAPI, 
   })
 
   useEffect(() => {
-    serFormulaires(data?.data.data);
-    setNbFormulaires(data?.data.nombreFormulaires);
+    if (data) {
+      setFormulaires(data?.data);
+      setNbFormulaires(data?.nbElements);
+    }
   }, [data]);
 
   // gestion des erreurs de chargement des données

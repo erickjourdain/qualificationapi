@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Toolbar from "@mui/material/Toolbar";
+import Container from "@mui/material/Container";
 import { loggedUser } from "../atomState";
 import { getCurrentUser } from "../utils/apiCall";
 import ApplicationMainNav from "../components/ApplicationMainNav";
@@ -45,9 +46,11 @@ const MainLayout = () => {
   return (
     <Box sx={{ display: "flex" }}>
       <ApplicationMainNav />
-      <Box component="main" sx={{ flexGrow: 1, p: 3, maxWidth: "lg" }}>
+      <Box component="main" sx={{ flexGrow: 1 }}>
         <Toolbar />
-        <Outlet />
+        <Container maxWidth="lg" sx={{ mb: 4 }}>
+          <Outlet />
+        </Container>
       </Box>
       <GeneralLayout />
     </Box>

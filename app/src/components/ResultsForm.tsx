@@ -165,7 +165,7 @@ const ResultsForm = () => {
           <TablePagination
             rowsPerPageOptions={[itemsPerPage]}
             component="div"
-            count={reponses?.nombreFormulaires}
+            count={reponses?.nbElements}
             rowsPerPage={itemsPerPage}
             page={page}
             onPageChange={handleChangePage} />

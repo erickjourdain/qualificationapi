@@ -10,22 +10,33 @@ import { FormCreation } from "./types/formCreation";
 import { FormsAPI } from "./types/formsAPI";
 import { LockAPI } from "./types/lockAPI";
 import { Role, User } from "./types/user";
-import {Runner} from "./types/runner";
+import { Runner } from "./types/runner";
 import { UserCreation } from "./types/userCreation";
+import { UsersAPI } from "./types/usersAPI";
+import { HeaderAPI } from "./types/headerAPI";
+import { HeadersAPI } from "./types/headersAPI";
+import { ProduitAPI } from "./types/produitAPI";
+import { ProduitsAPI } from "./types/produitsAPI";
 
-
-export { Info };
-export { AnswerAPI };
-export { AnswersAPI};
-export { AnwserUpdate };
-export { ChildrenProps };
-export { Form };
-export { FormAPI };
-export { Answer, FormAnswers };
-export { FormCreation };
-export { FormsAPI };
-export { LockAPI };
-export { Role, User };
-export { Runner };
-export { UserCreation };
+export {
+  Info,
+  AnswerAPI,
+  AnswersAPI,
+  AnwserUpdate,
+  ChildrenProps,
+  Form,
+  FormAPI,
+  Answer, FormAnswers,
+  FormCreation,
+  FormsAPI,
+  LockAPI,
+  Role, User,
+  Runner,
+  UserCreation,
+  UsersAPI,
+  HeaderAPI,
+  HeadersAPI,
+  ProduitAPI,
+  ProduitsAPI,
+}
 

@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider, createTheme } from "@mui/material";
 import MessageInfo from "./components/MessageInfo";
 import { setAuthorisation } from "./utils/apiCall";
-import { isAdmin, isCreator } from "./utils/auth";
+import { isAdmin, isCreator, isUser } from "./utils/auth";
 import MainLayout from "./layout/MainLayout";
 //import Index from "./pages/Index";
 import Login from "./pages/Login";
@@ -25,6 +25,7 @@ import ResetPwd from "./pages/ResetPwd";
 import FormForm from "./pages/FormForm";
 import AdminLayout from "./layout/AdminLayout";
 import Headers from "./pages/Headers";
+import AddHeader from "./pages/AddHeader";
 
 // création d'un instance de QueryClient
 const queryClient = new QueryClient({});
@@ -48,6 +49,10 @@ function App() {
           index: true,
           element: <Headers />,
         },
+        {
+          path: "opportunite/new",
+          element: isUser() ? <AddHeader /> : <NotAllowed />,
+        }
       ]
     },
     {

@@ -1,10 +1,10 @@
-import { AnswerAPI } from "./answerAPI";
+import { User } from "./user"
 
-export type AnswersAPI = {
-  data: AnswerAPI[];
+export type UsersAPI = {
+  data: User[];
   page: number;
   size: number;
   nbElements: number;
   hasPrevious: boolean;
   hasNext: boolean;
-};
+}

@@ -4,7 +4,7 @@ export type FormsAPI = {
   data: FormAPI[];
   page: number;
   size: number;
-  nombreFormulaires: number;
+  nbElements: number;
   hasPrevious: boolean;
   hasNext: boolean;
 };

@@ -4,7 +4,7 @@ export type HeadersAPI = {
   data: HeaderAPI[];
   page: number;
   size: number;
-  nombreHeaders: number;
+  nbElements: number;
   hasPrevious: boolean;
   hasNext: boolean;
 };
