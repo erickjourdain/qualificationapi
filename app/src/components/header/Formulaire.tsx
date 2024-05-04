@@ -34,6 +34,7 @@ const Formulaire = ({ header, onChange }: FormulaireProps) => {
     mutationFn: updateHeader,
     onSuccess: () => {
       setAlerte({ severite: "success", message: "enregistrement du produit réalisé" });
+      setDisabled(true);
       onChange();
     },
     onError: (error) => {
@@ -43,7 +44,7 @@ const Formulaire = ({ header, onChange }: FormulaireProps) => {
 
   // Mise à jour des données de l'entête
   const onSubmit = (data: HeaderAPI) => {
-    mutate(data);
+    mutate({ ...data, id: header.id });
   }
 
   // Mise à jour de l'état du formulaire
