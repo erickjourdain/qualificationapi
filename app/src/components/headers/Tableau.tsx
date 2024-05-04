@@ -8,15 +8,17 @@ import TableBody from "@mui/material/TableBody";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import TablePagination from "@mui/material/TablePagination";
 import Box from "@mui/material/Box";
+import CircularProgress from "@mui/material/CircularProgress";
 import { formatDate } from "../../utils/format";
 import { HeadersAPI } from "../../gec-tripetto";
 
 interface TableauHeaders {
   headers: HeadersAPI,
+  loading: boolean,
   onPageChange: (_event: unknown, newPage: number) => void,
 }
 
-const Tableau = ({ headers, onPageChange }: TableauHeaders) => {
+const Tableau = ({ headers, loading, onPageChange }: TableauHeaders) => {
 
   const navigate = useNavigate();
 
@@ -34,10 +36,10 @@ const Tableau = ({ headers, onPageChange }: TableauHeaders) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {headers.data.map((header) => (
+          {!loading && headers.data.map((header) => (
             <TableRow key={header.id}>
               <TableCell>
-                <VisibilityIcon sx={{ cursor: "pointer" }} onClick={() => navigate(`/opportunite/${header.id}`) } />
+                <VisibilityIcon sx={{ cursor: "pointer" }} onClick={() => navigate(`/opportunite/${header.uuid}`) } />
               </TableCell>
               <TableCell>{header.societe}</TableCell>
               <TableCell>{header.createur.nom} {header.createur.prenom}</TableCell>
@@ -46,6 +48,7 @@ const Tableau = ({ headers, onPageChange }: TableauHeaders) => {
               <TableCell>{header.projet}</TableCell>
             </TableRow>
           ))}
+          {loading && <CircularProgress />}
         </TableBody>
       </Table>
       <TablePagination

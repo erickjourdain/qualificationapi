@@ -55,7 +55,7 @@ function App() {
           element: isUser() ? <AddHeader /> : <NotAllowed />,
         },
         {
-          path: "opportunite/:id",
+          path: "opportunite/:uuid",
           element: <Header/>
         }
       ]

@@ -2,6 +2,7 @@ import { User } from "./user";
 
 export type HeaderAPI = {
   id: number;
+  uuid: string;
   societe: string;
   email: string;
   telephone: string;

@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosError } from "axios";
-import { AnwserUpdate, FormCreation, HeaderCreation, User, UserCreation } from "../gec-tripetto";
+import { AnwserUpdate, FormCreation, HeaderAPI, HeaderCreation, User, UserCreation } from "../gec-tripetto";
 import { sfAnd, sfEqual, sfLike } from "spring-filter-query-builder";
 
 // Création de l'instance Axios pour les requêtes vers l'API
@@ -233,6 +233,41 @@ const getHeaders = (page: number = 1, filter: string = "", include: string[] = [
   })
 }
 
+const updateHeader = (payload: HeaderAPI) => {
+  return instance.request({
+    method: "PATCH",
+    url: encodeURI(`/data/headers/${payload.id}`),
+    data: payload
+  })
+}
+
+const getProduits = (page: number = 1, filter: string = "", include: string[] = []) => {
+  let url = "";
+  url = `/data/produits?page=${page}&order=desc(id)`;
+  if (filter.length) url += `&filter=${filter}`;
+  if (include.length) url += `&include=${include.join(",")}`;
+  return instance.request({
+    method: "GET",
+    url: encodeURI(url),
+  })
+}
+
+const updateProduit = (payload: { id: number, description: string }) => {
+  return instance.request({
+    method: "PATCH",
+    url: encodeURI(`/data/produits/${payload.id}`),
+    data: payload,
+  })
+}
+
+const createProduit = (payload: { header: number, description: string }) => {
+  return instance.request({
+    method: "POST",
+    url: "/data/produits",
+    data: payload,
+  })
+}
+
 const createHeadersWithProducts = (payload: HeaderCreation) => {
   return instance.request({
     method: "POST",
@@ -266,5 +301,9 @@ export {
   getResetPwdToken,
   resetPassword,
   getHeaders,
+  updateHeader,
   createHeadersWithProducts,
+  getProduits,
+  createProduit,
+  updateProduit,
 };
