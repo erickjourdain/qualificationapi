@@ -153,6 +153,11 @@ public class HeaderService {
         .ifPresent(res -> {
           header.setOpportunite(res);
         });
+    // Mise à jour du projet
+    Optional.ofNullable(request.getProjet())
+        .ifPresent(res -> {
+          header.setProjet(res);
+        }); 
     // Mise à jour de la societe
     Optional.ofNullable(request.getSociete())
         .ifPresent(res -> {
@@ -179,6 +184,7 @@ public class HeaderService {
 
   /**
    * Recherche d'entités
+   * 
    * @param spec
    * @param paging
    * @return
