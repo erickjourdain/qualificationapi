@@ -19,6 +19,7 @@ import com.turkraft.springfilter.boot.Filter;
 import lne.intra.formsapi.model.Answer;
 import lne.intra.formsapi.model.Form;
 import lne.intra.formsapi.model.LockedAnswer;
+import lne.intra.formsapi.model.Produit;
 import lne.intra.formsapi.model.User;
 import lne.intra.formsapi.model.exception.AppException;
 import lne.intra.formsapi.model.request.AnswerRequest;
@@ -33,6 +34,7 @@ public class AnswerService {
   private final UserService userService;
   private final FormService formService;
   private final LockedAnswerService lockedAnswerService;
+  private final ProduitService produitService;
 
   /**
    * Ajout des champs à retourner à la réponse
@@ -160,6 +162,8 @@ public class AnswerService {
     User createur = userService.getByLogin(userDetails.getUsername());
     // récupération du formulaire
     Form formulaire = formService.getForm(request.getFormulaire());
+    // récupération du produit
+    Produit produit = produitService.geProduit(request.getProduit());
     // création de la nouvelle entrée
     Answer answer = Answer.builder()
         .uuid(UUID.randomUUID().toString())
@@ -167,6 +171,7 @@ public class AnswerService {
         .formulaire(formulaire)
         .createur(createur)
         .gestionnaire(createur)
+        .produit(produit)
         .build();
     // sauvegarde de la nouvelle entrée
     return answerRepository.save(answer);
