@@ -29,9 +29,10 @@ interface ProduitsProps {
   headerId: number;
   produits: ProduitsAPI;
   onChange: () => void;
+  onSelect: (produit: ProduitAPI) => void
 }
 
-const Produits = ({ headerId, produits, onChange }: ProduitsProps) => {
+const Produits = ({ headerId, produits, onChange, onSelect }: ProduitsProps) => {
 
   // Chargement de l'état Atom de gestion des alertes
   const setAlerte = useSetAtom(displayAlert);
@@ -47,12 +48,18 @@ const Produits = ({ headerId, produits, onChange }: ProduitsProps) => {
   // Modification du produit sélectionné
   const handleChange = (value: string) => {
     const selection = produits.data.find((prod) => prod.id.toString() === value);
-    if (selection) setProduit(selection);
+    if (selection) {
+      setProduit(selection);
+      onSelect(selection);
+    }
   }
 
   // Mise à jour de la liste des produits
   useEffect(() => {
-    if (produits.nbElements) setProduit(produits.data[0])
+    if (produits.nbElements) {
+      setProduit(produits.data[0]);
+      onSelect(produits.data[0])
+    }
     else setProduit(null);
   }, [produits]);
 

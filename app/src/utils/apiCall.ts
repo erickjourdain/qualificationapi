@@ -53,6 +53,7 @@ const delAuthorisation = () => {
  * @param page numéro de la page première page par défaut
  * @returns Promise retournant une réponse de type AxiosResponse
  */
+/*
 const getForms = (titre: string | null = null, page = 0, include = ["id", "titre", "slug"], size = 10) => {
   // construction du chemin d'interrogation de l'API
   const searchParams = titre ? sfAnd([sfEqual("valide", "true"), sfLike("titre", `*${titre}*`)]) : sfEqual("valide", "true");
@@ -62,6 +63,17 @@ const getForms = (titre: string | null = null, page = 0, include = ["id", "titre
     url: encodeURI(`/data/forms?filter=${searchParams}&page=${page + 1}&size=${size}&include=${include.join(",")}`),
   });
 };
+*/
+
+const getForms = (filter: string | null = null, page = 1, include: string[] = [], size = 10) => {
+  let url = `/data/forms?page=${page}&size=${size}`;
+  if (filter) url += `&filter=${filter}`;
+  if (include.length) url += `&include=${include.join(",")}`;
+  return instance.request({
+    method: "GET",
+    url: encodeURI(url),
+  })
+}
 
 const getFormsInit = (initForm: number, page = 1) => {
   // lancement de la requête
@@ -98,7 +110,7 @@ const updateForm = (payload: { id?: number; titre?: string; description?: string
 };
 
 //const saveAnswer = (payload: { reponse: string; donnees: string; formulaire: number; createur: number }) => {
-const saveAnswer = (payload: { reponse: string; formulaire: number }) => {
+const saveAnswer = (payload: { reponse: string; produit: number, formulaire: number }) => {
   return instance.request({
     method: "POST",
     url: "/data/answers",

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { sfEqual } from "spring-filter-query-builder";
@@ -13,13 +13,19 @@ import Stack from "@mui/material/Stack";
 import Chip from "@mui/material/Chip";
 import Loading from "../components/Loading";
 import Produits from "../components/header/Produits";
+import Qualifications from "../components/qualifications/Qualifications";
+import { ProduitAPI } from "../gec-tripetto";
 
 const Header = () => {
 
+  // Récupération du paramètre de la route
   const { uuid } = useParams();
 
   // Chargement de l'état Atom des alertes
   const setAlerte = useSetAtom(displayAlert);
+
+  // State: le produit sélectionné
+  const [produit, setProduit] = useState<ProduitAPI | null>(null);
 
   // Requête de récupération de l'entête
   const { data: header, isLoading: isLoadingHeader, refetch: refetchHeader } = useQuery({
@@ -52,31 +58,34 @@ const Header = () => {
     },
   })
 
+  const handleSelectProduct = (produit: ProduitAPI) => {
+    setProduit(produit);
+  }
+
   if (isLoadingHeader || isLoadingProduits) return (<Loading />)
 
   return (
-    <Box>
+    <Box sx={{ "& .MuiPaper-root": { mt: "20px" } }}>
       <Stack direction="row" spacing={2}>
         <Chip label={header.societe} color="primary" />
         {!!header.projet && <Chip label={header.projet} color="primary" />}
         {!!header.opportunite && <Chip label={header.opportunite} color="primary" />}
       </Stack>
       <Paper
-        sx={{
-          marginTop: "10px",
-        }}
       >
         <Box px={3} py={2}>
-          {header && <Formulaire header={header} onChange={refetchHeader}/>}
+          {header && <Formulaire header={header} onChange={refetchHeader} />}
         </Box>
       </Paper>
       <Paper
-        sx={{
-          marginTop: "10px",
-        }}
       >
         <Box px={3} py={2}>
-          {produits && <Produits headerId={header.id} produits={produits} onChange={refetchProduits}/>}
+          {produits && <Produits headerId={header.id} produits={produits} onChange={refetchProduits} onSelect={handleSelectProduct} />}
+        </Box>
+      </Paper>
+      <Paper>
+        <Box px={3} py={2}>
+          <Qualifications produit={produit} />
         </Box>
       </Paper>
     </Box>
