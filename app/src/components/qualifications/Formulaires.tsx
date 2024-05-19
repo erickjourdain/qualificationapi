@@ -12,9 +12,10 @@ import manageError from "../../utils/manageError";
 interface FormulairesProps {
   formulaires: FormAPI[];
   produit: ProduitAPI;
+  onUpdateFormulaire: () => void;
 }
 
-const Formulaires = ({ formulaires, produit }: FormulairesProps) => {
+const Formulaires = ({ formulaires, produit, onUpdateFormulaire }: FormulairesProps) => {
 
   const setAlerte = useSetAtom(displayAlert);
 
@@ -27,7 +28,10 @@ const Formulaires = ({ formulaires, produit }: FormulairesProps) => {
   const { mutate } = useMutation({
     mutationKey: ["saveAnswer"],
     mutationFn: saveAnswer,
-    onSuccess: () => setAlerte({ severite:"success", message: "réponse enregistrée" }),
+    onSuccess: () => {
+      setAlerte({ severite:"success", message: "réponse enregistrée" });
+      onUpdateFormulaire();
+    },
     onError: (error) => setAlerte({ severite: "error", message: manageError(error) }),
   })
 

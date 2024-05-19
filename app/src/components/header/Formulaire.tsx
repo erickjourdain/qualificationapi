@@ -30,6 +30,7 @@ const Formulaire = ({ header, onChange }: FormulaireProps) => {
   // State: état du formulaire
   const [isChanged, setIsChanged] = useState<boolean>(false);
 
+  // Mise à jour de l'entête de l'opportunité
   const { mutate} = useMutation({
     mutationFn: updateHeader,
     onSuccess: () => {
@@ -66,7 +67,8 @@ const Formulaire = ({ header, onChange }: FormulaireProps) => {
     name: "societe",
     className: "header-input",
     label: "raison sociale client",
-    disabled: disabled,
+    disabled,
+    size: "small",
     rules: {
       required: "La RS client est obligatoire",
       minLength: {
@@ -84,7 +86,8 @@ const Formulaire = ({ header, onChange }: FormulaireProps) => {
     name: "email",
     className: "header-input",
     label: "email du contact",
-    disabled: disabled,
+    disabled,
+    size: "small",
     rules: {
       required: "L'email est obligatoire",
       pattern: {
@@ -98,7 +101,8 @@ const Formulaire = ({ header, onChange }: FormulaireProps) => {
     name: "telephone",
     className: "header-input",
     label: "telephone du contact",
-    disabled: disabled,
+    disabled,
+    size: "small",
     rules: {
       pattern: {
         value: /^(?:\+33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/,
@@ -111,7 +115,8 @@ const Formulaire = ({ header, onChange }: FormulaireProps) => {
     name: "nom",
     className: "header-input",
     label: "nom du contact",
-    disabled: disabled,
+    disabled,
+    size: "small",
     rules: {
       minLength: {
         value: 3,
@@ -128,7 +133,8 @@ const Formulaire = ({ header, onChange }: FormulaireProps) => {
     name: "prenom",
     className: "header-input",
     label: "prénom du contact",
-    disabled: disabled,
+    disabled,
+    size: "small",
     rules: {
       minLength: {
         value: 3,
@@ -145,7 +151,8 @@ const Formulaire = ({ header, onChange }: FormulaireProps) => {
     name: "opportunite",
     className: "header-input",
     label: "opportunité CRM",
-    disabled: disabled,
+    disabled,
+    size: "small",
     rules: {
       pattern: {
         value: /^OPP\d{7}$/,
@@ -158,7 +165,8 @@ const Formulaire = ({ header, onChange }: FormulaireProps) => {
     name: "projet",
     className: "header-input",
     label: "projet UBW",
-    disabled: disabled,
+    disabled,
+    size: "small",
     rules: {
       pattern: {
         value: /^P\d{6}$/,

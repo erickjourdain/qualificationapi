@@ -12,7 +12,7 @@ public class AnswerResponse {
   private String reponse;
   private Integer version;
   private Boolean courante;
-  private Integer devis;
+  private String devis;
   private Statut statut;
   private UtilisateurResponse createur;
   private UtilisateurResponse gestionnaire;

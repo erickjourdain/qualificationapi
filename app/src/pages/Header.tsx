@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useParams } from "react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { sfEqual } from "spring-filter-query-builder";
 import { useSetAtom } from "jotai";
 import Paper from "@mui/material/Paper";
@@ -21,6 +21,9 @@ const Header = () => {
   // Récupération du paramètre de la route
   const { uuid } = useParams();
 
+  // Hook de gestion des requêtes ver l'API
+  const queryClient = useQueryClient();
+
   // Chargement de l'état Atom des alertes
   const setAlerte = useSetAtom(displayAlert);
 
@@ -28,7 +31,7 @@ const Header = () => {
   const [produit, setProduit] = useState<ProduitAPI | null>(null);
 
   // Requête de récupération de l'entête
-  const { data: header, isLoading: isLoadingHeader, refetch: refetchHeader } = useQuery({
+  const { data: header, isLoading: isLoadingHeader } = useQuery({
     queryKey: ["getHeader", uuid],
     queryFn: () => {
       if (!uuid) return null;
@@ -43,7 +46,7 @@ const Header = () => {
   });
 
   // Requête de récupération des produits associés
-  const { data: produits, isLoading: isLoadingProduits, refetch: refetchProduits } = useQuery({
+  const { data: produits, isLoading: isLoadingProduits } = useQuery({
     queryKey: ["getProduits", header],
     queryFn: () => {
       const filter = sfEqual("header", header.id);
@@ -57,6 +60,12 @@ const Header = () => {
       return true;
     },
   })
+
+  const onChange = () => {
+    console.log("hello");
+    queryClient.invalidateQueries({ queryKey: ["getHeader"]});
+    queryClient.invalidateQueries({ queryKey: ["getProduits"]});
+  }
 
   const handleSelectProduct = (produit: ProduitAPI) => {
     setProduit(produit);
@@ -74,13 +83,13 @@ const Header = () => {
       <Paper
       >
         <Box px={3} py={2}>
-          {header && <Formulaire header={header} onChange={refetchHeader} />}
+          {header && <Formulaire header={header} onChange={onChange} />}
         </Box>
       </Paper>
       <Paper
       >
         <Box px={3} py={2}>
-          {produits && <Produits headerId={header.id} produits={produits} onChange={refetchProduits} onSelect={handleSelectProduct} />}
+          {produits && <Produits headerId={header.id} produits={produits} onChange={onChange} onSelect={handleSelectProduct} />}
         </Box>
       </Paper>
       <Paper>

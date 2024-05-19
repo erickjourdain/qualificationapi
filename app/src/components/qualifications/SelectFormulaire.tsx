@@ -35,8 +35,10 @@ const SelectFormulaire = ({ formulaires, onSelect }: FormulairesProps) => {
     select: (reponse) => reponse.data as FormsAPI,
   });
 
+  // retour du formulaire sélectionné
   const handleConfirm = () => {
     onSelect(formulaire);
+    setFormulaire(null);
   }
 
   return (

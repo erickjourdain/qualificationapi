@@ -63,7 +63,7 @@ const Formulaire = () => {
     rules: { minLength: 1 }
   })
 
-  // 
+  // enregistrement de la nouvelle entrée
   const {
     mutate,
     isPending,

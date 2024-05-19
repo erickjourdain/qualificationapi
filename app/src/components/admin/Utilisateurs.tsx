@@ -23,7 +23,7 @@ import manageError from "../../utils/manageError";
 
 const Utilisateurs = () => {
 
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
 
   // Chargement de l'état Atom des alertes
   const setAlerte = useSetAtom(displayAlert);

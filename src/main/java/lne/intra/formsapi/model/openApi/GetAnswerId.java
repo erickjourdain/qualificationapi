@@ -12,7 +12,7 @@ public class GetAnswerId {
   private String reponse;
   private Integer version;
   private Boolean courante;
-  private Integer devis;
+  private String devis;
   private Statut statut;
   private GetUserId createur;
   private GetUserId gestionnaire;

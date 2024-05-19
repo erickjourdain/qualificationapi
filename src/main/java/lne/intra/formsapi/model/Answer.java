@@ -46,7 +46,7 @@ public class Answer {
   @Builder.Default
   private Boolean courante = true;
 
-  private Integer devis;
+  private String devis;
 
   @Enumerated(EnumType.STRING)
   @Column(columnDefinition = "VARCHAR(55) DEFAULT 'QUALIFICATION'")

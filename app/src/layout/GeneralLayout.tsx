@@ -16,7 +16,7 @@ const GeneralLayout = () => {
     if (notSaved && currentLocation.pathname !== nextLocation.pathname) {
       setQuitDialog(true);
       return true;
-    } else return false
+    } else return false;
   }, [notSaved])
   
   // Création du blocker de navigation

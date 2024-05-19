@@ -47,24 +47,6 @@ const delAuthorisation = () => {
   instance.defaults.headers.common["Authorization"] = "";
 };
 
-/**
- * Lancement requête de récupération des formulaires
- * @param titre chaine de caractères à rechercher dans le titre du formulaire null par défaut
- * @param page numéro de la page première page par défaut
- * @returns Promise retournant une réponse de type AxiosResponse
- */
-/*
-const getForms = (titre: string | null = null, page = 0, include = ["id", "titre", "slug"], size = 10) => {
-  // construction du chemin d'interrogation de l'API
-  const searchParams = titre ? sfAnd([sfEqual("valide", "true"), sfLike("titre", `*${titre}*`)]) : sfEqual("valide", "true");
-  // lancement de la requête
-  return instance.request({
-    method: "GET",
-    url: encodeURI(`/data/forms?filter=${searchParams}&page=${page + 1}&size=${size}&include=${include.join(",")}`),
-  });
-};
-*/
-
 const getForms = (filter: string | null = null, page = 1, include: string[] = [], size = 10) => {
   let url = `/data/forms?page=${page}&size=${size}`;
   if (filter) url += `&filter=${filter}`;
@@ -118,10 +100,14 @@ const saveAnswer = (payload: { reponse: string; produit: number, formulaire: num
   });
 };
 
-const getAnswers = (query: string) => {
+const getAnswers = (filter: string | null, page: number = 1, include: string[] = [], size: number = 10) => {  
+let url = "";
+url = `/data/answers?page=${page}&size=${size}&order=desc(id)`;
+if (filter) url += `&filter=${filter}`;
+if (include.length) url += `&include=${include.join(",")}`;
   return instance.request({
     method: "GET",
-    url: encodeURI(`data/answers?${query}`),
+    url: encodeURI(url),
   });
 };
 

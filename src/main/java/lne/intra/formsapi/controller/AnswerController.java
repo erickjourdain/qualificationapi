@@ -37,7 +37,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lne.intra.formsapi.model.Answer;
 import lne.intra.formsapi.model.LockedAnswer;
-import lne.intra.formsapi.model.Statut;
 import lne.intra.formsapi.model.User;
 import lne.intra.formsapi.model.exception.AppException;
 import lne.intra.formsapi.model.openApi.GetAnswerId;
@@ -232,16 +231,12 @@ public class AnswerController {
         throw new AppException(403, "La réponse est vérouillée par un aute utilisateur");
     });
     // Vérification de la possibilité de modifier la réponse
-    Statut statut = (Statut) answer.getStatut();
     if (answer.getCourante().equals(false)) {
       throw new AppException(400, "Seule les dernières réponses peuvent être modifiées");
     }
     // test de cohérence des données fournies pour mise à jour de la réponse
     if (request.getFormulaire() != null) {
       throw new AppException(400, "Le formulaire ne peut être modifiée");
-    }
-    if (statut == Statut.TERMINE && request.getStatut() != null) {
-      throw new AppException(400, "La réponse est clôturée");
     }
     answer = service.updateAnswer(id, request, userDetails);
     return ResponseEntity.ok(service.addFieldsToAnswer(answer, include));

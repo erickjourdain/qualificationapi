@@ -18,6 +18,7 @@ import { HeadersAPI } from "./types/headersAPI";
 import { ProduitAPI } from "./types/produitAPI";
 import { ProduitsAPI } from "./types/produitsAPI";
 import { HeaderCreation } from "./types/headerCreation";
+import { Statut } from "./types/statuts";
 
 export {
   Info,
@@ -39,6 +40,7 @@ export {
   HeadersAPI,
   ProduitAPI,
   ProduitsAPI,
-  HeaderCreation
+  HeaderCreation,
+  Statut
 }
 

@@ -23,7 +23,7 @@ import { formatDateTime } from "../../utils/format";
 
 const Formulaires = () => {
 
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
   const navigate = useNavigate();
 
   // Chargement de l'état Atom des alertes
@@ -38,7 +38,7 @@ const Formulaires = () => {
 
   const { data, error, isError, isLoading } = useQuery({
     queryKey: ["getForms", page],
-    queryFn: () => getForms(null, page, ["id", "titre", "version", "createur", "updatedAt", "slug"], itemsPerPage),
+    queryFn: () => getForms(null, page + 1, ["id", "titre", "version", "createur", "updatedAt", "slug"], itemsPerPage),
     select: (response) => response.data as FormsAPI, 
   })
 

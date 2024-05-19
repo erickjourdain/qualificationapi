@@ -149,7 +149,7 @@ public class AnswerService {
   }
 
   /**
-   * Energistrement d'une nouvelle réponse
+   * Enregistrement d'une nouvelle réponse
    * 
    * @param request
    * @param userDetails

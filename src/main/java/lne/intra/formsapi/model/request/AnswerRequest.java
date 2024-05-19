@@ -1,12 +1,10 @@
 package lne.intra.formsapi.model.request;
 
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lne.intra.formsapi.model.Statut;
 import lne.intra.formsapi.util.ObjectCreate;
-import lne.intra.formsapi.util.ObjectUpdate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,9 +25,7 @@ public class AnswerRequest {
 
   private Statut statut;
 
-  @Min(groups = { ObjectCreate.class, ObjectUpdate.class }, value = 1000000, message = "le champ 'devis' doit contenir 7 digits")
-  @Max(groups = { ObjectCreate.class, ObjectUpdate.class }, value = 9999999, message = "le champ 'devis' doit contenir 7 digits")
-  private Integer devis;
+  private String devis;
 
   @NotNull(groups = ObjectCreate.class, message = "le champ 'produit' est obligatoire")
   @Min(groups = ObjectCreate.class, value = 1, message = "le champ 'produit' doit être positif")

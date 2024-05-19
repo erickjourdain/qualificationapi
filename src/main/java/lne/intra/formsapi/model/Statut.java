@@ -4,6 +4,5 @@ public enum Statut {
   QUALIFICATION,
   DEVIS,
   GAGNE,
-  PERDU,
-  TERMINE
+  PERDU
 }

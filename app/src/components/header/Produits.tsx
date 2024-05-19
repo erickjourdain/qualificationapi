@@ -109,6 +109,7 @@ const Produits = ({ headerId, produits, onChange, onSelect }: ProduitsProps) => 
         <Select
           labelId="produit-select-label"
           id="reponse-versions-select"
+          size="small"
           value={produit.id.toString()}
           label="Produit"
           onChange={(evt: SelectChangeEvent) => {
@@ -146,6 +147,7 @@ const Produits = ({ headerId, produits, onChange, onSelect }: ProduitsProps) => 
             <TextField
               id="produit"
               label={label}
+              size="small"
               fullWidth
               {
               ...register("description", {
