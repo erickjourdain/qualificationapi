@@ -225,6 +225,7 @@ public class AnswerService {
           .gestionnaire(user)
           .devis(answer.getDevis())
           .statut(answer.getStatut())
+          .produit(answer.getProduit())
           .build();
     }
     // mise à jour de la réponse
