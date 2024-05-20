@@ -10,7 +10,6 @@ export type Form = {
   createur?: User;
   valide: boolean;
   version: number;
-  formulaireInitial: number;
   createdAt?: number;
   updatedAt?: number;
 };

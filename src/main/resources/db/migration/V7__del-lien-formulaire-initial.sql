@@ -1,0 +1,1 @@
+ALTER TABLE IF EXISTS `form` DROP COLUMN IF EXISTS `init_form`;

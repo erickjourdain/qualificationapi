@@ -10,7 +10,6 @@ public class FormResponse {
   private String titre;
   private String description;
   private String formulaire;
-  private Integer formulaireInitial;
   private Integer version;
   private Boolean valide;
   private UtilisateurResponse createur;

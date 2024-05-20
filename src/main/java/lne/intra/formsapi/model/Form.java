@@ -41,9 +41,6 @@ public class Form {
   @Column(nullable = false, columnDefinition = "MEDIUMTEXT")
   private String formulaire;
 
-  @Column
-  private Integer initForm;
-
   @Column(nullable = false)
   @Builder.Default
   private Integer version = 1;
