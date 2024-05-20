@@ -33,6 +33,7 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
   // Hook de gestion des requêtes ver l'API
   const queryClient = useQueryClient();
 
+  // Stockage de l'id de la réponse pour dévérouillahge lors du changement de page
   const versionRef = useRef<string | null>(null);
 
   // State du composant

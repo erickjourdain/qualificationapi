@@ -11,7 +11,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
-import { createUser } from "../utils/apiCall";
+import { createUser, delAuthorisation } from "../utils/apiCall";
 import manageError from "../utils/manageError";
 
 type Inputs = {
@@ -20,7 +20,6 @@ type Inputs = {
   login: string;
   password: string;
   confirmPassword: string;
-  secret: string;
 };
 
 const SignIn = () => {
@@ -39,7 +38,6 @@ const SignIn = () => {
       login: "",
       password: "",
       confirmPassword: "",
-      secret: "",
     },
   });
 
@@ -54,6 +52,7 @@ const SignIn = () => {
 
   const onSubmit = (data: Inputs) => {
     const { confirmPassword, ...payload } = data;
+    delAuthorisation();
     mutate(payload);
   };
 
@@ -190,20 +189,6 @@ const SignIn = () => {
         />
         <Typography variant="inherit" color="error">
           {errors.confirmPassword?.message}
-        </Typography>
-        <TextField
-          margin="normal"
-          required
-          fullWidth
-          id="secret"
-          label="clef d'enregistrement"
-          {...register("secret", {
-            required: "La clef est obligatoire.",
-          })}
-          error={errors.secret ? true : false}
-        />
-        <Typography variant="inherit" color="error">
-          {errors.secret?.message}
         </Typography>
         <Typography variant="inherit" color="error">
           {errors.root?.message}

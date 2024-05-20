@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -38,7 +37,6 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "signin endpoint")
 public class SignInController {
   @Autowired
-  private Environment env;
 
   private final UserService userService;
 
@@ -51,9 +49,6 @@ public class SignInController {
       @RequestParam(required = false) String include
   ) {
     Map<String, Object> response = new HashMap<>();
-    // vérification clef d'enregistrement
-    if (!request.getSecret().equals(env.getProperty("lne.intra.formsapi.signinkey")))
-      throw new AppException(400, "La clef d'enregistrement est incorrecte");
     UserRequest userRequest = UserRequest.builder()
         .nom(request.getNom().trim().toUpperCase())
         .prenom(request.getPrenom().trim().toLowerCase())
@@ -81,9 +76,6 @@ public class SignInController {
       @RequestBody SignInRequest request,
       @RequestParam(required = false) String include
   ) {
-    // vérification clef d'enregistrement
-    if (!request.getSecret().equals(env.getProperty("lne.intra.formsapi.signinkey")))
-      throw new AppException(400, "La clef d'enregistrement est incorrecte");
     // vérification présence d'utilisateur dans la base
     Pageable paging = PageRequest.of(0, 10,
         Sort.by(Direction.ASC, "id"));

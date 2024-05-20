@@ -61,12 +61,13 @@ const Header = () => {
     },
   })
 
+  // Relance des requêtes suite modificationsÒ
   const onChange = () => {
-    console.log("hello");
     queryClient.invalidateQueries({ queryKey: ["getHeader"]});
     queryClient.invalidateQueries({ queryKey: ["getProduits"]});
   }
 
+  // Sélection du produit
   const handleSelectProduct = (produit: ProduitAPI) => {
     setProduit(produit);
   }

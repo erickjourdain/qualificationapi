@@ -3,5 +3,4 @@ export type UserCreation = {
   prenom: string;
   login: string;
   password: string;
-  secret?: string;
 };

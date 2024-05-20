@@ -29,6 +29,4 @@ public class SignInRequest {
   @Size(min = 8, message = "le champ 'login' doit contenir au moins 8 caractères")
   private String password;
 
-  @NotBlank(message = "le champ 'secret' est obligatoire")
-  private String secret;
 }
