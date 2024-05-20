@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Export } from "@tripetto/runner";
 import { Instance } from "@tripetto/runner/module";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -33,6 +33,8 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
   // Hook de gestion des requêtes ver l'API
   const queryClient = useQueryClient();
 
+  const versionRef = useRef<string | null>(null);
+
   // State du composant
   const [version, setVersion] = useState<string | null>(null);
   const [oldVersion, setOldVersion] = useState<string | null>(null);
@@ -59,7 +61,7 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
   });
 
   // Unlock previous answer
-  const { refetch } = useQuery({
+  useQuery({
     queryKey: ["unlockAnswer", oldVersion, version],
     queryFn: () => {
       if (change && oldVersion) return unlockAnswer(parseInt(oldVersion));
@@ -75,8 +77,11 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
     } else setChange(false);
   }, [answer]);
 
+  // Dévérouillage lors du déchargement du composant
   useEffect(() => {
-    return () => { refetch() };
+    return () => {
+      if (versionRef.current) unlockAnswer(parseInt(versionRef.current));
+    };
   }, []);
 
   // Mise à jour de la réponse
@@ -126,6 +131,7 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
     if (id !== answer?.id.toString())
       setOldVersion(answer?.id.toString() || null);
     setVersion(id);
+    versionRef.current = id;
   }
 
   return (
