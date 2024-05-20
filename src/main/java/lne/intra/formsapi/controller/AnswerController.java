@@ -37,6 +37,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lne.intra.formsapi.model.Answer;
 import lne.intra.formsapi.model.LockedAnswer;
+import lne.intra.formsapi.model.Role;
 import lne.intra.formsapi.model.User;
 import lne.intra.formsapi.model.exception.AppException;
 import lne.intra.formsapi.model.openApi.GetAnswerId;
@@ -181,9 +182,10 @@ public class AnswerController {
 
     // recherche de la réponse
     Answer answer = service.getAnswer(id);
+    User user = userService.getByLogin(userDetails.getUsername());
+    Boolean isReader = user.getRole() == Role.READER;
     // pose d'un verrou sur la réponse
-    if (answer.getCourante() && lockedAnswerService.getByAnswer(answer).isEmpty()) {
-      User user = userService.getByLogin(userDetails.getUsername());
+    if (answer.getCourante() && lockedAnswerService.getByAnswer(answer).isEmpty() && !isReader) {
       LockedAnswer lockedAnswer = LockedAnswer.builder()
           .answer(answer)
           .utilisateur(user)
