@@ -1,0 +1,77 @@
+import React, { useEffect, useState } from "react";
+import { useAtomValue } from "jotai";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Alert from "@mui/material/Alert";
+import InputDevis from "./InputDevis";
+import SelectStatut from "./SelectStatut";
+import { formatDateTime } from "../../utils/format";
+import { AnswerAPI } from "../../gec-tripetto";
+import { loggedUser } from "../../atomState";
+
+interface HeaderAnswerProps {
+  answer: AnswerAPI;
+  onDevisChange: (devis: string) => void;
+  onStatutChange: (statut: string) => void;
+}
+
+const HeaderAnswer = ({ answer, onDevisChange, onStatutChange }: HeaderAnswerProps) => {
+
+  // Chargement de l'utilisateur connecté
+  const user = useAtomValue(loggedUser);
+
+  // State: état du composant
+  const [courante, setCourante] = useState<boolean>(false);
+  const [locked, setLocked] = useState<boolean>(true);
+  const [input, setInput] = useState<boolean>(false);
+
+  // Mise à jour de l'état lors du changement de réponse
+  useEffect(() => {
+    setCourante(answer.courante);
+    if (answer.courante && user)
+      setLocked(answer.courante && !!answer.lock && answer.lock.utilisateur.id !== user?.id);
+    else setLocked(true);
+  }, [answer]);
+
+  // Mise à jour de l'état de l'input des formulaires
+  useEffect(() => {
+    setInput(courante && !locked && (user !== null) && (user.role !== "READER"));
+  }, [courante, locked]);
+
+  return (
+    <Box sx={{
+      m: 1,
+      "& .MuiFormControl-root": { width: "30%", mr: 1, mt: 1 },
+      "& .MuiPaper-root": { mt: 0 }
+    }}>
+      <Box display="flex" flexDirection="row" alignContent="center">
+        <Box sx={{ width: "100%", mb: 2 }}>
+          <Typography variant="caption" display="block">
+            {`créé le ${formatDateTime(answer.createdAt)} par ${answer.createur.nom} ${answer.createur.prenom}`}
+          </Typography>
+          <Typography variant="caption" display="block">
+            {`modifié le ${formatDateTime(answer.updatedAt)} par ${answer.gestionnaire.nom} ${answer.gestionnaire.prenom}`}
+          </Typography>
+        </Box>
+        {
+          !courante &&
+          <Box sx={{ ml: 3, width: "100%" }} >
+            <Alert color="info">La version n'est pas la version courante</Alert>
+          </Box>
+        }
+        {
+          courante && locked &&
+          <Box sx={{ ml: 3, width: "100%" }} >
+            <Alert color="warning">La réponse est vérouillée par {answer.lock.utilisateur.prenom} {answer.lock.utilisateur.nom}</Alert>
+          </Box>
+        }
+      </Box>
+      <Box display="flex" alignItems="flex-start">
+        <InputDevis answer={answer} onSubmit={onDevisChange} disabled={!input} />
+        <SelectStatut answer={answer} onSelect={onStatutChange} disabled={!input} />
+      </Box>
+    </Box>
+  )
+}
+
+export default HeaderAnswer;

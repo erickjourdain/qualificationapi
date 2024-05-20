@@ -6,10 +6,11 @@ import MenuItem from "@mui/material/MenuItem";
 
 interface SelectStatutProps {
   answer: AnswerAPI;
+  disabled: boolean;
   onSelect: (statut: Statut) => void;
 }
 
-const SelectStatut = ({ answer, onSelect }: SelectStatutProps) => {
+const SelectStatut = ({ answer, disabled, onSelect }: SelectStatutProps) => {
 
   return (
     <TextField
@@ -19,6 +20,7 @@ const SelectStatut = ({ answer, onSelect }: SelectStatutProps) => {
     size="small"
     value={answer.statut}
     onChange={(event) => onSelect(event.target.value)}
+    disabled={disabled}
     helperText="définir le statut"
   >
     {Statuts.map((option) => (

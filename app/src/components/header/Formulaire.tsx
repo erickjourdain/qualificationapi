@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useMutation } from "@tanstack/react-query";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
@@ -13,7 +13,7 @@ import { HeaderAPI } from "../../gec-tripetto";
 import { formatDateTime } from "../../utils/format";
 import { updateHeader } from "../../utils/apiCall";
 import manageError from "../../utils/manageError";
-import { displayAlert } from "../../atomState";
+import { displayAlert, loggedUser } from "../../atomState";
 
 interface FormulaireProps {
   header: HeaderAPI
@@ -22,16 +22,18 @@ interface FormulaireProps {
 
 const Formulaire = ({ header, onChange }: FormulaireProps) => {
 
+  // Chargement de l'utilisateur connecté
+  const user = useAtomValue(loggedUser);
   // Chargement de l'état Atom de gestion des alertes
   const setAlerte = useSetAtom(displayAlert);
-    
+
   // State: ouverture / fermeture du formulaire
   const [disabled, setDisabled] = useState<boolean>(true);
   // State: état du formulaire
   const [isChanged, setIsChanged] = useState<boolean>(false);
 
   // Mise à jour de l'entête de l'opportunité
-  const { mutate} = useMutation({
+  const { mutate } = useMutation({
     mutationFn: updateHeader,
     onSuccess: () => {
       setAlerte({ severite: "success", message: "enregistrement du produit réalisé" });
@@ -184,10 +186,13 @@ const Formulaire = ({ header, onChange }: FormulaireProps) => {
             <br />
             {`modifié le ${formatDateTime(header.updatedAt)} par ${header.gestionnaire.nom} ${header.gestionnaire.prenom}`}
           </Typography>
-          <Stack direction="column">
-            <FormControlLabel control={<Switch checked={!disabled} onChange={() => setDisabled(!disabled)} />} label="Modifier" />
-            <BtnField name="save" type="submit" label="Enregistrer" color="primary" disabled={disabled || !isChanged} />
-          </Stack>
+          {
+            (user && user.role !== "READER") &&
+            <Stack direction="column">
+              <FormControlLabel control={<Switch checked={!disabled} onChange={() => setDisabled(!disabled)} />} label="Modifier" />
+              <BtnField name="save" type="submit" label="Enregistrer" color="primary" disabled={disabled || !isChanged} />
+            </Stack>
+          }
         </Stack>
         <InputField {...societeProps} />
         <InputField {...emailProps} />

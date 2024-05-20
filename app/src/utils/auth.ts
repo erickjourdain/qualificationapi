@@ -19,7 +19,7 @@ const isUser = () => {
 
 const isLogged = () => {
   const user = useAtomValue(loggedUser);
-  return !user
+  return !!user
 }
 
 export { isAdmin, isCreator, isUser, isLogged };

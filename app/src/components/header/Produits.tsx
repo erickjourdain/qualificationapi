@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { useSetAtom } from "jotai"
+import { useAtomValue, useSetAtom } from "jotai"
 import { useMutation } from "@tanstack/react-query"
 import { SubmitHandler, useForm } from "react-hook-form"
 import Box from "@mui/material/Box"
@@ -15,7 +15,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
-import { displayAlert } from "../../atomState"
+import { displayAlert, loggedUser } from "../../atomState"
 import { ProduitAPI, ProduitsAPI } from "../../gec-tripetto"
 import { createProduit, updateProduit } from "../../utils/apiCall"
 import manageError from "../../utils/manageError"
@@ -34,6 +34,8 @@ interface ProduitsProps {
 
 const Produits = ({ headerId, produits, onChange, onSelect }: ProduitsProps) => {
 
+  // Chargement utilisateur connecté
+  const user = useAtomValue(loggedUser);
   // Chargement de l'état Atom de gestion des alertes
   const setAlerte = useSetAtom(displayAlert);
 
@@ -123,16 +125,21 @@ const Produits = ({ headerId, produits, onChange, onSelect }: ProduitsProps) => 
             </MenuItem>
           ))}
         </Select>
-        <Tooltip title="Modifier produit" placement="left">
-          <IconButton color="warning" onClick={onEdit}>
-            <EditIcon />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Ajouter un produit" placement="left">
-          <IconButton color="primary" onClick={onAddProduct}>
-            <AddCircleIcon />
-          </IconButton>
-        </Tooltip>
+        {
+          (user && user.role !== "READER") &&
+          <>
+            <Tooltip title="Modifier produit" placement="left">
+              <IconButton color="warning" onClick={onEdit}>
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Ajouter un produit" placement="left">
+              <IconButton color="primary" onClick={onAddProduct}>
+                <AddCircleIcon />
+              </IconButton>
+            </Tooltip>
+          </>
+        }
       </Stack>
     )
   }
@@ -173,7 +180,7 @@ const Produits = ({ headerId, produits, onChange, onSelect }: ProduitsProps) => 
               <Tooltip title="Annuler" placement="left">
                 <CloseIcon />
               </Tooltip>
-            </IconButton>          
+            </IconButton>
           </Stack>
         </Box>
       )

@@ -8,6 +8,8 @@ import Tab from "@mui/material/Tab";
 import TabQualif from "./TabQualif";
 import { AnswerAPI, AnswersAPI, FormAPI, ProduitAPI } from "../../gec-tripetto";
 import { getAnswers } from "../../utils/apiCall";
+import { useAtomValue } from "jotai";
+import { loggedUser } from "../../atomState";
 
 interface QualificationsProps {
   produit: ProduitAPI | null;
@@ -17,6 +19,8 @@ const Qualifications = ({ produit }: QualificationsProps) => {
 
   const queryClient = useQueryClient();
 
+  // Chargement utilisateur connecté
+  const user = useAtomValue(loggedUser);
   // State: les formulaires utilisés
   const [formulaires, setFormulaires] = useState<FormAPI[]>([]);
   // State: formulaire sélectionné
@@ -45,13 +49,16 @@ const Qualifications = ({ produit }: QualificationsProps) => {
   }
 
   const onUpdateFormulaire = () => {
-    queryClient.invalidateQueries({ queryKey: ["getAnwsersFromProduct"]});
+    queryClient.invalidateQueries({ queryKey: ["getAnwsersFromProduct"] });
   }
 
   return (
     (produit && !isLoading &&
       <Box>
-        <Formulaires formulaires={formulaires} produit={produit} onUpdateFormulaire={onUpdateFormulaire}/>
+        {
+          (user && user.role !== "READER") &&
+          <Formulaires formulaires={formulaires} produit={produit} onUpdateFormulaire={onUpdateFormulaire} />
+        }
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs value={selectedTab} onChange={handleTabChange} aria-label="basic tabs example">
             {
@@ -62,7 +69,7 @@ const Qualifications = ({ produit }: QualificationsProps) => {
           </Tabs>
         </Box>
         {
-          formulaires.map((formulaire, index) => <TabQualif show={selectedTab === index} formulaire={formulaire} key={formulaire.id} produit={produit}/>)
+          formulaires.map((formulaire, index) => <TabQualif show={selectedTab === index} formulaire={formulaire} key={formulaire.id} produit={produit} />)
         }
       </Box>
     )

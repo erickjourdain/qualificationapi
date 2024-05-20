@@ -123,7 +123,7 @@ const getUniqueAnswer = async (query: string) => {
   });
 };
 
-const getAnswer = (id: number, query: string | null) => {
+const getAnswer = (id: number, query: string | null = null) => {
   const url = query ? `data/answers/${id}?${query}` : `data/answers/${id}`;
   return instance.request({
     method: "GET",

@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider, createTheme } from "@mui/material";
 import MessageInfo from "./components/MessageInfo";
 import { setAuthorisation } from "./utils/apiCall";
-import { isAdmin, isCreator, isUser } from "./utils/auth";
+import { isAdmin, isLogged } from "./utils/auth";
 import MainLayout from "./layout/MainLayout";
 //import Index from "./pages/Index";
 import Login from "./pages/Login";
@@ -48,15 +48,15 @@ function App() {
       children: [
         {
           index: true,
-          element: <Headers />,
+          element: isLogged() ? <Headers /> : <NotAllowed />,
         },
         {
           path: "opportunite/new",
-          element: isUser() ? <AddHeader /> : <NotAllowed />,
+          element: isLogged() ? <AddHeader /> : <NotAllowed />,
         },
         {
           path: "opportunite/:uuid",
-          element: <Header/>
+          element: isLogged() ? <Header/> : <NotAllowed />
         }
       ]
     },

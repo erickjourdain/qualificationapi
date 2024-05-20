@@ -50,9 +50,9 @@ const VoirReponses = ({ answer, updatedAnswer }: VoirReponsesProps) => {
       } else {
         data = await formatTripettoAnswers(formulaire, updatedAnswer, refAnwser);
       }
-      console.log(data);
+      //console.log(data);
       const displayData = await displayAnswers(data);
-      console.log(displayData);
+      //console.log(displayData);
       if (displayData) setReponses(displayData);
     }
 

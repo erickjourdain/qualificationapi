@@ -11,10 +11,11 @@ import { AnswerAPI } from "../../gec-tripetto";
 
 interface InputDevisProps {
   answer: AnswerAPI;
+  disabled: boolean;
   onSubmit: (devis: string) => void;
 }
 
-const InputDevis = ({ answer, onSubmit }: InputDevisProps) => {
+const InputDevis = ({ answer, disabled, onSubmit }: InputDevisProps) => {
 
   // States du composant
   const [editDevis, setEditDevis] = useState<boolean>(false);
@@ -62,7 +63,7 @@ const InputDevis = ({ answer, onSubmit }: InputDevisProps) => {
       <InputLabel
         htmlFor="outlined-devis"
         size="small"
-        disabled={!editDevis}
+        disabled={!editDevis || disabled}
       >
         {label}
       </InputLabel>
@@ -71,14 +72,14 @@ const InputDevis = ({ answer, onSubmit }: InputDevisProps) => {
         type="text"
         size="small"
         label={label}
-        disabled={!editDevis}
+        disabled={!editDevis || disabled}
         value={devis}
         onChange={(evt) => setDevis(evt.target.value)}
         error={!!error}
         startAdornment={
           (editDevis || devis) && <InputAdornment position="start">DEV</InputAdornment>
         }
-        endAdornment={
+        endAdornment={!disabled &&
           <InputAdornment position="end">
             <IconButton
               onClick={onClickInput}
