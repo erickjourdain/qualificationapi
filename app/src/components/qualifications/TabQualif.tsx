@@ -5,17 +5,15 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAtomValue, useSetAtom } from "jotai";
 import Box from "@mui/material/Box";
 import Fab from "@mui/material/Fab";
-import Button from "@mui/material/Button";
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import { displayAlert, loggedUser } from "../../atomState";
 import { AnswerAPI, FormAPI, ProduitAPI, Statut } from "../../gec-tripetto";
 import manageError from "../../utils/manageError";
 import { getAnswer, unlockAnswer, updateAnswer } from "../../utils/apiCall";
 import PlayTripetto from "../PlayTripetto";
-import VoirReponses from "./VoirReponses";
-import Stack from "@mui/material/Stack";
 import HeaderAnswer from "./HeaderAnswer";
 import Version from "./Version";
+import DisplayTripetto from "./DisplayTripetto";
 
 interface TabQualifProps {
   show: boolean;
@@ -40,8 +38,9 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
   const [version, setVersion] = useState<string | null>(null);
   const [oldVersion, setOldVersion] = useState<string | null>(null);
   const [showTripetto, setShowTripetto] = useState<boolean>(false);
-  const [updatedAnswer, setUpdatedAnswer] = useState<Export.IExportables | null>(null);
   const [change, setChange] = useState<boolean>(false);
+  const [unlock, setUnlock] = useState<boolean>(false);
+  const [majRep, setMajRep] = useState<number>(0);
 
   // Chargement de la réponse à afficher
   const { data: answer } = useQuery({
@@ -52,7 +51,9 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
       else return null;
     },
     select: (reponse) => {
-      if (reponse) return reponse.data as AnswerAPI;
+      if (reponse) {
+        return reponse.data as AnswerAPI;
+      }
     },
     enabled: !!version,
     throwOnError: (error, _query) => {
@@ -62,12 +63,15 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
   });
 
   // Unlock previous answer
-  useQuery({
-    queryKey: ["unlockAnswer", oldVersion, version],
-    queryFn: () => {
-      if (change && oldVersion) return unlockAnswer(parseInt(oldVersion));
-      else return null;
-    }
+  const { data: unlocked } = useQuery({
+    queryKey: ["unlockAnswer", oldVersion],
+    queryFn: () => (oldVersion && unlock) ? unlockAnswer(parseInt(oldVersion)) : null,
+    /*() =>{
+      //if (change && oldVersion && (oldVersion !== version)) 
+        //return unlockAnswer(parseInt(oldVersion));
+      //else return null;
+    },*/
+    select: (reponse) => (reponse) ? reponse.data as boolean : null,
   })
 
   // Mise du vérouillage lors du changement de réponse
@@ -76,7 +80,13 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
       const locked = (!!answer.lock && answer.lock.utilisateur.id !== user.id);
       setChange(!locked && user.role !== "READER");
     } else setChange(false);
+    setUnlock(true);
   }, [answer]);
+
+  // Mise à jour de l'état de dévérouillage
+  useEffect(() => {
+    setUnlock(!unlocked);
+  }, [unlocked]);
 
   // Dévérouillage lors du déchargement du composant
   useEffect(() => {
@@ -86,10 +96,11 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
   }, []);
 
   // Mise à jour de la réponse
-  const { mutate, isPending } = useMutation({
+  const { mutate } = useMutation({
     mutationFn: updateAnswer,
     onSuccess: () => {
       setAlerte({ severite: "success", message: "l'opportunité a été mise à jour" });
+      setMajRep(majRep + 1);
       queryClient.invalidateQueries({ queryKey: ["getAnswer"] })
     },
     onError: (error) => setAlerte({ severite: "error", message: manageError(error) }),
@@ -111,28 +122,25 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
     });
   }
 
-  // Changement de la réponse
-  const onReponseChange = () => {
-    if (answer && updatedAnswer) mutate({
-      id: answer.id,
-      reponse: JSON.stringify(updatedAnswer),
-    })
-  }
-
   // Validation du formualire Tripetto
   const onSubmit = (instance: Instance) => {
     setShowTripetto(false);
     const exportables = Export.exportables(instance);
-    setUpdatedAnswer(exportables);
+    if (answer)
+      mutate({
+        id: answer?.id,
+        reponse: JSON.stringify(exportables),
+      });
     return true;
   }
 
   // Gestion changement version
   const handleVersionChange = (id: string) => {
-    if (id !== answer?.id.toString())
-      setOldVersion(answer?.id.toString() || null);
-    setVersion(id);
-    versionRef.current = id;
+    if (id !== version) {
+      setOldVersion(version);
+      setVersion(id);
+      versionRef.current = id;
+    }
   }
 
   return (
@@ -143,13 +151,13 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
     >
       {show && (
         <Box>
-          <Version formulaire={formulaire} produit={produit} onChange={handleVersionChange} />
+          <Version formulaire={formulaire} produit={produit} maj={majRep} onChange={handleVersionChange} />
           {answer &&
             <>
               <HeaderAnswer answer={answer} onDevisChange={onDevisChange} onStatutChange={onStatutChange} />
               <Box display="flex">
                 {
-                  !updatedAnswer && change &&
+                  change &&
                   <Fab
                     onClick={() => setShowTripetto(true)}
                     color="warning"
@@ -158,7 +166,10 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
                     <PlayCircleIcon />
                   </Fab>
                 }
-                <VoirReponses answer={answer} updatedAnswer={updatedAnswer} />
+                <DisplayTripetto
+                  data={JSON.parse(answer.reponse)}
+                  form={JSON.parse(formulaire.formulaire)}
+                />
                 <PlayTripetto
                   open={showTripetto}
                   onClose={function (): void {
@@ -170,26 +181,6 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
                 />
               </Box>
             </>
-          }
-          {
-            updatedAnswer && <Stack direction="row" spacing={2} justifyContent="flex-end">
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={onReponseChange}
-                disabled={isPending}
-              >
-                Enregistrer
-              </Button>
-              <Button
-                variant="contained"
-                color="warning"
-                onClick={() => setUpdatedAnswer(null)}
-                disabled={isPending}
-              >
-                Annuler
-              </Button>
-            </Stack>
           }
         </Box>
       )}

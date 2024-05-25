@@ -14,10 +14,11 @@ import { displayAlert } from "../../atomState";
 interface VersionProps {
   formulaire: FormAPI;
   produit: ProduitAPI;
+  maj: number;
   onChange: (id: string) => void;
 }
 
-const Version = ({ formulaire, produit, onChange }: VersionProps) => {
+const Version = ({ formulaire, produit, maj, onChange }: VersionProps) => {
 
   // Chargement de l'état Atom de gestion des alertes
   const setAlerte = useSetAtom(displayAlert);
@@ -27,7 +28,7 @@ const Version = ({ formulaire, produit, onChange }: VersionProps) => {
 
   // Récupération des différentes versions existantes des réponses au formulaire de qualification
   const { data: versions } = useQuery({
-    queryKey: ["getVersions"],
+    queryKey: ["getVersions", maj],
     queryFn: () => {
       const filter = sfAnd([sfEqual("produit", produit.id), sfEqual("formulaire", formulaire.id)]);
       return getAnswers(filter.toString(), 1);
