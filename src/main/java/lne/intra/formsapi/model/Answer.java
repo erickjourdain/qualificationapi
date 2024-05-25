@@ -16,6 +16,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -46,8 +47,6 @@ public class Answer {
   @Builder.Default
   private Boolean courante = true;
 
-  private String devis;
-
   @Enumerated(EnumType.STRING)
   @Column(columnDefinition = "VARCHAR(55) DEFAULT 'QUALIFICATION'")
   @Builder.Default private Statut statut = Statut.QUALIFICATION;
@@ -61,6 +60,11 @@ public class Answer {
   @ManyToOne
   @JoinColumn(name = "gestionnaire")
   private User gestionnaire;
+
+  @JsonBackReference
+  @OneToOne
+  @JoinColumn(name = "devis")
+  private Devis devis;
 
   @JsonBackReference
   @ManyToOne

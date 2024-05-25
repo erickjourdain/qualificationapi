@@ -3,6 +3,7 @@ package lne.intra.formsapi.model.request;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lne.intra.formsapi.model.Devis;
 import lne.intra.formsapi.model.Statut;
 import lne.intra.formsapi.util.ObjectCreate;
 import lombok.AllArgsConstructor;
@@ -25,7 +26,7 @@ public class AnswerRequest {
 
   private Statut statut;
 
-  private String devis;
+  private Devis devis;
 
   @NotNull(groups = ObjectCreate.class, message = "le champ 'produit' est obligatoire")
   @Min(groups = ObjectCreate.class, value = 1, message = "le champ 'produit' doit être positif")

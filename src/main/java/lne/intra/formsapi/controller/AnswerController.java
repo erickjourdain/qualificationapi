@@ -142,14 +142,14 @@ public class AnswerController {
     Page<Answer> answers = service.search(filter, paging);
 
     // Création de la liste des réponses
-    List<Map<String, Object>> AnswersWithCreateur = new ArrayList<>();
+    List<Map<String, Object>> answersWithCreateur = new ArrayList<>();
     // boucle sur les réponses pour ajout des informations
     for (Answer answer : answers) {
-      AnswersWithCreateur.add(service.addFieldsToAnswer(answer, include));
+      answersWithCreateur.add(service.addFieldsToAnswer(answer, include));
     }
     ListDataResponse response = ListDataResponse.builder()
         .nbElements(answers.getTotalElements()) // nombre de formulaires totales
-        .data(AnswersWithCreateur) // les réponses
+        .data(answersWithCreateur) // les réponses
         .page(paging.getPageNumber() + 1) // le numéro de la page retournée
         .size(paging.getPageSize()) // le nombre d'éléments retournées
         .hasPrevious(answers.hasPrevious()) // existe-t-il une page précédente
