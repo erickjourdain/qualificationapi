@@ -5,12 +5,9 @@ import Box from "@mui/material/Box";
 import Autocomplete from "@mui/material/Autocomplete";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
-import IconButton from "@mui/material/IconButton";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import { FormAPI, FormsAPI } from "../../gec-tripetto";
 import { getForms } from "../../utils/apiCall";
 import Stack from "@mui/material/Stack";
-import Tooltip from "@mui/material/Tooltip";
 
 interface FormulairesProps {
   formulaires: FormAPI[];
@@ -35,12 +32,6 @@ const SelectFormulaire = ({ formulaires, onSelect }: FormulairesProps) => {
     select: (reponse) => reponse.data as FormsAPI,
   });
 
-  // retour du formulaire sélectionné
-  const handleConfirm = () => {
-    onSelect(formulaire);
-    setFormulaire(null);
-  }
-
   return (
     <Stack direction="row" spacing={2} justifyContent="flex-end">
       <Autocomplete
@@ -58,6 +49,10 @@ const SelectFormulaire = ({ formulaires, onSelect }: FormulairesProps) => {
         isOptionEqualToValue={(option, value) => option.id === value.id}
         onChange={(_event, newValue: FormAPI | null) => {
           setFormulaire(newValue);
+          onSelect(newValue);
+          setTimeout(() => {
+            setFormulaire(null);
+          }, 500);
         }}
         onInputChange={(_event, newInputValue) => {
           setInputValue(newInputValue);
@@ -81,11 +76,6 @@ const SelectFormulaire = ({ formulaires, onSelect }: FormulairesProps) => {
           )
         }}
       />
-      <Tooltip title="Lancer la qualification" placement="left">
-      <IconButton color="primary" onClick={handleConfirm}>
-        <CheckCircleIcon />
-      </IconButton>
-      </Tooltip>
     </Stack>
 
   )
