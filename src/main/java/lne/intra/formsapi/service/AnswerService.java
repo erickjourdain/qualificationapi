@@ -223,7 +223,6 @@ public class AnswerService {
           .version(answer.getVersion() + 1)
           .createur(user)
           .gestionnaire(user)
-          .devis(answer.getDevis())
           .statut(answer.getStatut())
           .produit(answer.getProduit())
           .build();
