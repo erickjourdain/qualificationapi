@@ -5,15 +5,18 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.boot.Filter;
 
 import lne.intra.formsapi.model.Devis;
+import lne.intra.formsapi.model.User;
 import lne.intra.formsapi.model.exception.AppException;
 import lne.intra.formsapi.model.request.DevisRequest;
 import lne.intra.formsapi.repository.DevisRepository;
@@ -24,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 public class DevisService {
 
   private final DevisRepository devisRepository;
+  private final UserService userService;
 
   public Map<String, Object> addFieldsToDevis(Devis devis, String include) throws AppException {
 
@@ -40,8 +44,8 @@ public class DevisService {
       response.put("id", devis.getId());
     if (fields.isEmpty() || fields.contains("reference"))
       response.put("reference", devis.getReference());
-    if (fields.isEmpty() || fields.contains("version"))
-      response.put("version", devis.getVersion());
+    if (fields.isEmpty() || fields.contains("answer"))
+      response.put("answer", devis.getAnswer());
     if (fields.isEmpty() || fields.contains("createdAt"))
       response.put("createdAt", devis.getCreatedAt());
 
@@ -68,10 +72,15 @@ public class DevisService {
    * @return Devis
    * @throws AppException
    */
-  public Devis saveDevis(DevisRequest request) throws AppException {
+  public Devis saveDevis(DevisRequest request, UserDetails userDetails) 
+  throws AppException {
+    // récupération des informations sur l'utilisateur connecté
+    User createur = userService.getByLogin(userDetails.getUsername());
+    // création de la nouvelle entrée
     Devis devis = Devis.builder()
         .reference(request.getReference())
-        .version(request.getVersion())
+        .answer(request.getAnswer())
+        .createur(createur)
         .build();
     // sauvegarde de la nouvelle entrée
     return devisRepository.save(devis);
@@ -86,5 +95,12 @@ public class DevisService {
    */
   public Page<Devis> search(@Filter Specification<Devis> spec, Pageable paging) {
     return devisRepository.findAll(spec, paging);
+  }
+
+  /**
+   * Recherche d'un devis via sa référence
+   */
+  public Optional<Devis> getByRef(String reference) {
+    return devisRepository.findByReference(reference);
   }
 }

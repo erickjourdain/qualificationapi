@@ -3,6 +3,7 @@ package lne.intra.formsapi.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
@@ -13,6 +14,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -60,14 +63,17 @@ public class DevisController {
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @PostMapping()
   @PreAuthorize("hasAnyAuthority('admin:create','creator:create','user:create')")
-
   public ResponseEntity<Map<String, Object>> save(
+      @AuthenticationPrincipal UserDetails userDetails,
       @RequestBody DevisRequest request,
       @RequestParam(required = false) String include) throws AppException {
     // Validation des champs fournis dans la requête
     devisValidator.validateData(request, ObjectCreate.class);
+    // Vérifier que le devis n'existe pas dans la base
+    Optional<Devis> dev = service.getByRef(request.getReference());
+    if (dev.isPresent()) throw new AppException(400, "Le devis est déjà présent dans la base");
     // Sauvegarde du devis
-    Devis devis = service.saveDevis(request);
+    Devis devis = service.saveDevis(request, userDetails);
     return ResponseEntity.ok(service.addFieldsToDevis(devis, include));
   }
 
