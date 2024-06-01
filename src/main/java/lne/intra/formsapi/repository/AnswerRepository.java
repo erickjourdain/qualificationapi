@@ -9,16 +9,16 @@ import lne.intra.formsapi.model.Answer;
 public interface AnswerRepository extends JpaRepository<Answer, Integer>, JpaSpecificationExecutor<Answer> {
 
   @Query("""
-    select count(a.id) from Answser a
+    select count(a.id) from Answer a
     where a.produit <> :produit
     and a.devis = :devis
     """)
   Integer CountDevisOtherProduct(Integer produit, Integer devis);
 
   @Query("""
-    select count(a.id) from Answser a
+    select count(a.id) from Answer a
     where a.produit = :produit
-    and a.formulaire =: formulaire
+    and a.formulaire =:formulaire
     and a.devis = :devis
     """)
   Integer CountDevisProductForm(Integer produit, Integer formulaire, Integer devis);
