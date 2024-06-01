@@ -62,8 +62,8 @@ public class Answer {
   private User gestionnaire;
 
   @JsonBackReference
-  @OneToOne
-  @JoinColumn(name = "devis")
+  @ManyToOne
+  @JoinColumn(name = "devis_id")
   private Devis devis;
 
   @JsonBackReference

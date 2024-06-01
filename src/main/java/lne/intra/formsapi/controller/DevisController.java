@@ -69,7 +69,7 @@ public class DevisController {
       @RequestParam(required = false) String include) throws AppException {
     // Validation des champs fournis dans la requête
     devisValidator.validateData(request, ObjectCreate.class);
-    // Vérifier que le devis n'existe pas dans la base
+    // Vérifier unicité du devis
     Optional<Devis> dev = service.getByRef(request.getReference());
     if (dev.isPresent()) throw new AppException(400, "Le devis est déjà présent dans la base");
     // Sauvegarde du devis

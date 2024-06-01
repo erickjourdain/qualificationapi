@@ -36,6 +36,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lne.intra.formsapi.model.Answer;
+import lne.intra.formsapi.model.Devis;
 import lne.intra.formsapi.model.LockedAnswer;
 import lne.intra.formsapi.model.Role;
 import lne.intra.formsapi.model.User;
@@ -44,7 +45,9 @@ import lne.intra.formsapi.model.openApi.GetAnswerId;
 import lne.intra.formsapi.model.openApi.GetAnswers;
 import lne.intra.formsapi.model.request.AnswerRequest;
 import lne.intra.formsapi.model.response.ListDataResponse;
+import lne.intra.formsapi.repository.AnswerRepository;
 import lne.intra.formsapi.service.AnswerService;
+import lne.intra.formsapi.service.DevisService;
 import lne.intra.formsapi.service.LockedAnswerService;
 import lne.intra.formsapi.service.UserService;
 import lne.intra.formsapi.util.ObjectCreate;
@@ -64,6 +67,7 @@ public class AnswerController {
   private final UserService userService;
   private final LockedAnswerService lockedAnswerService;
   private final ObjectsValidator<AnswerRequest> answerValidator;
+  private final AnswerRepository answerRepository;
 
   /**
    * Contrôleur de création d'une nouvelle réponse
@@ -234,9 +238,18 @@ public class AnswerController {
     });
     // Vérification de la possibilité de modifier la réponse
     if (answer.getCourante().equals(false)) {
-      throw new AppException(400, "Seule les dernières réponses peuvent être modifiées");
+      throw new AppException(400, "Seules les dernières réponses peuvent être modifiées");
     }
-    // test de cohérence des données fournies pour mise à jour de la réponse
+    // Vérification du devis 
+    if (request.getDevis() != null) {
+      // Le devis ne paut être attaché à un autre produit
+      Integer test1 = answerRepository.CountDevisOtherProduct(answer.getProduit().getId(), request.getDevis());
+      if (test1 > 0) throw new AppException(400, "Le devis est rattaché à un autre produit");
+      // Le devis ne peut être attaché à une autre version de la réponse
+      Integer test2 = answerRepository.CountDevisProductForm(answer.getProduit().getId(), answer.getFormulaire().getId(), request.getDevis());
+      if (test2 > 0) throw new AppException(400, "Ce devis est déjà rattaché à une autre version de la réponse");
+    }
+    // Tests de cohérence des données fournies pour mise à jour de la réponse
     if (request.getFormulaire() != null) {
       throw new AppException(400, "Le formulaire ne peut être modifiée");
     }

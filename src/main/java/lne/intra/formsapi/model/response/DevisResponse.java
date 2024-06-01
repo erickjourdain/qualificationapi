@@ -9,7 +9,6 @@ import lombok.Data;
 public class DevisResponse {
   private Integer id;
   private String reference;
-  private AnswerResponse answer;
   private User createur;
   private Date createdAt;
 }

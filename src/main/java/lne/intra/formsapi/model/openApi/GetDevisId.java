@@ -8,7 +8,6 @@ import lombok.Data;
 public class GetDevisId {
   private Integer id;
   private String reference;
-  private GetAnswerId answer;
   private GetUserId createur;
   private Date createdAt;
 }

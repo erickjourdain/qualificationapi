@@ -32,11 +32,6 @@ public class Devis {
 
   @Column(nullable = false, unique = true)
   private String reference;
-
-  @JsonBackReference
-  @OneToOne
-  @JoinColumn(name = "answer")
-  private Answer answer;
   
   @JsonBackReference
   @ManyToOne

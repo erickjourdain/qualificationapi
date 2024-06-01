@@ -44,8 +44,6 @@ public class DevisService {
       response.put("id", devis.getId());
     if (fields.isEmpty() || fields.contains("reference"))
       response.put("reference", devis.getReference());
-    if (fields.isEmpty() || fields.contains("answer"))
-      response.put("answer", devis.getAnswer());
     if (fields.isEmpty() || fields.contains("createdAt"))
       response.put("createdAt", devis.getCreatedAt());
 
@@ -79,7 +77,6 @@ public class DevisService {
     // création de la nouvelle entrée
     Devis devis = Devis.builder()
         .reference(request.getReference())
-        .answer(request.getAnswer())
         .createur(createur)
         .build();
     // sauvegarde de la nouvelle entrée

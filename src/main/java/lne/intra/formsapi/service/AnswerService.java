@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import com.turkraft.springfilter.boot.Filter;
 
 import lne.intra.formsapi.model.Answer;
+import lne.intra.formsapi.model.Devis;
 import lne.intra.formsapi.model.Form;
 import lne.intra.formsapi.model.LockedAnswer;
 import lne.intra.formsapi.model.Produit;
@@ -35,6 +36,7 @@ public class AnswerService {
   private final FormService formService;
   private final LockedAnswerService lockedAnswerService;
   private final ProduitService produitService;
+  private final DevisService devisService;
 
   /**
    * Ajout des champs à retourner à la réponse
@@ -198,7 +200,8 @@ public class AnswerService {
     // Mise à jour du devis
     Optional.ofNullable(request.getDevis())
         .ifPresent(res -> {
-          answer.setDevis(res);
+          Devis devis = devisService.getDevis(res);
+          answer.setDevis(devis);
         });
     // Mise à jour du statut
     Optional.ofNullable(request.getStatut())
