@@ -3,7 +3,6 @@ import { useAtomValue } from "jotai";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Alert from "@mui/material/Alert";
-import InputDevis from "./InputDevis";
 import SelectStatut from "./SelectStatut";
 import { formatDateTime } from "../../utils/format";
 import { AnswerAPI } from "../../gec-tripetto";
@@ -11,11 +10,10 @@ import { loggedUser } from "../../atomState";
 
 interface HeaderAnswerProps {
   answer: AnswerAPI;
-  onDevisChange: (devis: string) => void;
   onStatutChange: (statut: string) => void;
 }
 
-const HeaderAnswer = ({ answer, onDevisChange, onStatutChange }: HeaderAnswerProps) => {
+const HeaderAnswer = ({ answer, onStatutChange }: HeaderAnswerProps) => {
 
   // Chargement de l'utilisateur connecté
   const user = useAtomValue(loggedUser);
@@ -44,8 +42,8 @@ const HeaderAnswer = ({ answer, onDevisChange, onStatutChange }: HeaderAnswerPro
       "& .MuiFormControl-root": { width: "30%", mr: 1, mt: 1 },
       "& .MuiPaper-root": { mt: 0 }
     }}>
-      <Box display="flex" flexDirection="row" alignContent="center">
-        <Box sx={{ width: "100%", mb: 2 }}>
+      <Box display="flex" flexDirection="row" alignContent="center" justifyContent="space-between">
+        <Box>
           <Typography variant="caption" display="block">
             {`créé le ${formatDateTime(answer.createdAt)} par ${answer.createur.nom} ${answer.createur.prenom}`}
           </Typography>
@@ -55,20 +53,13 @@ const HeaderAnswer = ({ answer, onDevisChange, onStatutChange }: HeaderAnswerPro
         </Box>
         {
           !courante &&
-          <Box sx={{ ml: 3, width: "100%" }} >
             <Alert color="info">La version n'est pas la version courante</Alert>
-          </Box>
+
         }
         {
           courante && locked &&
-          <Box sx={{ ml: 3, width: "100%" }} >
             <Alert color="warning">La réponse est vérouillée par {answer.lock.utilisateur.prenom} {answer.lock.utilisateur.nom}</Alert>
-          </Box>
-        }
-      </Box>
-      <Box display="flex" alignItems="flex-start">
-        <InputDevis answer={answer} onSubmit={onDevisChange} disabled={!input} />
-        <SelectStatut answer={answer} onSelect={onStatutChange} disabled={!input} />
+        }<SelectStatut answer={answer} onSelect={onStatutChange} disabled={!input} />
       </Box>
     </Box>
   )

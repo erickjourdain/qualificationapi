@@ -21,7 +21,6 @@ const SelectStatut = ({ answer, disabled, onSelect }: SelectStatutProps) => {
     value={answer.statut}
     onChange={(event) => onSelect(event.target.value)}
     disabled={disabled}
-    helperText="définir le statut"
   >
     {Statuts.map((option) => (
       <MenuItem key={option} value={option}>

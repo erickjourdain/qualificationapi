@@ -106,14 +106,6 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
     onError: (error) => setAlerte({ severite: "error", message: manageError(error) }),
   })
 
-  // Changement du numéro de devis associé
-  const onDevisChange = (devis: string) => {
-    if (answer) mutate({
-      id: answer.id,
-      devis,
-    });
-  }
-
   // Changemenent du statut du devis
   const onStatutChange = (statut: Statut) => {
     if (answer) mutate({
@@ -154,7 +146,7 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
           <Version formulaire={formulaire} produit={produit} maj={majRep} onChange={handleVersionChange} />
           {answer &&
             <>
-              <HeaderAnswer answer={answer} onDevisChange={onDevisChange} onStatutChange={onStatutChange} />
+              <HeaderAnswer answer={answer} onStatutChange={onStatutChange} />
               <Box display="flex">
                 {
                   change &&

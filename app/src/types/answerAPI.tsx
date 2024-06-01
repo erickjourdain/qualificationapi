@@ -2,6 +2,7 @@ import { FormAPI } from "./formAPI";
 import { User } from "./user";
 import { LockAPI } from "./lockAPI";
 import { Statut } from "./statuts";
+import { DevisAPI } from "./devisAPI";
 
 export type AnswerAPI = {
   id: number;
@@ -13,7 +14,7 @@ export type AnswerAPI = {
   statut: Statut;
   version: number;
   courante: boolean;
-  devis: number;
+  devis: DevisAPI | null;
   lock: LockAPI;
   createdAt?: number;
   updatedAt?: number;
