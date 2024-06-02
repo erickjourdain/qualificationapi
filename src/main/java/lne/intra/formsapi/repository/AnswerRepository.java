@@ -9,18 +9,20 @@ import lne.intra.formsapi.model.Answer;
 public interface AnswerRepository extends JpaRepository<Answer, Integer>, JpaSpecificationExecutor<Answer> {
 
   @Query("""
-    select count(a.id) from Answer a
-    where a.produit <> :produit
-    and a.devis = :devis
-    """)
-  Integer CountDevisOtherProduct(Integer produit, Integer devis);
+      select count(a) from Answer a
+      inner join Devis d on d.id = a.devis.id
+      where a.produit.id <> :produit
+      and d.reference = :devis
+      """)
+  Integer countDevisOtherProduct(Integer produit, String devis);
 
   @Query("""
-    select count(a.id) from Answer a
-    where a.produit = :produit
-    and a.formulaire =:formulaire
-    and a.devis = :devis
-    """)
-  Integer CountDevisProductForm(Integer produit, Integer formulaire, Integer devis);
+      select count(a) from Answer a
+      inner join Devis d on d.id = a.devis.id
+      where a.produit.id = :produit
+      and a.formulaire.id =:formulaire
+      and d.reference = :devis
+      """)
+  Integer countDevisProductForm(Integer produit, Integer formulaire, String devis);
 
 }

@@ -36,6 +36,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lne.intra.formsapi.model.Answer;
+import lne.intra.formsapi.model.Devis;
 import lne.intra.formsapi.model.LockedAnswer;
 import lne.intra.formsapi.model.Role;
 import lne.intra.formsapi.model.User;
@@ -43,8 +44,10 @@ import lne.intra.formsapi.model.exception.AppException;
 import lne.intra.formsapi.model.openApi.GetAnswerId;
 import lne.intra.formsapi.model.openApi.GetAnswers;
 import lne.intra.formsapi.model.request.AnswerRequest;
+import lne.intra.formsapi.model.request.AnswerDevisRequest;
 import lne.intra.formsapi.model.response.ListDataResponse;
 import lne.intra.formsapi.repository.AnswerRepository;
+import lne.intra.formsapi.repository.DevisRepository;
 import lne.intra.formsapi.service.AnswerService;
 import lne.intra.formsapi.service.LockedAnswerService;
 import lne.intra.formsapi.service.UserService;
@@ -65,7 +68,9 @@ public class AnswerController {
   private final UserService userService;
   private final LockedAnswerService lockedAnswerService;
   private final ObjectsValidator<AnswerRequest> answerValidator;
+  private final ObjectsValidator<AnswerDevisRequest> answerDevisValidator;
   private final AnswerRepository answerRepository;
+  private final DevisRepository devisRepository;
 
   /**
    * Contrôleur de création d'une nouvelle réponse
@@ -228,30 +233,88 @@ public class AnswerController {
     // récupération des informations sur l'utilisateur connecté
     User user = userService.getByLogin(userDetails.getUsername());
     Optional<LockedAnswer> lockedAnswer = lockedAnswerService.getByAnswer(answer);
-    Optional.ofNullable(lockedAnswer)
-        .orElseThrow(() -> new AppException(404, "Aucun verrou posé sur cet enregistrement"));
-    lockedAnswer.ifPresent(lock -> {
+    lockedAnswer.ifPresentOrElse(lock -> {
       if (user.getId() != lock.getUtilisateur().getId())
         throw new AppException(403, "La réponse est vérouillée par un aute utilisateur");
+    }, () -> {
+      throw new AppException(403, "Acun verrou posé sur cette réponse");
     });
     // Vérification de la possibilité de modifier la réponse
     if (answer.getCourante().equals(false)) {
       throw new AppException(400, "Seules les dernières réponses peuvent être modifiées");
     }
-    // Vérification du devis 
-    if (request.getDevis() != null) {
-      // Le devis ne paut être attaché à un autre produit
-      Integer test1 = answerRepository.CountDevisOtherProduct(answer.getProduit().getId(), request.getDevis());
-      if (test1 > 0) throw new AppException(400, "Le devis est rattaché à un autre produit");
-      // Le devis ne peut être attaché à une autre version de la réponse
-      Integer test2 = answerRepository.CountDevisProductForm(answer.getProduit().getId(), answer.getFormulaire().getId(), request.getDevis());
-      if (test2 > 0) throw new AppException(400, "Ce devis est déjà rattaché à une autre version de la réponse");
-    }
+
     // Tests de cohérence des données fournies pour mise à jour de la réponse
     if (request.getFormulaire() != null) {
       throw new AppException(400, "Le formulaire ne peut être modifiée");
     }
     answer = service.updateAnswer(id, request, userDetails);
+    return ResponseEntity.ok(service.addFieldsToAnswer(answer, include));
+  }
+
+  /**
+   * Controleur d'ajout d'un devis à une réponse
+   * 
+   * @param userDetails
+   * @param id
+   * @param request
+   * @param include
+   * @return
+   * @throws NotFoundException
+   */
+  @Operation(summary = "ajout d'un devis à réponse apportée à un formulaire", description = "Accès limité aux rôles `ADMIN`, `CREATOR` et `USER`")
+  @ApiResponse(responseCode = "200", description = "La réponse mise à jour", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetAnswerId.class)))
+  @ApiResponse(responseCode = "400", description = "Requête incorrecte", content = @Content(mediaType = "application/text"))
+  @ApiResponse(responseCode = "404", description = "Réponse ou Créateur non trouvé dans la base", content = @Content(mediaType = "application/text"))
+  @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
+  @PatchMapping("/devis/{id}")
+  @PreAuthorize("hasAnyAuthority('admin:update','creator:update','user:update')")
+  public ResponseEntity<Map<String, Object>> updateDevis(
+      @AuthenticationPrincipal UserDetails userDetails,
+      @PathVariable Integer id,
+      @RequestBody AnswerDevisRequest request,
+      @RequestParam(required = false) String include) throws NotFoundException {
+
+    // validation des champs fournis dans la requête
+    answerDevisValidator.validateData(request, ObjectUpdate.class);
+
+    // Récupération de la réponse à modifier
+    Answer answer = service.getAnswer(id);
+    // final Answer updatAnswer = answer;
+    // récupération des informations sur l'utilisateur connecté
+    User user = userService.getByLogin(userDetails.getUsername());
+    Optional<LockedAnswer> lockedAnswer = lockedAnswerService.getByAnswer(answer);
+    lockedAnswer.ifPresentOrElse(lock -> {
+      if (user.getId() != lock.getUtilisateur().getId())
+        throw new AppException(403, "La réponse est vérouillée par un aute utilisateur");
+    }, () -> {
+      throw new AppException(403, "Acun verrou posé sur cette réponse");
+    });
+
+    // Vérification cohérence de la référence du devis
+    // Le devis ne peut être attaché à un autre produit
+    Integer test1 = answerRepository.countDevisOtherProduct(answer.getProduit().getId(), request.getDevis());
+    if (test1 > 0)
+      throw new AppException(400, "Le devis est rattaché à un autre produit");
+    // Le devis ne peut être attaché à une autre version de la réponse
+    Integer test2 = answerRepository.countDevisProductForm(answer.getProduit().getId(), answer.getFormulaire().getId(),
+        request.getDevis());
+    if (test2 > 0)
+      throw new AppException(400, "Ce devis est déjà rattaché à une autre version de la réponse");
+
+    Optional<Devis> devis = devisRepository.findByReference(request.getDevis());
+    if (devis.isPresent()) {
+      answer.setDevis(devis.get());
+    } else {
+      Devis newDevis = Devis.builder()
+          .reference(request.getDevis())
+          .createur(user)
+          .build();
+      Devis savedDevis = devisRepository.save(newDevis);
+      answer.setDevis(savedDevis);
+    }
+    answer = answerRepository.save(answer);
+
     return ResponseEntity.ok(service.addFieldsToAnswer(answer, include));
   }
 

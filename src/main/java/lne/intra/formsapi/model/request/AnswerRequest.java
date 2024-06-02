@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lne.intra.formsapi.model.Statut;
 import lne.intra.formsapi.util.ObjectCreate;
-import lne.intra.formsapi.util.ObjectUpdate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,9 +24,6 @@ public class AnswerRequest {
   private Integer formulaire;
 
   private Statut statut;
-
-  @Min(groups = ObjectUpdate.class, value = 1, message = "le champ 'devis' doit être positif")
-  private Integer devis;
 
   @NotNull(groups = ObjectCreate.class, message = "le champ 'produit' est obligatoire")
   @Min(groups = ObjectCreate.class, value = 1, message = "le champ 'produit' doit être positif")
