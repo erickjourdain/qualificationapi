@@ -72,14 +72,23 @@ const Header = () => {
     setProduit(produit);
   }
 
+  // ouvrir l'explorateur de fichier
+  // code à compléter et modifier
+  const openFolder = (type: string) => {
+    let path = process.env.GECDOCUMENT_PATH;
+    if (type === "projet") path = `${path}/PROJET/${header.projet}`;
+    if (type === "opportunite") path = `${path}/OPPORTUNITE/${header.opportunite}`;
+    alert(`open ${path}`);
+  }
+
   if (isLoadingHeader || isLoadingProduits) return (<Loading />)
 
   return (
     <Box sx={{ "& .MuiPaper-root": { mt: "20px" } }}>
       <Stack direction="row" spacing={2}>
         <Chip label={header.societe} color="primary" />
-        {!!header.projet && <Chip label={header.projet} color="primary" />}
-        {!!header.opportunite && <Chip label={header.opportunite} color="primary" />}
+        {!!header.projet && <Chip label={header.projet} color="primary" onClick={() => openFolder("projet")} />}
+        {!!header.opportunite && <Chip label={header.opportunite} color="primary" onClick={() => openFolder("opportunite")}/>}
       </Stack>
       <Paper
       >

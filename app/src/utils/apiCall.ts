@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosError } from "axios";
 import { AnwserUpdate, FormCreation, HeaderAPI, HeaderCreation, User, UserCreation } from "../gec-tripetto";
-import { sfAnd, sfEqual, sfLike } from "spring-filter-query-builder";
+import { sfEqual } from "spring-filter-query-builder";
 
 // Création de l'instance Axios pour les requêtes vers l'API
 const instance = axios.create({
