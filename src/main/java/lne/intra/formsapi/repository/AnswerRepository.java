@@ -19,6 +19,21 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer>, JpaSpe
   @Query("""
       select count(a) from Answer a
       inner join Devis d on d.id = a.devis.id
+      where a.id = :answer
+      """)
+  Integer countDevisOnAnswser(Integer answer);
+
+  @Query("""
+      select count(a) from Answer a
+      inner join Devis d on d.id = a.devis.id
+      where a.produit.header.id <> :header
+      and d.reference = :devis
+      """)
+  Integer countDevisOtherHeader(Integer header, String devis);
+
+  @Query("""
+      select count(a) from Answer a
+      inner join Devis d on d.id = a.devis.id
       where a.produit.id = :produit
       and a.formulaire.id =:formulaire
       and d.reference = :devis

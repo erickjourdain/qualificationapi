@@ -283,19 +283,16 @@ public class AnswerController {
     // final Answer updatAnswer = answer;
     // récupération des informations sur l'utilisateur connecté
     User user = userService.getByLogin(userDetails.getUsername());
-    Optional<LockedAnswer> lockedAnswer = lockedAnswerService.getByAnswer(answer);
-    lockedAnswer.ifPresentOrElse(lock -> {
-      if (user.getId() != lock.getUtilisateur().getId())
-        throw new AppException(403, "La réponse est vérouillée par un aute utilisateur");
-    }, () -> {
-      throw new AppException(403, "Acun verrou posé sur cette réponse");
-    });
 
     // Vérification cohérence de la référence du devis
-    // Le devis ne peut être attaché à un autre produit
-    Integer test1 = answerRepository.countDevisOtherProduct(answer.getProduit().getId(), request.getDevis());
+    // Un devis est déjà attaché à la réponse de la version
+    Integer test0 = answerRepository.countDevisOnAnswser(answer.getId());
+    if (test0 > 0)
+      throw new AppException(400, "Un devis est déjà rattaché à cette réponse");
+    // Le devis ne peut être attaché à une autre opportunité
+    Integer test1 = answerRepository.countDevisOtherHeader(answer.getProduit().getHeader().getId(), request.getDevis());
     if (test1 > 0)
-      throw new AppException(400, "Le devis est rattaché à un autre produit");
+      throw new AppException(400, "Le devis est rattaché à une autre opportunité");
     // Le devis ne peut être attaché à une autre version de la réponse
     Integer test2 = answerRepository.countDevisProductForm(answer.getProduit().getId(), answer.getFormulaire().getId(),
         request.getDevis());
