@@ -5,7 +5,7 @@ import { useAtom } from "jotai";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import IconButton from "@mui/material/IconButton";
-import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import LogoutIcon from '@mui/icons-material/Logout';
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -83,7 +83,7 @@ const Settings = () => {
           ]
         }
       </Menu>
-      <IconButton color="inherit" onClick={() => navigate("/close")}><ExitToAppIcon /></IconButton>
+      <IconButton color="inherit" onClick={() => navigate("/close")}><LogoutIcon /></IconButton>
     </Box>
   );
 };

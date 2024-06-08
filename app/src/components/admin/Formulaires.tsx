@@ -13,7 +13,6 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableBody from "@mui/material/TableBody";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { getForms } from "../../utils/apiCall";
 import manageError from "../../utils/manageError";
@@ -86,7 +85,6 @@ const Formulaires = () => {
         <Table aria-label="table-users">
           <TableHead>
             <TableRow>
-              <TableCell>Voir</TableCell>
               <TableCell>Titre</TableCell>
               <TableCell>Version</TableCell>
               <TableCell>Mise à jour</TableCell>
@@ -95,10 +93,7 @@ const Formulaires = () => {
           </TableHead>
           <TableBody>
             {formulaires.map((form) => (
-              <TableRow key={form.id}>
-                <TableCell>
-                  <VisibilityIcon sx={{ cursor: "pointer" }} onClick={() => navigate({ pathname: `form/${form.slug}` })} />
-                </TableCell>
+              <TableRow key={form.id} onDoubleClick={() => navigate({ pathname: `form/${form.slug}` })} sx={{ cursor: "pointer"}}>
                 <TableCell>{form.titre}</TableCell>
                 <TableCell>{form.version}</TableCell>
                 <TableCell>{formatDateTime(form.updatedAt)}</TableCell>

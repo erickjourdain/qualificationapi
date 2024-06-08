@@ -11,7 +11,6 @@ import Divider from "@mui/material/Divider";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
-import AddCircleIcon from '@mui/icons-material/AddCircle';
 import Tooltip from "@mui/material/Tooltip";
 import { createHeadersWithProducts } from "../../utils/apiCall";
 import { displayAlert } from "../../atomState";
@@ -35,7 +34,7 @@ type Inputs = {
 const Formulaire = () => {
 
   const navigate = useNavigate();
-  
+
   // Chargement de l'état Atom des alertes et de la sauvegarde des données
   const setAlerte = useSetAtom(displayAlert);
 
@@ -70,7 +69,7 @@ const Formulaire = () => {
   } = useMutation({
     mutationFn: createHeadersWithProducts,
     onSuccess: () => navigate("/"),
-    onError: (error) => setAlerte({ severite: "error", message: manageError(error)})
+    onError: (error) => setAlerte({ severite: "error", message: manageError(error) })
   })
 
   // soumission du formulaire
@@ -265,11 +264,13 @@ const Formulaire = () => {
         ))
       }
       <br />
-      <Tooltip title="ajouter un produit" placement="right">
-        <IconButton aria-label="add-product" color="primary" size="large" onClick={() => append({description: ""})}>
-          <AddCircleIcon />
-        </IconButton>
-      </Tooltip>
+      <Box ml={1} mb={1}>
+        <Button variant="outlined" color="primary" onClick={() => append({ description: "" })}>
+          Ajouter un produit
+        </Button>
+      </Box>
+
+      <Divider />
 
       <Box mt={3}>
         <Stack spacing={2} direction="row">

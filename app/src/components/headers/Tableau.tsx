@@ -5,7 +5,6 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 import TableBody from "@mui/material/TableBody";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import TablePagination from "@mui/material/TablePagination";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -27,8 +26,8 @@ const Tableau = ({ headers, loading, onPageChange }: TableauHeaders) => {
       <Table aria-label="table-headers">
         <TableHead>
           <TableRow>
-            <TableCell>Voir</TableCell>
             <TableCell>Client</TableCell>
+            <TableCell>Contact</TableCell>
             <TableCell>Créateur</TableCell>
             <TableCell>Date</TableCell>
             <TableCell>Opportunité</TableCell>
@@ -37,11 +36,9 @@ const Tableau = ({ headers, loading, onPageChange }: TableauHeaders) => {
         </TableHead>
         <TableBody>
           {!loading && headers.data.map((header) => (
-            <TableRow key={header.id}>
-              <TableCell>
-                <VisibilityIcon sx={{ cursor: "pointer" }} onClick={() => navigate(`/opportunite/${header.uuid}`) } />
-              </TableCell>
+            <TableRow key={header.id} onDoubleClick={() => navigate(`/opportunite/${header.uuid}`)} sx={{ cursor: "pointer"}}>
               <TableCell>{header.societe}</TableCell>
+              <TableCell>{header.nom} {header.prenom}</TableCell>
               <TableCell>{header.createur.nom} {header.createur.prenom}</TableCell>
               <TableCell>{formatDate(header.createdAt)}</TableCell>
               <TableCell>{header.opportunite}</TableCell>
