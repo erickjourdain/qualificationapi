@@ -9,11 +9,12 @@ import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import { displayAlert, loggedUser } from "../../atomState";
 import { AnswerAPI, FormAPI, ProduitAPI, Statut } from "../../gec-tripetto";
 import manageError from "../../utils/manageError";
-import { getAnswer, unlockAnswer, updateAnswer } from "../../utils/apiCall";
+import { addDevisAnswer, getAnswer, unlockAnswer, updateAnswer } from "../../utils/apiCall";
 import PlayTripetto from "../PlayTripetto";
 import HeaderAnswer from "./HeaderAnswer";
 import Version from "./Version";
 import DisplayTripetto from "./DisplayTripetto";
+import Devis from "./Devis";
 
 interface TabQualifProps {
   show: boolean;
@@ -96,8 +97,19 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
   }, []);
 
   // Mise à jour de la réponse
-  const { mutate } = useMutation({
+  const { mutate: mutateAnswer } = useMutation({
     mutationFn: updateAnswer,
+    onSuccess: () => {
+      setAlerte({ severite: "success", message: "l'opportunité a été mise à jour" });
+      setMajRep(majRep + 1);
+      queryClient.invalidateQueries({ queryKey: ["getAnswer"] })
+    },
+    onError: (error) => setAlerte({ severite: "error", message: manageError(error) }),
+  })
+
+  // Mise à jour du devis
+  const { mutate: mutateDevis } = useMutation({
+    mutationFn: addDevisAnswer,
     onSuccess: () => {
       setAlerte({ severite: "success", message: "l'opportunité a été mise à jour" });
       setMajRep(majRep + 1);
@@ -108,7 +120,7 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
 
   // Changemenent du statut du devis
   const onStatutChange = (statut: Statut) => {
-    if (answer) mutate({
+    if (answer) mutateAnswer({
       id: answer.id,
       statut
     });
@@ -119,7 +131,7 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
     setShowTripetto(false);
     const exportables = Export.exportables(instance);
     if (answer)
-      mutate({
+      mutateAnswer({
         id: answer?.id,
         reponse: JSON.stringify(exportables),
       });
@@ -135,6 +147,11 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
     }
   }
 
+  // Gestion changement devis
+  const handleDevisChange = (devis: string) => {
+    if (answer) mutateDevis({ id: answer.id, devis });
+  }
+
   return (
     <div
       role="tabpanel"
@@ -143,7 +160,10 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
     >
       {show && (
         <Box>
-          <Version formulaire={formulaire} produit={produit} maj={majRep} onChange={handleVersionChange} />
+          <Box m={1} >
+            <Version formulaire={formulaire} produit={produit} maj={majRep} onChangeVer={handleVersionChange} />
+            <Devis answer={answer} onChangeDevis={handleDevisChange} />
+          </Box>
           {answer &&
             <>
               <HeaderAnswer answer={answer} onStatutChange={onStatutChange} />

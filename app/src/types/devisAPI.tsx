@@ -1,6 +1,8 @@
+import { User } from "./user";
+
 export type DevisAPI = {
   id: number;
   reference: string;
-  version: number;
+  createur: User;
   createdAt?: number;
 }

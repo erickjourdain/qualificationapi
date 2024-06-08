@@ -274,6 +274,14 @@ const createHeadersWithProducts = (payload: HeaderCreation) => {
   })
 }
 
+const addDevisAnswer = (payload: {id: number, devis: string}) => {
+  return instance.request({
+    method: "PATCH",
+    url: `data/answers/devis/${payload.id}`,
+    data: { devis: payload.devis }
+  })
+}
+
 export {
   apiRequest,
   setAuthorisation,
@@ -304,4 +312,5 @@ export {
   getProduits,
   createProduit,
   updateProduit,
+  addDevisAnswer
 };
