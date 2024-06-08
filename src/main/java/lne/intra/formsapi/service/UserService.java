@@ -23,6 +23,7 @@ import lne.intra.formsapi.model.request.ChangePwdRequest;
 import lne.intra.formsapi.model.request.UserRequest;
 import lne.intra.formsapi.repository.UserRepository;
 import lne.intra.formsapi.util.Slugify;
+import lne.intra.formsapi.util.TransformString;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -31,6 +32,7 @@ public class UserService {
 
   private final UserRepository repository;
   private final PasswordEncoder passwordEncoder;
+  private final TransformString transformString;
 
   public Map<String, Object> setUserResponse(User user, String include, UserDetails userDetails) {
     Map<String, Object> response = new HashMap<>();
@@ -125,7 +127,7 @@ public class UserService {
     final Slugify slug = Slugify.builder().build();
     // création du nouvel utilisatuer avec les données fournies
     User user = User.builder()
-        .prenom(request.getPrenom().trim().toLowerCase())
+        .prenom(transformString.FirstCharacterUpper(request.getPrenom().trim()))
         .nom(request.getNom().trim().toUpperCase())
         .login(request.getLogin().trim().toLowerCase())
         .password(passwordEncoder.encode(request.getPassword()))
@@ -154,7 +156,7 @@ public class UserService {
         });
     Optional.ofNullable(request.getPrenom())
         .ifPresent(res -> {
-          user.setPrenom(res.trim().toLowerCase());
+          user.setPrenom(transformString.FirstCharacterUpper(res.trim()));
         });
     Optional.ofNullable(request.getRole())
         .ifPresent(res -> {

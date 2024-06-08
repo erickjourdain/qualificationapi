@@ -121,7 +121,7 @@ public class ProduitService {
     Header header = headerService.getHeader(request.getHeader());
     // création de la nouvelle entrée
     Produit produit = Produit.builder()
-        .description(request.getDescription())
+        .description(request.getDescription().trim())
         .header(header)
         .createur(createur)
         .gestionnaire(createur)
@@ -147,7 +147,7 @@ public class ProduitService {
     // mise à jour de la description
     Optional.ofNullable(request.getDescription())
         .ifPresent(res -> {
-          produit.setDescription(res);
+          produit.setDescription(res.trim());
         });
     // mise à jour de l'opportunité
     Optional.ofNullable(request.getHeader())

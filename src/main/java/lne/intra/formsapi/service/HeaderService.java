@@ -21,6 +21,7 @@ import lne.intra.formsapi.model.User;
 import lne.intra.formsapi.model.exception.AppException;
 import lne.intra.formsapi.model.request.HeaderRequest;
 import lne.intra.formsapi.repository.HeaderRepository;
+import lne.intra.formsapi.util.TransformString;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -29,6 +30,7 @@ public class HeaderService {
 
   private final HeaderRepository headerRepository;
   private final UserService userService;
+  private final TransformString transformString;
 
   public Map<String, Object> addFieldsToHeader(Header header, String include)
       throws AppException {
@@ -120,11 +122,11 @@ public class HeaderService {
     // création de la nouvelle entrée
     Header header = Header.builder()
         .uuid(UUID.randomUUID().toString())
-        .societe(request.getSociete())
-        .email(request.getEmail().toLowerCase())
-        .telephone(request.getTelephone())
-        .nom(request.getNom().toUpperCase())
-        .prenom(request.getPrenom().toLowerCase())
+        .societe(request.getSociete().trim().toUpperCase())
+        .email(request.getEmail().trim().toLowerCase())
+        .telephone(request.getTelephone().trim())
+        .nom(request.getNom().trim().toUpperCase())
+        .prenom(transformString.FirstCharacterUpper(request.getPrenom().trim()))
         .opportunite(request.getOpportunite().toUpperCase())
         .projet(request.getProjet().toUpperCase())
         .createur(createur)
@@ -161,22 +163,22 @@ public class HeaderService {
     // Mise à jour de la societe
     Optional.ofNullable(request.getSociete())
         .ifPresent(res -> {
-          header.setSociete(res);
+          header.setSociete(res.trim().toUpperCase());
         });
     // Mise à jour de la telephone
     Optional.ofNullable(request.getTelephone())
         .ifPresent(res -> {
-          header.setTelephone(res);
+          header.setTelephone(res.trim());
         });
     // Mise à jour du nom
     Optional.ofNullable(request.getNom())
         .ifPresent(res -> {
-          header.setNom(res);
+          header.setNom(res.trim().toUpperCase());
         });
     // Mise à jour du prenom
     Optional.ofNullable(request.getPrenom())
         .ifPresent(res -> {
-          header.setPrenom(res);
+          header.setPrenom(transformString.FirstCharacterUpper(res).trim());
         });
     // mise à jour de l'entete
     return headerRepository.save(header);
