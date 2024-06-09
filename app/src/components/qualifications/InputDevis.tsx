@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import FormControl from "@mui/material/FormControl";
 import FormHelperText from "@mui/material/FormHelperText";
 import IconButton from "@mui/material/IconButton";
@@ -8,14 +8,20 @@ import OutlinedInput from "@mui/material/OutlinedInput";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 interface InputDevisProps {
+  initValue: string | null;
   onSubmit: (devis: string) => void;
 }
 
-const InputDevis = ({ onSubmit }: InputDevisProps) => {
+const InputDevis = ({ initValue, onSubmit }: InputDevisProps) => {
 
   // States du composant
   const [devis, setDevis] = useState<string>("");
   const [error, setError] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (initValue) setDevis(initValue);
+    else setDevis("");
+  }, [initValue])
 
   // Gestion des clicks sur l'input du devis
   const onClickInput = () => {

@@ -104,7 +104,10 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
       setMajRep(majRep + 1);
       queryClient.invalidateQueries({ queryKey: ["getAnswer"] })
     },
-    onError: (error) => setAlerte({ severite: "error", message: manageError(error) }),
+    onError: (error) => {
+      setAlerte({ severite: "error", message: manageError(error) });
+      queryClient.invalidateQueries({ queryKey: ["getAnswer"] });
+    }
   })
 
   // Mise à jour du devis
@@ -113,9 +116,12 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
     onSuccess: () => {
       setAlerte({ severite: "success", message: "l'opportunité a été mise à jour" });
       setMajRep(majRep + 1);
-      queryClient.invalidateQueries({ queryKey: ["getAnswer"] })
+      queryClient.invalidateQueries({ queryKey: ["getAnswer"] });
     },
-    onError: (error) => setAlerte({ severite: "error", message: manageError(error) }),
+    onError: (error) => {
+      setAlerte({ severite: "error", message: manageError(error) });
+      queryClient.invalidateQueries({ queryKey: ["getAnswer"] });
+    }
   })
 
   // Changemenent du statut du devis

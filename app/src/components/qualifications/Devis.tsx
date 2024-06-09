@@ -14,7 +14,6 @@ const Devis = ({ answer, onChangeDevis }: DevisProps) => {
   const [devis, setDevis] = useState<string | null>(null);
   const [inputDevis, setInputDevis] = useState<boolean>(false);
 
-
   useEffect(() => {
     setInputDevis(false);
     if (answer && answer.devis) {
@@ -24,23 +23,21 @@ const Devis = ({ answer, onChangeDevis }: DevisProps) => {
     }
   }, [answer]);
 
-  /**
-   * Miseà jour de la référénce du devis
-   * @param dev string - référence du devis
-   */
+  // Mise à jour de la référénce du devis
   const handleDevisChange = (dev: string) => {
     setDevis(dev);
-    onChangeDevis(dev);
+    if (dev !== answer?.devis?.reference) onChangeDevis(dev);
+    else setInputDevis(false);
   }
 
   if (!answer) return <></>
 
-  if (devis) return (
-    <Chip label={devis} color="primary" />
+  if (devis && !inputDevis) return (
+    <Chip label={devis} color="primary" onDoubleClick={() => setInputDevis(true)} />
   )
 
-  if (!devis && inputDevis) return (
-    <InputDevis onSubmit={handleDevisChange} />
+  if (inputDevis) return (
+    <InputDevis initValue={devis} onSubmit={handleDevisChange} />
   )
 
   if (!devis && !inputDevis) return (
