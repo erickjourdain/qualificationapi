@@ -66,7 +66,7 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
   // Unlock previous answer
   const { data: unlocked } = useQuery({
     queryKey: ["unlockAnswer", oldVersion],
-    queryFn: () => (oldVersion && unlock) ? unlockAnswer(parseInt(oldVersion)) : null,
+    queryFn: () => (oldVersion && unlock && user?.role !== "READER") ? unlockAnswer(parseInt(oldVersion)) : null,
     /*() =>{
       //if (change && oldVersion && (oldVersion !== version)) 
         //return unlockAnswer(parseInt(oldVersion));
@@ -75,11 +75,11 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
     select: (reponse) => (reponse) ? reponse.data as boolean : null,
   })
 
-  // Mise du vérouillage lors du changement de réponse
+  // Mise à jour du vérouillage lors du changement de réponse
   useEffect(() => {
     if (answer && answer.courante && user) {
       const locked = (!!answer.lock && answer.lock.utilisateur.id !== user.id);
-      setChange(!locked && user.role !== "READER");
+      setChange(!locked);
     } else setChange(false);
     setUnlock(true);
   }, [answer]);
@@ -92,7 +92,7 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
   // Dévérouillage lors du déchargement du composant
   useEffect(() => {
     return () => {
-      if (versionRef.current) unlockAnswer(parseInt(versionRef.current));
+      if (versionRef.current && user?.role !== "READER") unlockAnswer(parseInt(versionRef.current));
     };
   }, []);
 
@@ -168,7 +168,7 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
         <Box>
           <Box m={1} >
             <Version formulaire={formulaire} produit={produit} maj={majRep} onChangeVer={handleVersionChange} />
-            { (user && user.role !== "READER") && <Devis answer={answer} onChangeDevis={handleDevisChange} /> }
+            <Devis answer={answer} onChangeDevis={handleDevisChange} />
           </Box>
           {answer &&
             <>
