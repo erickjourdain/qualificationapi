@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { sfEqual } from "spring-filter-query-builder";
 import { useSetAtom } from "jotai";
 import Paper from "@mui/material/Paper";
@@ -14,7 +14,7 @@ import Chip from "@mui/material/Chip";
 import Loading from "../components/Loading";
 import Produits from "../components/header/Produits";
 import Qualifications from "../components/qualifications/Qualifications";
-import { ProduitAPI } from "../gec-tripetto";
+import { ProduitAPI, ProduitsAPI } from "../gec-tripetto";
 
 const Header = () => {
 
@@ -27,6 +27,8 @@ const Header = () => {
   // Chargement de l'état Atom des alertes
   const setAlerte = useSetAtom(displayAlert);
 
+  // State: le tableau des produits
+  const [produits, setProduits] = useState<ProduitsAPI>();
   // State: le produit sélectionné
   const [produit, setProduit] = useState<ProduitAPI | null>(null);
 
@@ -45,6 +47,7 @@ const Header = () => {
     },
   });
 
+  /*
   // Requête de récupération des produits associés
   const { data: produits, isLoading: isLoadingProduits } = useQuery({
     queryKey: ["getProduits", header],
@@ -60,11 +63,40 @@ const Header = () => {
       return true;
     },
   })
+  */
 
-  // Relance des requêtes suite modificationsÒ
+  const { data: infiniteProduits, hasNextPage, fetchNextPage, isLoading: isLoadingProduits } = useInfiniteQuery({
+    queryKey: ["getProduitsInfinite", header],
+    queryFn: async ({ pageParam }) => {
+      const filter = sfEqual("header", header.id);
+      const include = ["id", "description"];
+      const produits = await getProduits(pageParam, filter.toString(), include);
+      return produits.data as ProduitsAPI;
+    },
+    initialPageParam: 1,
+    getNextPageParam: (produits) => (produits.hasNext) ? produits.page + 1 : undefined,
+    enabled: !!header,
+    throwOnError: (error, query) => {
+      if (error) setAlerte({ severite: "error", message: manageError(error) });
+      return true;
+    },
+  });
+
+  // Mise à jour du tableau des produits suite récupération des données
+  useEffect(() => {
+    const prod: ProduitAPI[] = [];
+    infiniteProduits?.pages.map(p => p.data.map(data => {
+      prod.push(data)
+    }))
+    setProduits({data: prod, nbElements: prod.length, hasNext: false, hasPrevious: false, page: 1, size: prod.length});
+    if (hasNextPage) fetchNextPage();
+  }, [infiniteProduits])
+
+  // Relance des requêtes suite modifications
   const onChange = () => {
     queryClient.invalidateQueries({ queryKey: ["getHeader"]});
     queryClient.invalidateQueries({ queryKey: ["getProduits"]});
+    queryClient.invalidateQueries({ queryKey: ["getProduitsInfinite"]});
   }
 
   // Sélection du produit
