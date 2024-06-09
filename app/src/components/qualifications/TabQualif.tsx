@@ -168,7 +168,7 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
         <Box>
           <Box m={1} >
             <Version formulaire={formulaire} produit={produit} maj={majRep} onChangeVer={handleVersionChange} />
-            <Devis answer={answer} onChangeDevis={handleDevisChange} />
+            { (user && user.role !== "READER") && <Devis answer={answer} onChangeDevis={handleDevisChange} /> }
           </Box>
           {answer &&
             <>

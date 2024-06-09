@@ -48,7 +48,7 @@ const UserForm = () => {
       if (user) return getResetPwdToken(user?.id)
       else return Promise.resolve(null);
     },
-    enabled: pwdToken && !!user && (token !== null),
+    enabled: pwdToken && !!user && (token === null),
   })
 
   // Mise à jour des données suite récupération de l'utilisateur

@@ -88,7 +88,6 @@ const Utilisateurs = () => {
           <Table aria-label="table-users">
             <TableHead>
               <TableRow>
-                <TableCell>Voir</TableCell>
                 <TableCell>Utilisateur</TableCell>
                 <TableCell>Role</TableCell>
                 <TableCell>Validé</TableCell>

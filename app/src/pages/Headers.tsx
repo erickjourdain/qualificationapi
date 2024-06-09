@@ -95,7 +95,7 @@ const Headers = () => {
         </Typography>
         <Box sx={{ display: "flex", justifyContent: "space-between" }} >
           {
-            user && user.role !== "USER" &&
+            user && user.role !== "READER" &&
             <Button color="primary" variant="contained" startIcon={<AddCircleIcon />} sx={{ mb: 2 }} onClick={() => navigate("/opportunite/new")}>
               Nouvelle Opportunité
             </Button>
