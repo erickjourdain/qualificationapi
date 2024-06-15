@@ -27,7 +27,7 @@ const InputDevis = ({ initValue, onSubmit }: InputDevisProps) => {
   const onClickInput = () => {
     setError(false);
       // Test de l'entrée
-      if (!/^DEV[0-9]{6}-V[1-9]$/.test(devis.trim())) {
+      if (!/^DEV[0-9]{7}-V[1-9]$/.test(devis.trim())) {
         setError(true);
       } else onSubmit(devis.trim()); // Lancement de l'enregistrement
   }
@@ -60,7 +60,7 @@ const InputDevis = ({ initValue, onSubmit }: InputDevisProps) => {
         }
       />
       <FormHelperText error={!!error} id="outlined-devis-helper-text">
-        DEV123456-V1
+        DEV1234567-V1
       </FormHelperText>
     </FormControl>
   )
