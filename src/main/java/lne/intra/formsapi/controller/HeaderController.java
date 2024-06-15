@@ -1,10 +1,19 @@
 package lne.intra.formsapi.controller;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -36,6 +45,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lne.intra.formsapi.model.Header;
 import lne.intra.formsapi.model.exception.AppException;
+import lne.intra.formsapi.model.openApi.GetDir;
 import lne.intra.formsapi.model.openApi.GetHeaderId;
 import lne.intra.formsapi.model.openApi.GetHeaders;
 import lne.intra.formsapi.model.request.HeaderProductsRequest;
@@ -61,6 +71,50 @@ public class HeaderController {
   private final ProduitService produitService;
   private final ObjectsValidator<HeaderRequest> headerValidator;
   private final ObjectsValidator<HeaderProductsRequest> headerProductsValidator;
+
+  @Value("${lne.intra.formsapi.gecdocdir}")
+  private String gecdocdir;
+
+  @Operation(summary = "Récupération des chemins de l'opportunité et du projet dans GEC-DOCUMENTS", description = "Accès limité aux personnes connectées")
+  @ApiResponse(responseCode = "200", description = "Liste des chemins", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetDir.class)))
+  @ApiResponse(responseCode = "404", description = "id non trouvé", content = @Content(mediaType = "application/text"))
+  @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
+  @GetMapping("/dir/{id}")
+  @PreAuthorize("hasAnyAuthority('admin:read','creator:read','user:read','reader:read')")
+  public ResponseEntity<Map<String, Object>> directories(
+      @PathVariable Integer id) throws AppException, IOException {
+
+    Map<String, Object> response = new HashMap<>();
+
+    // Récupération de l'entête
+    Header header = headerService.getHeader(id);
+
+    // Recherche du répertoire opportunité
+    if (Objects.nonNull(header.getOpportunite()) && !header.getOpportunite().isEmpty()) {
+      String opp = StringUtils.right(header.getOpportunite(), 7);
+      String year = StringUtils.substring(opp, 0, 2);
+      Path startDir = Paths.get(gecdocdir + "/OPPORTUNITES/20" + year);
+      Optional<Path> oppDir = Files.walk(startDir)
+          .filter(Files::isDirectory)
+          .filter(f -> f.toString().contains(opp))
+          .findFirst();
+      response.put("opportunite", oppDir);
+    } else
+      response.put("opportunite", null);
+
+    // Recherche du répertoire projet
+    if (Objects.nonNull(header.getProjet()) && !header.getProjet().isEmpty()) {
+      Path startDir = Paths.get(gecdocdir + "/PROJETS");
+      Optional<Path> projDir = Files.walk(startDir)
+          .filter(Files::isDirectory)
+          .filter(f -> f.toString().contains(header.getProjet()))
+          .findFirst();
+      response.put("projet", projDir);
+    } else
+      response.put("projet", null);
+
+    return ResponseEntity.ok(response);
+  }
 
   /**
    * Contrôleur de création d'une nouvelle entête

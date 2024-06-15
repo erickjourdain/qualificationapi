@@ -33,5 +33,10 @@
     "name": "lne.intra.formsapi.server",
     "type": "java.lang.String",
     "description": "Adresse du serveur"
+  },
+  {
+    "name": "lne.intra.formsapi.gecdocdir",
+    "type": "java.lang.String",
+    "description": "Chemin vers le répertoire GEC-DOCUMENT"
   }
 ]}
