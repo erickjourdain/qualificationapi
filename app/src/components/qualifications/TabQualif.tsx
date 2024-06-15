@@ -6,6 +6,7 @@ import { useAtomValue, useSetAtom } from "jotai";
 import Box from "@mui/material/Box";
 import Fab from "@mui/material/Fab";
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
+import PrintIcon from "@mui/icons-material/Print";
 import { displayAlert, loggedUser } from "../../atomState";
 import { AnswerAPI, FormAPI, ProduitAPI, Statut } from "../../gec-tripetto";
 import manageError from "../../utils/manageError";
@@ -158,6 +159,67 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
     if (answer) mutateDevis({ id: answer.id, devis });
   }
 
+  // Impreesion du formulaire
+  const printForm = async () => {
+    if (answer) {
+      // création du tableau avec les réponses au question du formulaire
+      const fields = JSON.parse(answer.reponse).fields.map((field: Export.IExportableField) => { return { name: field.name, value: field.value } });
+      // création du document HTML pour l'impression
+      const html = `
+        <!DOCTYPE html>
+        <html lang="fr">
+        <head>
+          <meta charset="UTF-8" />
+          <meta name="robots" content="noindex" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+          <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+          <meta property="og:title" content="Formulaire" />
+          <meta property="og:description" content="Reponse au Formulaire" />
+          <title>Formulaire</title>
+        </head>
+        
+        <body>
+          <div id="RunnerElement">
+            Chargement des données...
+          </div>
+          <script src="https://cdn.jsdelivr.net/npm/@tripetto/runner"></script>
+          <script src="https://cdn.jsdelivr.net/npm/@tripetto/runner-classic"></script>
+          <script type="module">
+          const urls = [
+            "https://cdn.jsdelivr.net/npm/@tripetto/runner-classic/runner/locales/fr.json", 
+            "https://cdn.jsdelivr.net/npm/@tripetto/runner-classic/runner/translations/fr.json"
+          ];
+          const requests = urls.map(url=>fetch(url));
+          Promise.all(requests)
+          .then(responses => {
+            const locale = responses[0].json();
+            const translations = responses[1].json();
+            TripettoClassic.run({
+              element: document.getElementById("RunnerElement"),
+              definition: ${(formulaire.formulaire)},
+              onImport: (instance) => { TripettoRunner.Import.fields(instance, ${JSON.stringify(fields)}) },
+              locale,
+              translations,
+            });
+            window.onafterprint = (event) => {
+              window.close();
+            };
+            setTimeout(() => {
+              window.print();
+            }, 500);        
+          })
+          .catch(err => document.getElementById("RunnerElement").innerHTML("Erreur durant le chargement des données..."));
+          </script>
+        </body>
+        
+        </html>   
+      `
+      // Ouverture du popup pour impression
+      const windowFeatures = "left=100,top=100,width=1200,height=800";
+      window.open(URL.createObjectURL(new Blob([html], { type: "text/html" })), "Impression Formulaire", windowFeatures);
+    }
+  }
+
   return (
     <div
       role="tabpanel"
@@ -173,17 +235,26 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
           {answer &&
             <>
               <HeaderAnswer answer={answer} onStatutChange={onStatutChange} />
-              <Box display="flex">
-                {
-                  change &&
+              <Box display="flex" flexDirection="column">
+                <Box
+                  sx={{ alignSelf: "flex-end" }}>
+                  {
+                    change &&
+                    <Fab
+                      onClick={() => setShowTripetto(true)}
+                      color="warning"
+                      size="medium">
+                      <PlayCircleIcon />
+                    </Fab>
+                  }
                   <Fab
-                    onClick={() => setShowTripetto(true)}
-                    color="warning"
-                    size="medium"
-                    sx={{ ml: "auto", order: 2 }}>
-                    <PlayCircleIcon />
+                    onClick={() => printForm()}
+                    color="primary"
+                    sx={{ ml: 2 }}
+                    size="medium">
+                    <PrintIcon />
                   </Fab>
-                }
+                </Box>
                 <DisplayTripetto
                   data={JSON.parse(answer.reponse)}
                   form={JSON.parse(formulaire.formulaire)}
