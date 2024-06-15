@@ -5,7 +5,7 @@ import { sfEqual } from "spring-filter-query-builder";
 import { useSetAtom } from "jotai";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
-import { getHeaders, getProduits } from "../utils/apiCall";
+import { getDirectories, getHeaders, getProduits } from "../utils/apiCall";
 import manageError from "../utils/manageError";
 import { displayAlert } from "../atomState";
 import Formulaire from "../components/header/Formulaire";
@@ -47,24 +47,7 @@ const Header = () => {
     },
   });
 
-  /*
-  // Requête de récupération des produits associés
-  const { data: produits, isLoading: isLoadingProduits } = useQuery({
-    queryKey: ["getProduits", header],
-    queryFn: () => {
-      const filter = sfEqual("header", header.id);
-      const include = ["id", "createur", "gestionnaire", "description", "createdAt", "updatedAt"];
-      return getProduits(1, filter.toString(), include);
-    },
-    select: (reponse) => reponse.data,
-    enabled: !!header,
-    throwOnError: (error, query) => {
-      if (error) setAlerte({ severite: "error", message: manageError(error) });
-      return true;
-    },
-  })
-  */
-
+  // Requête récupération des produits associés à l'entête
   const { data: infiniteProduits, hasNextPage, fetchNextPage, isLoading: isLoadingProduits } = useInfiniteQuery({
     queryKey: ["getProduitsInfinite", header],
     queryFn: async ({ pageParam }) => {
@@ -106,11 +89,16 @@ const Header = () => {
 
   // ouvrir l'explorateur de fichier
   // code à compléter et modifier
-  const openFolder = (type: string) => {
-    let path = process.env.GECDOCUMENT_PATH;
-    if (type === "projet") path = `${path}/PROJET/${header.projet}`;
-    if (type === "opportunite") path = `${path}/OPPORTUNITE/${header.opportunite}`;
-    alert(`open ${path}`);
+  const openFolder = async (type: string) => {
+    let path: string = "";
+    try {
+      const directories = await getDirectories(header.id);
+      if (type === "projet") path = directories.data.projet;
+      if (type === "opportunite") path = directories.data.opportunite;
+      alert(`open ${path}`);
+    } catch (error) {
+      setAlerte({ severite: "error", message: manageError(error) });
+    }
   }
 
   if (isLoadingHeader || isLoadingProduits) return (<Loading />)

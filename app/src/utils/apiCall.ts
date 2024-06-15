@@ -282,6 +282,13 @@ const addDevisAnswer = (payload: {id: number, devis: string}) => {
   })
 }
 
+const getDirectories = (id: number) => {
+  return instance.request({
+    method: "GET",
+    url: `data/headers/dir/${id}`,
+  })
+}
+
 export {
   apiRequest,
   setAuthorisation,
@@ -312,5 +319,6 @@ export {
   getProduits,
   createProduit,
   updateProduit,
-  addDevisAnswer
+  addDevisAnswer,
+  getDirectories,
 };
