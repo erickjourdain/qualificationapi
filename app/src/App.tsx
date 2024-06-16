@@ -3,10 +3,12 @@ import { RouterProvider } from "react-router";
 import { createBrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider, createTheme } from "@mui/material";
+import Favicon from "react-favicon";
 import MessageInfo from "./components/MessageInfo";
 import { setAuthorisation } from "./utils/apiCall";
 import { isAdmin, isLogged } from "./utils/auth";
 import MainLayout from "./layout/MainLayout";
+import favicon from "./layout/favicon"
 import Login from "./pages/Login";
 import AddForm from "./pages/AddForm";
 import NotAllowed from "./components/NotAllowed";
@@ -75,35 +77,6 @@ function App() {
         }
       ]
     },
-    /*  {
-        path: "ajouter",
-        element: <AddForm />,
-        errorElement: <Error />,
-      },
-      {
-        path: "formulaire/:slug",
-        element: <IndexForm />,
-        children: [
-          {
-            path: "edit",
-            element: isCreator() ? <EditForm /> : <NotAllowed />,
-          },
-          {
-            path: "play",
-            element: <PlayForm open />,
-          },
-          {
-            path: "answers",
-            element: <ResultsForm />,
-          },
-          {
-            path: "answers/:uuid/:version",
-            element: <IndexReponse />,
-          },
-        ],
-      },
-  ],
-},*/
     {
       path: "/login",
       element: <Login />,
@@ -121,10 +94,11 @@ function App() {
       element: <CloseApp />
     }
   ]);
-
+  
   return (
     <ThemeProvider theme={defaultTheme}>
       <QueryClientProvider client={queryClient}>
+        <Favicon url={favicon} />
         <RouterProvider router={router} />
         <MessageInfo />
       </QueryClientProvider>
