@@ -70,12 +70,8 @@ const Formulaires = () => {
     );
 
   if (formulaires) return (
-    <Paper
-      sx={{
-        marginTop: "10px",
-      }}
-    >
-      <Box sx={{ minWidth: 400, maxWidth: "80%", margin: "auto" }}>
+    <Paper>
+      <Box px={3} py={2}>
         <Typography variant="h5" gutterBottom>
           Formulaires
         </Typography>

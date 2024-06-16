@@ -51,32 +51,33 @@ function App() {
         },
         {
           path: "opportunite/:uuid",
-          element: isLogged() ? <Header/> : <NotAllowed />
-        }
+          element: isLogged() ? <Header /> : <NotAllowed />
+        },
+        {
+          path: "admin",
+          element: isAdmin() ? <AdminLayout /> : <NotAllowed />,
+          children: [
+            {
+              index: true,
+              element: <Admin />
+            },
+            {
+              path: "user/:slug",
+              element: <UserForm />,
+            },
+            {
+              path: "form/:slug",
+              element: <FormForm />,
+            },
+            {
+              path: "form/ajouter",
+              element: <AddForm />
+            }
+          ]
+        },
       ]
     },
-    {
-      path: "admin",
-      element: isAdmin() ? <AdminLayout /> : <NotAllowed />,
-      children: [
-        {
-          index: true,
-          element: <Admin />
-        },
-        {
-          path: "user/:slug",
-          element: <UserForm />,
-        },
-        {
-          path: "form/:slug",
-          element: <FormForm />,
-        },
-        {
-          path: "form/ajouter",
-          element: <AddForm />
-        }
-      ]
-    },
+
     {
       path: "/login",
       element: <Login />,
@@ -94,7 +95,7 @@ function App() {
       element: <CloseApp />
     }
   ]);
-  
+
   return (
     <ThemeProvider theme={defaultTheme}>
       <QueryClientProvider client={queryClient}>

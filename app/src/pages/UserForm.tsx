@@ -100,11 +100,7 @@ const UserForm = () => {
 
   if (user)
     return (
-      <Paper
-        sx={{
-          marginTop: "10px",
-        }}
-      >
+      <Paper>
         <Box px={3} py={2}>
           <Typography variant="h6" sx={{ m: 2 }}>
             Profil {user.prenom} {user.nom}

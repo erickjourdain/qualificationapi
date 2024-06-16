@@ -11,7 +11,6 @@ import FeedIcon from "@mui/icons-material/Feed";
 import PersonIcon from "@mui/icons-material/Person";
 import Divider from "@mui/material/Divider";
 import ListSubheader from "@mui/material/ListSubheader";
-import ApplicationMainNav from "../components/ApplicationMainNav";
 import GeneralLayout from "./GeneralLayout";
 
 type typeMenu = "formulaires" | "utilisateurs";
@@ -33,8 +32,7 @@ const AdminLayout = () => {
   }
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <ApplicationMainNav />
+    <>
       <Drawer
         variant="permanent"
         sx={{
@@ -62,12 +60,11 @@ const AdminLayout = () => {
           </List>
         </Box>
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3, maxWidth: "lg" }}>
-        <Toolbar />
+      <Box component="main" sx={{ flexGrow: 1, p: 3, maxWidth: "xl", ml: `${drawerWidth}px` }}>
         <Outlet context={{ menu: selected } satisfies typeContext} />
       </Box>
       <GeneralLayout />
-    </Box>
+    </>
   )
 }
 
