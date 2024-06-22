@@ -95,7 +95,7 @@ const Header = () => {
       const directories = await getDirectories(header.id);
       if (type === "projet") path = directories.data.projet;
       if (type === "opportunite") path = directories.data.opportunite;
-      alert(`open ${path}`);
+      window.open(`opengecapp:${path}`);
     } catch (error) {
       setAlerte({ severite: "error", message: manageError(error) });
     }
