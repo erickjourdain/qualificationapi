@@ -104,12 +104,29 @@ public class HeaderController {
 
     // Recherche du répertoire projet
     if (Objects.nonNull(header.getProjet()) && !header.getProjet().isEmpty()) {
+      int numProjet = Integer.valueOf(StringUtils.right(header.getProjet(), 6));
       Path startDir = Paths.get(gecdocdir + "/PROJETS");
-      Optional<Path> projDir = Files.walk(startDir)
+      Optional<Path> initDir = Files.walk(startDir, 1)
           .filter(Files::isDirectory)
-          .filter(f -> f.toString().contains(header.getProjet()))
+          .filter(f -> f.getFileName().toString().matches("P[0-9]{6}-P[0-9]{6}"))
+          .filter(f -> {
+            int startProj = Integer.valueOf(StringUtils.substring(f.getFileName().toString(), 1, 7));
+            int endProj = Integer.valueOf(StringUtils.substring(f.getFileName().toString(), 9, 15));
+            return (startProj <= numProjet && numProjet <= endProj);
+          })
           .findFirst();
-      response.put("projet", projDir);
+      initDir.ifPresentOrElse(dir -> {
+        Optional<Path> projDir;
+        try {
+          projDir = Files.walk(dir, 1)
+              .filter(Files::isDirectory)
+              .filter(f -> f.toString().contains(header.getProjet()))
+              .findFirst();
+          response.put("projet", projDir);
+        } catch (IOException e) {
+          response.put("projet", null);
+        }
+      }, () -> response.put("projet", null));
     } else
       response.put("projet", null);
 
