@@ -26,6 +26,10 @@ spring:
     out-of-order: false
     baseline-on-migrate: true
 
+springdoc:
+  swagger-ui:
+    disable-swagger-default-url: true
+
 #Tomcat configuration
 server:
   port: 3030

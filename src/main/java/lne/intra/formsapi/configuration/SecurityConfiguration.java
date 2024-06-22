@@ -9,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -64,7 +65,6 @@ public class SecurityConfiguration {
              * "/api/v1/data/users/**").hasAuthority(ADMIN_DELETE.name())
              */
             .anyRequest().permitAll())
-
         .sessionManagement((session) -> session
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authenticationProvider(authenticationProvider)
@@ -78,7 +78,7 @@ public class SecurityConfiguration {
     return http.build();
   }
 
-//  @Bean
+  // @Bean
   CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
     configuration.setAllowedOrigins(Arrays.asList("*"));
@@ -89,4 +89,9 @@ public class SecurityConfiguration {
     return source;
   }
 
+  @Bean
+  public WebSecurityCustomizer webSecurityCustomizer() {
+    return web -> web.ignoring().requestMatchers(
+        "/swagger-ui/**", "/v3/api-docs/**");
+  }
 }
