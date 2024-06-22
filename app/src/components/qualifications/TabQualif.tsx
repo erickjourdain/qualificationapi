@@ -243,7 +243,7 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
                 <Box
                   sx={{ alignSelf: "flex-end" }}>
                   {
-                    change &&
+                    change && user?.role !== "READER" &&
                     <Fab
                       onClick={() => setShowTripetto(true)}
                       color="warning"

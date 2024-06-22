@@ -20,13 +20,13 @@ const HeaderAnswer = ({ answer, onStatutChange }: HeaderAnswerProps) => {
 
   // State: état du composant
   const [courante, setCourante] = useState<boolean>(false);
-  const [locked, setLocked] = useState<boolean>(true);
+  const [locked, setLocked] = useState<boolean>(false);
   const [input, setInput] = useState<boolean>(false);
 
   // Mise à jour de l'état lors du changement de réponse
   useEffect(() => {
     setCourante(answer.courante);
-    if (answer.courante && user)
+    if (answer.courante && user && user.role !== "READER")
       setLocked(answer.courante && !!answer.lock && answer.lock.utilisateur.id !== user?.id);
     else setLocked(true);
   }, [answer]);
@@ -57,7 +57,7 @@ const HeaderAnswer = ({ answer, onStatutChange }: HeaderAnswerProps) => {
 
         }
         {
-          courante && locked &&
+          courante && locked && answer.lock &&
             <Alert color="warning">La réponse est vérouillée par {answer.lock.utilisateur.prenom} {answer.lock.utilisateur.nom}</Alert>
         }<SelectStatut answer={answer} onSelect={onStatutChange} disabled={!input} />
       </Box>
