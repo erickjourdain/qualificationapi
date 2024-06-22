@@ -43,6 +43,7 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
   const [change, setChange] = useState<boolean>(false);
   const [unlock, setUnlock] = useState<boolean>(false);
   const [majRep, setMajRep] = useState<number>(0);
+  const [render, setRender] = useState<boolean>(false);
 
   // Chargement de la réponse à afficher
   const { data: answer } = useQuery({
@@ -83,6 +84,7 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
       setChange(!locked);
     } else setChange(false);
     setUnlock(true);
+    setRender(true);
   }, [answer]);
 
   // Mise à jour de l'état de dévérouillage
@@ -148,9 +150,11 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
   // Gestion changement version
   const handleVersionChange = (id: string) => {
     if (id !== version) {
+      setRender(false);
       setOldVersion(version);
       setVersion(id);
       versionRef.current = id;
+      queryClient.invalidateQueries({ queryKey: ["getAnswer"] });
     }
   }
 
@@ -258,6 +262,7 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
                 <DisplayTripetto
                   data={JSON.parse(answer.reponse)}
                   form={JSON.parse(formulaire.formulaire)}
+                  render={render}
                 />
                 <PlayTripetto
                   open={showTripetto}

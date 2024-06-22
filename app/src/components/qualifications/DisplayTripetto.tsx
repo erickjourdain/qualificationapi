@@ -8,9 +8,10 @@ import localeClassic from "@tripetto/runner-classic/runner/locales/fr.json";
 type DisplayTripettoProps = {
   form: IDefinition;
   data: Export.IExportables;
+  render: boolean;
 };
 
-const DisplayTripetto = ({ form, data }: DisplayTripettoProps) => {
+const DisplayTripetto = ({ form, data, render }: DisplayTripettoProps) => {
 
   const [values, setValues] = useState<Import.IFieldByName[]>([]);
 
@@ -24,9 +25,10 @@ const DisplayTripetto = ({ form, data }: DisplayTripettoProps) => {
         });
       });
     setValues(val);
-  }, [data]);
+  }, [data, render, form]);
 
   return (
+    render &&
     <ClassicRunner
       definition={form}
       locale={localeClassic as unknown as ILocale}
