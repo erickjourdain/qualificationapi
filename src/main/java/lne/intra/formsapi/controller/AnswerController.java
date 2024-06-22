@@ -359,10 +359,15 @@ public class AnswerController {
   public ResponseEntity<Boolean> unlock(
       @AuthenticationPrincipal UserDetails userDetails,
       @PathVariable Integer id) throws NotFoundException {
+    User user = userService.getByLogin(userDetails.getUsername());
     Answer answer = service.getAnswer(id);
     Optional<LockedAnswer> lockedAnswer = lockedAnswerService.getByAnswer(answer);
-    lockedAnswer.ifPresentOrElse(lock -> lockedAnswerService.delete(lock.getId()),
-        () -> new AppException(404, "Aucun verrou posé sur cet enregistrement"));
+    lockedAnswer.ifPresentOrElse(lock -> {
+      if (user.getId() == lock.getUtilisateur().getId()) {
+        lockedAnswerService.delete(lock.getId());
+      }
+    },
+      () -> new AppException(404, "Aucun verrou posé sur cet enregistrement"));
     return ResponseEntity.ok(true);
   }
 }
