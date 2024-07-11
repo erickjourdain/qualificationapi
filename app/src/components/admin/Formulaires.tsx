@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useEffect, useState } from "react";
 import { useSetAtom } from "jotai";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import Button from "@mui/material/Button";
 import Skeleton from "@mui/material/Skeleton";
 import Paper from "@mui/material/Paper";
@@ -75,7 +75,7 @@ const Formulaires = () => {
         <Typography variant="h5" gutterBottom>
           Formulaires
         </Typography>
-        <Button color="primary" variant="contained" startIcon={<AddCircleIcon />} onClick={() => navigate({ pathname: "form/ajouter" })}>
+        <Button color="primary" variant="contained" startIcon={<AddCircleIcon />} onClick={() => navigate({ to: "/admin/formulaires/ajouter" })}>
           Nouveau Formulaire
         </Button>
         <Table aria-label="table-users">
@@ -89,7 +89,7 @@ const Formulaires = () => {
           </TableHead>
           <TableBody>
             {formulaires.map((form) => (
-              <TableRow key={form.id} onDoubleClick={() => navigate({ pathname: `form/${form.slug}` })} sx={{ cursor: "pointer"}}>
+              <TableRow key={form.id} onDoubleClick={() => navigate({ to: `/admin/formulaires/${form.slug}` })} sx={{ cursor: "pointer"}}>
                 <TableCell>{form.titre}</TableCell>
                 <TableCell>{form.version}</TableCell>
                 <TableCell>{formatDateTime(form.updatedAt)}</TableCell>

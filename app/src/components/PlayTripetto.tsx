@@ -1,5 +1,4 @@
 
-import React from "react";
 import { useAtom } from "jotai";
 import { Export, IDefinition, Import, Instance } from "@tripetto/runner";
 import { ChatRunner } from "@tripetto/runner-chat";
@@ -13,13 +12,7 @@ import translationChat from "@tripetto/runner-chat/runner/translations/fr.json";
 import translationAutoScroll from "@tripetto/runner-autoscroll/runner/translations/fr.json";
 import { ILocale, TTranslation } from "@tripetto/runner/module/l10n";
 import { selectedRunner } from "../atomState";
-import Dialog from "@mui/material/Dialog";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogActions from "@mui/material/DialogActions";
-import Button from "@mui/material/Button";
-
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 
 type TripettoProps = {
   open: boolean;

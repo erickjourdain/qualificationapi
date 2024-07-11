@@ -1,7 +1,6 @@
-import React from "react";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { useSetAtom } from "jotai";
 import Skeleton from "@mui/material/Skeleton";
 import Table from "@mui/material/Table";
@@ -92,7 +91,7 @@ const Utilisateurs = () => {
             </TableHead>
             <TableBody>
               {users.map((user) => (
-                <TableRow key={user.id} onDoubleClick={() => navigate({ pathname: `user/${user.slug}` })} sx={{ cursor: "pointer "}}>
+                <TableRow key={user.id} onDoubleClick={() => navigate({ to: `/admin/utilisateurs/${user.slug}` })} sx={{ cursor: "pointer "}}>
                   <TableCell>{`${user.prenom} ${user.nom}`}</TableCell>
                   <TableCell>{user.role}</TableCell>
                   <TableCell>{icon(user.validated)}</TableCell>

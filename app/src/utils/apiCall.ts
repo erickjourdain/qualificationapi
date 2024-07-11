@@ -4,7 +4,7 @@ import { sfEqual } from "spring-filter-query-builder";
 
 // Création de l'instance Axios pour les requêtes vers l'API
 const instance = axios.create({
-  baseURL: process.env.API_URL,
+  baseURL: import.meta.env.VITE_API_URL,
   timeout: 5000,
 });
 

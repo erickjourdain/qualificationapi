@@ -1,11 +1,10 @@
-import React from "react";
 import AppBar from "@mui/material/AppBar";
 import IconButton from "@mui/material/IconButton";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import MenuIcon from "@mui/icons-material/Menu";
 import Settings from "./Settings";
-import { useNavigate } from "react-router";
+import { useNavigate } from "@tanstack/react-router";
 
 const ApplicationMainNav = () => {
 
@@ -20,7 +19,7 @@ const ApplicationMainNav = () => {
         color="inherit"
         aria-label="menu"
         sx={{ mr: 2 }}
-        onClick={() => navigate("/")}
+        onClick={() => navigate({to: "/"})}
       >
         <MenuIcon />
       </IconButton>

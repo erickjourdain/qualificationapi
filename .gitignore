@@ -49,6 +49,8 @@ src/main/resources/application-prod.yml
 # Dependencies
 /app/node
 /app/node_modules
+# Old App
+/app-old
 
 # Project specific
 /app/public/*

@@ -1,7 +1,6 @@
-import React from "react";
 import { useState, MouseEvent } from "react";
-import { useNavigate } from "react-router";
 import { useAtom } from "jotai";
+import { useNavigate } from "@tanstack/react-router";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import IconButton from "@mui/material/IconButton";
@@ -79,11 +78,11 @@ const Settings = () => {
         {isAdmin() &&
           [
             <Divider key="divider" />,
-            <MenuItem key="admin" onClick={() => navigate("/admin")}>Administration</MenuItem>
+            <MenuItem key="admin" onClick={() => navigate({to: "/admin/formulaires" })}>Administration</MenuItem>
           ]
         }
       </Menu>
-      <IconButton color="inherit" onClick={() => navigate("/close")}><LogoutIcon /></IconButton>
+      <IconButton color="inherit" onClick={() => navigate({to: "/close"})}><LogoutIcon /></IconButton>
     </Box>
   );
 };
