@@ -19,6 +19,7 @@ import manageError from "../../utils/manageError";
 import { displayAlert } from "../../atomState";
 import { FormAPI, FormsAPI } from "../../gec-tripetto";
 import { formatDateTime } from "../../utils/format";
+import { sfEqual } from "spring-filter-query-builder";
 
 const Formulaires = () => {
 
@@ -37,7 +38,10 @@ const Formulaires = () => {
 
   const { data, error, isError, isLoading } = useQuery({
     queryKey: ["getForms", page],
-    queryFn: () => getForms(null, page + 1, ["id", "titre", "version", "createur", "updatedAt", "slug"], itemsPerPage),
+    queryFn: () => {
+      const filter = sfEqual("valide", "true");
+      return getForms(filter.toString(), page + 1, ["id", "titre", "version", "createur", "updatedAt", "slug"], itemsPerPage);
+    },
     select: (response) => response.data as FormsAPI, 
   })
 

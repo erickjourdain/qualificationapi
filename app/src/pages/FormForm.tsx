@@ -66,7 +66,7 @@ const FormForm = () => {
     onSuccess: (response) => {
       setAlerte({ severite: "success", message: "Les données ont été mises à jour" });
       if (form && form.slug !== response.data.slug) {
-        navigate(`/formulaire/${response.data.slug}`);
+        navigate(`/admin/form/${response.data.slug}`);
       } else {
         refetch();
       }
