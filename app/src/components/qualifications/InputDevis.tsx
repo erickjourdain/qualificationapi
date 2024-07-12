@@ -27,9 +27,9 @@ const InputDevis = ({ initValue, onSubmit }: InputDevisProps) => {
   const onClickInput = () => {
     setError(false);
       // Test de l'entrée
-      if (!/^DEV[0-9]{7}-V[1-9]$/.test(devis.trim())) {
+      if (!/^DEV[0-9]{7}-V[1-9]$/i.test(devis.trim())) {
         setError(true);
-      } else onSubmit(devis.trim()); // Lancement de l'enregistrement
+      } else onSubmit(devis.trim().toUpperCase()); // Lancement de l'enregistrement
   }
 
   return (
