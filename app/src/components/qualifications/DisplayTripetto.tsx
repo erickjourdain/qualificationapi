@@ -14,21 +14,24 @@ type DisplayTripettoProps = {
 const DisplayTripetto = ({ form, data, render }: DisplayTripettoProps) => {
 
   const [values, setValues] = useState<Import.IFieldByName[]>([]);
+  const [ready, setReady] = useState<boolean>(false);
 
   useEffect(() => {
+    setReady(false);
+    setValues([]);
     const val: Import.IFieldByName[] = [];
-    if (data)
-      data.fields.forEach((field) => {
-        val.push({
-          name: field.name,
-          value: field.value,
-        });
+    for (let index = 0; index < data.fields.length; index++) {
+      val.push({
+        name: data.fields[index].name,
+        value: data.fields[index].value,
       });
+    }
     setValues(val);
+    setReady(true);
   }, [data, render, form]);
 
   return (
-    render &&
+    render && ready &&
     <ClassicRunner
       definition={form}
       locale={localeClassic as unknown as ILocale}

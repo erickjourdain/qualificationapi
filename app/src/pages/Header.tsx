@@ -31,6 +31,7 @@ const Header = () => {
   const [produits, setProduits] = useState<ProduitsAPI>();
   // State: le produit sélectionné
   const [produit, setProduit] = useState<ProduitAPI | null>(null);
+  const [nbAffichage, setNbAffichage] = useState<number>(0);
 
   // Requête de récupération de l'entête
   const { data: header, isLoading: isLoadingHeader } = useQuery({
@@ -85,6 +86,7 @@ const Header = () => {
   // Sélection du produit
   const handleSelectProduct = (produit: ProduitAPI) => {
     setProduit(produit);
+    setNbAffichage(nbAffichage + 1);
   }
 
   // ouvrir l'explorateur de fichier
@@ -124,7 +126,7 @@ const Header = () => {
       </Paper>
       <Paper>
         <Box px={3} py={2}>
-          <Qualifications produit={produit} />
+          <Qualifications produit={produit} nbAffichage={nbAffichage}/>
         </Box>
       </Paper>
     </Box>

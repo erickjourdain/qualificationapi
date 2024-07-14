@@ -75,7 +75,12 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
       //else return null;
     },*/
     select: (reponse) => (reponse) ? reponse.data as boolean : null,
-  })
+  });
+
+  // Reset de la version lors du changement de produit
+  useEffect(() => {
+    setVersion(null);
+  }, [produit]);
 
   // Mise à jour du vérouillage lors du changement de réponse
   useEffect(() => {
@@ -105,7 +110,7 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
     onSuccess: () => {
       setAlerte({ severite: "success", message: "l'opportunité a été mise à jour" });
       setMajRep(majRep + 1);
-      queryClient.invalidateQueries({ queryKey: ["getAnswer"] })
+      queryClient.invalidateQueries({ queryKey: ["getAnswer"] });
     },
     onError: (error) => {
       setAlerte({ severite: "error", message: manageError(error) });
@@ -262,7 +267,7 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
                 <DisplayTripetto
                   data={JSON.parse(answer.reponse)}
                   form={JSON.parse(formulaire.formulaire)}
-                  render={render}
+                  render={render && show}
                 />
                 <PlayTripetto
                   open={showTripetto}

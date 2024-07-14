@@ -13,9 +13,10 @@ import { loggedUser } from "../../atomState";
 
 interface QualificationsProps {
   produit: ProduitAPI | null;
+  nbAffichage: number;
 }
 
-const Qualifications = ({ produit }: QualificationsProps) => {
+const Qualifications = ({ produit, nbAffichage }: QualificationsProps) => {
 
   const queryClient = useQueryClient();
 
@@ -24,11 +25,11 @@ const Qualifications = ({ produit }: QualificationsProps) => {
   // State: les formulaires utilisés
   const [formulaires, setFormulaires] = useState<FormAPI[]>([]);
   // State: formulaire sélectionné
-  const [selectedTab, setSelectedTAb] = useState<number>(0);
+  const [selectedTab, setSelectedTab] = useState<string>("");
 
   // Load les réponses aux formulaires de qualification pour le produit
   const { data: reponses, isLoading } = useQuery({
-    queryKey: ["getAnwsersFromProduct", produit],
+    queryKey: ["getAnwsersFromProduct", produit, nbAffichage],
     queryFn: () => {
       const filter = sfAnd([sfEqual("produit", produit?.id || 0), sfEqual("courante", "true")]);
       return getAnswers(filter.toString(), 1, ["id", "formulaire"]);
@@ -40,12 +41,17 @@ const Qualifications = ({ produit }: QualificationsProps) => {
   // Mise à jour des formulaires suite à récupération des réponses
   useEffect(() => {
     const forms = reponses?.data.map((reponse: AnswerAPI) => reponse.formulaire);
-    if (forms) setFormulaires(forms);
+    if (forms) {
+      setFormulaires(forms);
+      setSelectedTab(`${produit ? produit.id : "0"}-${forms[0] ? forms[0].id : 0}`);
+    }
   }, [reponses]);
 
+  useEffect(() => setSelectedTab(""), [produit]);
+
   // Changement de l'onglet sélectionné
-  const handleTabChange = (_event: SyntheticEvent, newValue: number) => {
-    setSelectedTAb(newValue);
+  const handleTabChange = (_event: SyntheticEvent, newValue: string) => {
+    setSelectedTab(newValue);
   }
 
   const onUpdateFormulaire = () => {
@@ -53,23 +59,47 @@ const Qualifications = ({ produit }: QualificationsProps) => {
   }
 
   return (
-    (produit && !isLoading &&
+    (produit && !isLoading && (selectedTab !== "") &&
       <Box>
         {
           (user && user.role !== "READER") &&
-          <Formulaires formulaires={formulaires} produit={produit} onUpdateFormulaire={onUpdateFormulaire} />
+          <Formulaires 
+            formulaires={formulaires} 
+            produit={produit} 
+            onUpdateFormulaire={onUpdateFormulaire} 
+          />
         }
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={selectedTab} onChange={handleTabChange} aria-label="basic tabs example">
+          <Tabs 
+            value={selectedTab} 
+            onChange={handleTabChange} 
+            aria-label="basic tabs example"
+          >
             {
-              formulaires.map((formulaire, index) =>
-                <Tab label={formulaire.titre} key={formulaire.id} id={`tab-${index}`} />
-              )
+              formulaires.map((formulaire, index) => {
+                return (
+                  <Tab 
+                    label={formulaire.titre} 
+                    key={formulaire.id} 
+                    id={`tab-${index}`}
+                    value={`${produit.id}-${formulaire.id}`}
+                  />
+                )
+              })
             }
           </Tabs>
         </Box>
         {
-          formulaires.map((formulaire, index) => <TabQualif show={selectedTab === index} formulaire={formulaire} key={formulaire.id} produit={produit} />)
+          formulaires.map((formulaire) => {
+            return (
+              <TabQualif
+                show={`${produit.id}-${formulaire.id}` === selectedTab}
+                formulaire={formulaire} 
+                key={formulaire.id} 
+                produit={produit} 
+              />
+            )
+          })
         }
       </Box>
     )
