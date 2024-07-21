@@ -11,7 +11,7 @@ import Box from "@mui/material/Box";
 import { displayAlert } from "../atomState";
 import { getForm, updateForm } from "../utils/apiCall";
 import { formatDateTime } from "../utils/format";
-import { Form } from "../gec-tripetto";
+import { FormAPI } from "../gec-tripetto";
 import manageError from "../utils/manageError";
 import FormInputs from "../components/FormInputs";
 import PlayTripetto from "../components/PlayTripetto";
@@ -49,7 +49,7 @@ const FormForm = () => {
     queryKey: ["getFormId", slug],
     queryFn: () => getForm(slug),
     select: (data) => {
-      if (data.data.data.length) return data.data.data[0] as Form
+      if (data.data.data.length) return data.data.data[0] as FormAPI
       else return null;
     },
     refetchOnWindowFocus: false,
@@ -144,7 +144,7 @@ const FormForm = () => {
               form={{
                 titre: form.titre,
                 description: form.description,
-                formulaire: JSON.stringify(form.formulaire),
+                formulaire: form.formulaire,
               }}
               onSubmit={onSubmit}
               onFinish={() => navigate(-1)}
