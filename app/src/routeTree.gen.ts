@@ -17,6 +17,7 @@ import { Route as LoginImport } from './routes/login'
 import { Route as CloseImport } from './routes/close'
 import { Route as MainLayoutImport } from './routes/_mainLayout'
 import { Route as MainLayoutIndexImport } from './routes/_mainLayout/index'
+import { Route as MainLayoutFormulairesImport } from './routes/_mainLayout/formulaires'
 import { Route as MainLayoutAdminLayoutImport } from './routes/_mainLayout/_adminLayout'
 import { Route as MainLayoutAdminLayoutAdminUtilisateursIndexImport } from './routes/_mainLayout/_adminLayout/admin/utilisateurs/index'
 import { Route as MainLayoutAdminLayoutAdminFormulairesIndexImport } from './routes/_mainLayout/_adminLayout/admin/formulaires/index'
@@ -53,6 +54,11 @@ const MainLayoutRoute = MainLayoutImport.update({
 
 const MainLayoutIndexRoute = MainLayoutIndexImport.update({
   path: '/',
+  getParentRoute: () => MainLayoutRoute,
+} as any)
+
+const MainLayoutFormulairesRoute = MainLayoutFormulairesImport.update({
+  path: '/formulaires',
   getParentRoute: () => MainLayoutRoute,
 } as any)
 
@@ -137,6 +143,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainLayoutAdminLayoutImport
       parentRoute: typeof MainLayoutImport
     }
+    '/_mainLayout/formulaires': {
+      id: '/_mainLayout/formulaires'
+      path: '/formulaires'
+      fullPath: '/formulaires'
+      preLoaderRoute: typeof MainLayoutFormulairesImport
+      parentRoute: typeof MainLayoutImport
+    }
     '/_mainLayout/': {
       id: '/_mainLayout/'
       path: '/'
@@ -193,6 +206,7 @@ export const routeTree = rootRoute.addChildren({
       MainLayoutAdminLayoutAdminFormulairesIndexRoute,
       MainLayoutAdminLayoutAdminUtilisateursIndexRoute,
     }),
+    MainLayoutFormulairesRoute,
     MainLayoutIndexRoute,
   }),
   CloseRoute,
@@ -220,6 +234,7 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "_mainLayout.tsx",
       "children": [
         "/_mainLayout/_adminLayout",
+        "/_mainLayout/formulaires",
         "/_mainLayout/"
       ]
     },
@@ -245,6 +260,10 @@ export const routeTree = rootRoute.addChildren({
         "/_mainLayout/_adminLayout/admin/formulaires/",
         "/_mainLayout/_adminLayout/admin/utilisateurs/"
       ]
+    },
+    "/_mainLayout/formulaires": {
+      "filePath": "_mainLayout/formulaires.tsx",
+      "parent": "/_mainLayout"
     },
     "/_mainLayout/": {
       "filePath": "_mainLayout/index.tsx",

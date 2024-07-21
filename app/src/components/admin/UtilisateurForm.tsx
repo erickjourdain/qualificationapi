@@ -5,9 +5,9 @@ import { useMutation } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
 import { Box, Button, FormControl, FormControlLabel, InputLabel, MenuItem, Select, Stack, Switch, TextField, Typography } from "@mui/material";
 import { Role, User } from "../../gec-tripetto";
-import { displayAlert } from "../../atomState";
 import { updateUser } from "../../utils/apiCall";
 import manageError from "../../utils/manageError";
+import { alertAtom } from "../../stores/mainStore";
 
 type IFormInputs = {
   prenom: string;
@@ -27,7 +27,7 @@ const UtilisateurForm = ({ user, onUpdated }: UpdateFormProps) => {
   const roles = ["ADMIN", "CREATOR", "USER", "READER"];
   
   // Chargement de l'état Atom des alertes
-  const setAlerte = useSetAtom(displayAlert);
+  const setAlerte = useSetAtom(alertAtom);
 
   // Définition des éléments pour la validation du formulaire
   const {

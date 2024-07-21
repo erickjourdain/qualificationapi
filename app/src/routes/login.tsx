@@ -1,19 +1,23 @@
-import { useState } from 'react';
-import { createFileRoute, Link, Navigate } from '@tanstack/react-router';
+import { useSetAtom } from 'jotai';
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from "react-hook-form";
 import { Avatar, Box, Button, Container, CssBaseline, TextField, Typography } from '@mui/material';
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { delAuthorisation, login, setAuthorisation } from '../utils/apiCall';
 import manageError from '../utils/manageError';
+import { tokenAtom } from '../stores/mainStore';
+import { useCallback } from 'react';
 
 export const Route = createFileRoute('/login')({
-  component: Login
+  component: Login,
 })
 
 function Login() {
-  // Etat local pour gestion de l'état des requêts de connexion
-  const [connected, setConnected] = useState<Boolean>(false);
+
+  const setToken = useSetAtom(tokenAtom);
+
+  const navigate = useNavigate();
 
   // Définition des éléments pour la validation du formulaire
   const {
@@ -32,28 +36,24 @@ function Login() {
   const { mutate, isPending } = useMutation({
     mutationFn: login,
     onSuccess: (response) => {
-      // sauvegarde du token dans le navigateur
-      localStorage.setItem("token", response.data.token);
       // intégration du token dans le Header des futures requêtes
       setAuthorisation(response.data.token);
-      setConnected(true);
+      // sauvegarde du token dans le navigateur
+      setToken(response.data.token);
+      navigate({ to: "/" });
     },
     onError: (error) => {
-      setConnected(false);
       setError("root", { type: "serveur", message: manageError(error) });
     },
   });
 
   // Appel de la requête de connexion à l'API
-  const onSubmit = async (data: { login: string, password: string }) => {
+  const onSubmit = useCallback(async (data: { login: string, password: string }) => {
     //suppression du token existant et de l'entête des requêtes
     localStorage.removeItem("token");
     delAuthorisation()
     mutate({ login: data.login, password: data.password });
-  };
-
-  // Naviguer vers Home page si utilisateur connecté
-  if (connected) return <Navigate to="/" />;
+  }, []);
 
   return (
     <Container component="main" maxWidth="xs">
@@ -72,7 +72,7 @@ function Login() {
         <Typography component="h1" variant="h5">
           Login
         </Typography>
-        <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate sx={{ mt: 1 }}>
+        <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate sx={{ mt: 1, width: "100%" }}>
           <TextField
             margin="normal"
             required

@@ -3,7 +3,6 @@ import { useSetAtom } from "jotai";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import Button from "@mui/material/Button";
-import Skeleton from "@mui/material/Skeleton";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -19,8 +18,13 @@ import manageError from "../../utils/manageError";
 import { displayAlert } from "../../atomState";
 import { FormAPI, FormsAPI } from "../../gec-tripetto";
 import { formatDateTime } from "../../utils/format";
+import Loading from "../Loading";
 
-const Formulaires = () => {
+interface FormulairesProps {
+  admin: boolean;
+}
+
+const Formulaires = ({ admin }: FormulairesProps) => {
 
   const itemsPerPage = 10;
   const navigate = useNavigate();
@@ -38,7 +42,7 @@ const Formulaires = () => {
   const { data, error, isError, isLoading } = useQuery({
     queryKey: ["getForms", page],
     queryFn: () => getForms(null, page + 1, ["id", "titre", "version", "createur", "updatedAt", "slug"], itemsPerPage),
-    select: (response) => response.data as FormsAPI, 
+    select: (response) => response.data as FormsAPI,
   })
 
   useEffect(() => {
@@ -58,26 +62,25 @@ const Formulaires = () => {
     setPage(newPage);
   };
 
-  if (isLoading)
-    return (
-      <>
-        <Skeleton variant="text" />
-        <Skeleton variant="text" />
-        <Skeleton variant="text" />
-        <Skeleton variant="text" />
-        <Skeleton variant="text" />
-      </>
-    );
+  // Sélcetion d'un formulaires
+  const handleSelect = (form: FormAPI) => {
+    if (admin) navigate({ to: `/admin/formulaires/${form.slug}` })
+  }
+
+  if (isLoading) return <Loading />;
 
   if (formulaires) return (
     <Paper>
       <Box px={3} py={2}>
         <Typography variant="h5" gutterBottom>
-          Formulaires
+          Liste des Formulaires disponibles
         </Typography>
-        <Button color="primary" variant="contained" startIcon={<AddCircleIcon />} onClick={() => navigate({ to: "/admin/formulaires/ajouter" })}>
-          Nouveau Formulaire
-        </Button>
+        {
+          admin &&
+          <Button color="primary" variant="contained" startIcon={<AddCircleIcon />} onClick={() => navigate({ to: "/admin/formulaires/ajouter" })}>
+            Nouveau Formulaire
+          </Button>
+        }
         <Table aria-label="table-users">
           <TableHead>
             <TableRow>
@@ -89,7 +92,7 @@ const Formulaires = () => {
           </TableHead>
           <TableBody>
             {formulaires.map((form) => (
-              <TableRow key={form.id} onDoubleClick={() => navigate({ to: `/admin/formulaires/${form.slug}` })} sx={{ cursor: "pointer"}}>
+              <TableRow key={form.id} onDoubleClick={() => handleSelect(form)} sx={{ cursor: "pointer" }}>
                 <TableCell>{form.titre}</TableCell>
                 <TableCell>{form.version}</TableCell>
                 <TableCell>{formatDateTime(form.updatedAt)}</TableCell>

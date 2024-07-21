@@ -3,7 +3,6 @@ import { AnswerAPI } from "./types/answerAPI";
 import { AnswersAPI } from "./types/answersAPI";
 import { AnwserUpdate } from "./types/answerUpdate";
 import { ChildrenProps } from "./types/childrenProps";
-import { Form } from "./types/form";
 import { FormAPI } from "./types/formAPI";
 import { Answer, FormAnswers } from "./types/formAnswers";
 import { FormCreation } from "./types/formCreation";
@@ -26,7 +25,6 @@ export {
   AnswersAPI,
   AnwserUpdate,
   ChildrenProps,
-  Form,
   FormAPI,
   Answer, FormAnswers,
   FormCreation,

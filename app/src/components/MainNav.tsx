@@ -1,12 +1,12 @@
 import AppBar from "@mui/material/AppBar";
+import { useNavigate } from "@tanstack/react-router";
 import IconButton from "@mui/material/IconButton";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import MenuIcon from "@mui/icons-material/Menu";
-import Settings from "./Settings";
-import { useNavigate } from "@tanstack/react-router";
+import Selection from "./mainnav/Selection";
 
-const ApplicationMainNav = () => {
+const MainNav = () => {
 
   const navigate = useNavigate();
 
@@ -26,10 +26,10 @@ const ApplicationMainNav = () => {
       <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
         Qualification
       </Typography>
-      <Settings />
+      <Selection />
     </Toolbar>
   </AppBar>
   )
 }
 
-export default ApplicationMainNav;
+export default MainNav;

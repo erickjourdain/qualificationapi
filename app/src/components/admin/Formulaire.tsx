@@ -1,16 +1,17 @@
 import { isEmpty } from "lodash";
 import { useEffect, useState } from "react";
 import { useSetAtom } from "jotai";
+import { useNavigate, useParams } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { displayAlert } from "../../atomState";
-import { getForm, updateForm } from "../../utils/apiCall";
-import { formatDateTime } from "../../utils/format";
-import { Form } from "../../gec-tripetto";
-import manageError from "../../utils/manageError";
+import { Alert, Box, Paper, Typography } from "@mui/material";
 import PlayTripetto from "../PlayTripetto";
 import FormulaireForm from "./FormulaireForm";
-import { useNavigate, useParams } from "@tanstack/react-router";
-import { Alert, Box, Paper, Skeleton, Typography } from "@mui/material";
+import Loading from "../Loading";
+import { getForm, updateForm } from "../../utils/apiCall";
+import { formatDateTime } from "../../utils/format";
+import { FormAPI } from "../../gec-tripetto";
+import manageError from "../../utils/manageError";
+import { alertAtom } from "../../stores/mainStore";
 
 // définition du type pour la mise à jour des données
 type UpdateFormValues = {
@@ -22,9 +23,9 @@ type UpdateFormValues = {
 
 const Formulaire = () => {
   const navigate = useNavigate();
+
   // Chargement de l'état Atom des alertes
-  
-  const setAlerte = useSetAtom(displayAlert);
+    const setAlerte = useSetAtom(alertAtom);
 
   // Récupération des données de la route
   const { formSlug } = useParams({ from: "/_mainLayout/_adminLayout/admin/formulaires/$formSlug" });
@@ -46,7 +47,7 @@ const Formulaire = () => {
     queryKey: ["getFormId", formSlug],
     queryFn: () => getForm(formSlug),
     select: (data) => {
-      if (data.data.data.length) return data.data.data[0] as Form
+      if (data.data.data.length) return data.data.data[0] as FormAPI
       else return null;
     },
     refetchOnWindowFocus: false,
@@ -102,16 +103,7 @@ const Formulaire = () => {
     }
   };
 
-  if (isLoading)
-    return (
-      <>
-        <Skeleton variant="text" />
-        <Skeleton variant="text" />
-        <Skeleton variant="text" />
-        <Skeleton variant="text" />
-        <Skeleton variant="text" />
-      </>
-    );
+  if (isLoading) return <Loading />;
 
   if (form === null) return (
     <Paper
@@ -141,7 +133,7 @@ const Formulaire = () => {
               form={{
                 titre: form.titre,
                 description: form.description,
-                formulaire: JSON.stringify(form.formulaire),
+                formulaire: form.formulaire,
               }}
               onSubmit={onSubmit}
               onFinish={() => navigate({ to: "/admin/formulaires" })}

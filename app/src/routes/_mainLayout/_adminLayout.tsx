@@ -1,25 +1,40 @@
-import { createFileRoute, Outlet, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, Outlet, redirect, useNavigate } from '@tanstack/react-router';
 import { Box, Divider, Drawer, List, ListItem, ListItemIcon, ListItemText, ListSubheader, Toolbar } from '@mui/material'
 import FeedIcon from "@mui/icons-material/Feed";
 import PersonIcon from "@mui/icons-material/Person";
+import { useAtomValue } from 'jotai';
+import { adminAtom } from '../../stores/mainStore';
 
 export const Route = createFileRoute('/_mainLayout/_adminLayout')({
   component: AdminLayout,
+  beforeLoad: ({ context }) => {
+    console.log(context);
+    if (!context.auth.isCreator) {
+      throw redirect({to: "/"});
+    }
+  }
 })
 
 function AdminLayout() {
+  // Rôle de l'utisateur connecté
+  const isAdmin = useAtomValue(adminAtom);
+
+  // Largeur de la barre latérale
   const drawerWidth = 200;
 
+  // Hook de navigation
   const navigate = useNavigate();
 
-  const formulaires = () => {
+  // Navigation vers la gestion des formulaires
+  const handleFormulairesClick = () => {
     navigate({ to: "/admin/formulaires" });
   }
 
-  const utilisateurs = () => {
+  // Navigation vers la gestion des utilisateurs
+  const handleUtilisateursClick = () => {
     navigate({ to: "/admin/utilisateurs" });
   }
-  
+
   return (
     <>
       <Drawer
@@ -34,22 +49,24 @@ function AdminLayout() {
         <Box sx={{ overflow: "auto", cursor: "pointer" }}>
           <List subheader={<ListSubheader>Administration</ListSubheader>}>
             <Divider />
-            <ListItem key="form" onClick={formulaires}>
+            <ListItem key="form" onClick={handleFormulairesClick}>
               <ListItemIcon>
                 <FeedIcon />
               </ListItemIcon>
               <ListItemText primary="Formulaires" />
             </ListItem>
-            <ListItem key="user" onClick={utilisateurs}>
-              <ListItemIcon>
-                <PersonIcon />
-              </ListItemIcon>
-              <ListItemText primary="Utilisateurs" />
-            </ListItem>
+            {isAdmin &&
+              <ListItem key="user" onClick={handleUtilisateursClick}>
+                <ListItemIcon>
+                  <PersonIcon />
+                </ListItemIcon>
+                <ListItemText primary="Utilisateurs" />
+              </ListItem>
+            }
           </List>
         </Box>
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3, maxWidth: "xl", ml: `${drawerWidth}px` }}>
+      <Box component="main" sx={{ flexGrow: 1, maxWidth: "xl", ml: `${drawerWidth}px` }}>
         <Outlet />
       </Box>
     </>

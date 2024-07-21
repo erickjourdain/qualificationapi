@@ -1,17 +1,21 @@
-import { ThemeProvider, createTheme } from "@mui/material";
-import { createRouter, RouterProvider } from '@tanstack/react-router'
+import { useMemo } from "react";
+import { useAtomValue } from "jotai";
+import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
+import { createRouter, RouterProvider } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { routeTree } from "./routeTree.gen";
-import { setAuthorisation } from "./utils/apiCall";
+import Alerte from "./components/Alerte";
+import { modeAtom } from "./stores/mainStore";
+import { AuthProvider, useAuth } from "./auth";
 
 // création d'un instance de QueryClient
 const queryClient = new QueryClient({});
 
-const defaultTheme = createTheme();
-
+// création du router
 const router = createRouter({
   routeTree,
   defaultPreload: 'intent',
+  context: { auth: {isAdmin: false, isCreator: false} }
 });
 
 declare module '@tanstack/react-router' {
@@ -22,18 +26,34 @@ declare module '@tanstack/react-router' {
 }
 
 function App() {
-  // Chargement du token de connexion à l'API
-  // récupération du token stocké dans le navigateur
-  const token = localStorage.getItem("token");
-  if (token) setAuthorisation(token);
+
+  // Chargement de l'état Atom du theme
+  const mode = useAtomValue(modeAtom);
+
+  const auth = useAuth();
+
+  // Définition du thème
+  const theme = useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode: (mode === "dark") ? "dark" : "light",
+        },
+      }),
+    [mode],
+  );
 
   return (
-    <ThemeProvider theme={defaultTheme}>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
       <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
+        <AuthProvider>
+          <RouterProvider router={router} context={{ auth }}/>
+        </AuthProvider>
+        <Alerte />
       </QueryClientProvider>
     </ThemeProvider>
   );
 }
 
-export default App
+export default App;

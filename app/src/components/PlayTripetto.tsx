@@ -11,8 +11,8 @@ import translationClassic from "@tripetto/runner-classic/runner/translations/fr.
 import translationChat from "@tripetto/runner-chat/runner/translations/fr.json";
 import translationAutoScroll from "@tripetto/runner-autoscroll/runner/translations/fr.json";
 import { ILocale, TTranslation } from "@tripetto/runner/module/l10n";
-import { selectedRunner } from "../atomState";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import { runnerAtom } from "../stores/mainStore";
 
 type TripettoProps = {
   open: boolean;
@@ -26,7 +26,7 @@ const PlayTripetto = ({ open, onClose, form, data, onSubmit }: TripettoProps) =>
   let runner: JSX.Element;
 
   // Chargement de l'état Atom du runner
-  const [tripettoRunner] = useAtom(selectedRunner);
+  const [tripettoRunner] = useAtom(runnerAtom);
 
   const onImport = (instance: Instance) => {
     const values: Import.IFieldByName[] = [];

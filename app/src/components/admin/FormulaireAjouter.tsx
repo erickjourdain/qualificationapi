@@ -5,17 +5,17 @@ import { useNavigate } from "@tanstack/react-router";
 import { useSetAtom } from "jotai";
 import { Box, Paper, Typography } from "@mui/material";
 import { FormCreation } from "../../gec-tripetto";
-import { displayAlert } from "../../atomState";
 import { createForm } from "../../utils/apiCall";
 import manageError from "../../utils/manageError";
 import PlayTripetto from "../PlayTripetto";
 import FormulaireForm from "./FormulaireForm";
+import { alertAtom } from "../../stores/mainStore";
 
 const FormulaireAjouter = () => {
   const navigate = useNavigate();
   
   // Chargement de l'état Atom des alertes
-  const setAlerte = useSetAtom(displayAlert);
+  const setAlerte = useSetAtom(alertAtom);
 
   // définition de l'état du composant pour gestion de la MAJ des données
   // du formulaire Tripetto
