@@ -2,22 +2,16 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useSetAtom } from "jotai";
-import Skeleton from "@mui/material/Skeleton";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableRow from "@mui/material/TableRow";
-import TableCell from "@mui/material/TableCell";
-import TablePagination from "@mui/material/TablePagination";
-import Paper from "@mui/material/Paper";
-import Box from "@mui/material/Box";
-import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import { Box, Paper, Table, TableBody, TableCell, TablePagination, TableRow } from "@mui/material";
+import CheckBoxIcon from "@mui/icons-material/CheckBox"
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import Typography from "@mui/material/Typography";
 import TableHead from "@mui/material/TableHead";
-import { User, UsersAPI } from "../../gec-tripetto";
-import { displayAlert } from "../../atomState";
-import { getUsers } from "../../utils/apiCall";
-import manageError from "../../utils/manageError";
+import { User, UsersAPI } from "@/gec-tripetto";
+import { displayAlert } from "@/atomState";
+import { getUsers } from "@/utils/apiCall";
+import manageError from "@/utils/manageError";
+import Loading from "../Loading";
 
 const Utilisateurs = () => {
 
@@ -62,16 +56,7 @@ const Utilisateurs = () => {
     return (val) ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />
   }
 
-  if (isLoading)
-    return (
-      <>
-        <Skeleton variant="text" />
-        <Skeleton variant="text" />
-        <Skeleton variant="text" />
-        <Skeleton variant="text" />
-        <Skeleton variant="text" />
-      </>
-    );
+  if (isLoading) return <Loading />
 
   if (users)
     return (

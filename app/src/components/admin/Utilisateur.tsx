@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useParams } from "@tanstack/react-router";
 import { useSetAtom, useAtomValue } from "jotai";
 import { sfEqual } from "spring-filter-query-builder";
 import { Alert, Box, Button, Paper, Skeleton, TextField, Typography } from "@mui/material";
-import UtilisateurForm from "./UtilisateurForm";
-import { User } from "../../gec-tripetto";
-import { displayAlert, loggedUser } from "../../atomState";
-import { getResetPwdToken, getUsers } from "../../utils/apiCall";
-import manageError from "../../utils/manageError";
-import { useParams } from "@tanstack/react-router";
+import { User } from "@/gec-tripetto";
+import { displayAlert, loggedUser } from "@/atomState";
+import { getResetPwdToken, getUsers } from "@/utils/apiCall";
+import manageError from "@/utils/manageError";
+import UtilisateurForm from "@components/admin/UtilisateurForm";
 
 const Utilisateur = () => {
   // Chargement de l'état Atom des alertes

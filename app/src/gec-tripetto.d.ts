@@ -18,6 +18,7 @@ import { ProduitAPI } from "./types/produitAPI";
 import { ProduitsAPI } from "./types/produitsAPI";
 import { HeaderCreation } from "./types/headerCreation";
 import { Statut } from "./types/statuts";
+import { AppRouterContext } from "./types/appRouterContext";
 
 export {
   Info,
@@ -39,6 +40,7 @@ export {
   ProduitAPI,
   ProduitsAPI,
   HeaderCreation,
-  Statut
+  Statut,
+  AppRouterContext
 }
 

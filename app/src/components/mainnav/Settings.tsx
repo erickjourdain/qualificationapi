@@ -3,7 +3,7 @@ import { useAtomValue } from "jotai";
 import { useNavigate } from "@tanstack/react-router";
 import { IconButton, Tooltip } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
-import { creatorAtom} from "../../stores/mainStore";
+import { creatorAtom} from "@/stores/mainStore";
 
 const Settings = () => {
   // Chargement de l'état du rôle Créateur de l'utilisateur

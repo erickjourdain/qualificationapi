@@ -1,18 +1,12 @@
-import { createFileRoute, Outlet, redirect, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, Outlet, useNavigate } from '@tanstack/react-router';
+import { useAtomValue } from 'jotai';
 import { Box, Divider, Drawer, List, ListItem, ListItemIcon, ListItemText, ListSubheader, Toolbar } from '@mui/material'
 import FeedIcon from "@mui/icons-material/Feed";
 import PersonIcon from "@mui/icons-material/Person";
-import { useAtomValue } from 'jotai';
-import { adminAtom } from '../../stores/mainStore';
+import { adminAtom } from '@/stores/mainStore';
 
 export const Route = createFileRoute('/_mainLayout/_adminLayout')({
   component: AdminLayout,
-  beforeLoad: ({ context }) => {
-    console.log(context);
-    if (!context.auth.isCreator) {
-      throw redirect({to: "/"});
-    }
-  }
 })
 
 function AdminLayout() {

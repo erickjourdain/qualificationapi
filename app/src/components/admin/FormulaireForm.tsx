@@ -5,7 +5,7 @@ import { Box, Button, FormControlLabel, Stack, Switch, TextField, Typography } f
 import QuizIcon from "@mui/icons-material/Quiz";
 import ClearIcon from "@mui/icons-material/Clear";
 import ContentPasteGoIcon from "@mui/icons-material/ContentPasteGo";
-import TripettoSchema from "../../types/tripettoSchema.json";
+import TripettoSchema from "@/types/tripettoSchema.json";
 
 type FormulaireFormProps = {
   form: {

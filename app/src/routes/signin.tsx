@@ -3,8 +3,9 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
 import { Alert, Avatar, Box, Button, Container, CssBaseline, TextField, Typography } from '@mui/material';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';import { createUser, delAuthorisation } from '../utils/apiCall';
-import manageError from '../utils/manageError';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { createUser, delAuthorisation } from '@/utils/apiCall';
+import manageError from '@/utils/manageError';
 
 export const Route = createFileRoute('/signin')({
   component: Signin,

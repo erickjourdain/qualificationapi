@@ -1,19 +1,26 @@
 import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/router-devtools";
-import { AuthContext } from "../auth";
+import React, { Suspense } from "react";
+import { AppRouterContext } from "@/gec-tripetto";
 
-interface RouterContext {
-  auth: AuthContext
-}
+const TanStackRouterDevtools =
+  import.meta.env.MODE === "production"
+    ? () => null
+    : React.lazy(() =>
+      import("@tanstack/router-devtools").then((res) => ({
+        default: res.TanStackRouterDevtools,
+      })),
+    );
 
-export const Route = createRootRouteWithContext<RouterContext>()({
+export const Route = createRootRouteWithContext<AppRouterContext>()({
   component: () => (
     <>
       <Outlet />
-      <TanStackRouterDevtools position="bottom-right" initialIsOpen={false} />
+      <Suspense>
+        <TanStackRouterDevtools position="bottom-right" initialIsOpen={false} />
+      </Suspense>
     </>
   ),
   notFoundComponent: () => {
     return <p>This is the notFoundComponent configured on root route</p>
-  },
+  }
 });

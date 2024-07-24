@@ -4,10 +4,10 @@ import { Controller, useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
 import { Box, Button, FormControl, FormControlLabel, InputLabel, MenuItem, Select, Stack, Switch, TextField, Typography } from "@mui/material";
-import { Role, User } from "../../gec-tripetto";
-import { updateUser } from "../../utils/apiCall";
-import manageError from "../../utils/manageError";
-import { alertAtom } from "../../stores/mainStore";
+import { Role, User } from "@/gec-tripetto";
+import { updateUser } from "@/utils/apiCall";
+import manageError from "@/utils/manageError";
+import { alertAtom } from "@/stores/mainStore";
 
 type IFormInputs = {
   prenom: string;

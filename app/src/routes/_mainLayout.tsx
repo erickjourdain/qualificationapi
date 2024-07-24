@@ -1,8 +1,8 @@
 import { useAtom } from 'jotai';
-import { Box, Container, Toolbar, Typography } from '@mui/material';
 import { createFileRoute, Navigate, Outlet } from '@tanstack/react-router';
-import MainNav from '../components/MainNav';
-import { userAtom } from '../stores/mainStore';
+import { Box, Container, Toolbar, Typography } from '@mui/material';
+import MainNav from '@components/MainNav';
+import { userAtom } from '@/stores/mainStore';
 
 export const Route = createFileRoute('/_mainLayout')({
   component: MainLayout,

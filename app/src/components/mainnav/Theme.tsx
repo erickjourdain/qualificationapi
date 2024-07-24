@@ -4,7 +4,7 @@ import { IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Tooltip } from 
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import CkeckIcon from "@mui/icons-material/Check";
-import { modeAtom } from "../../stores/mainStore";
+import { modeAtom } from "@/stores/mainStore";
 
 interface Theme {
   mode: "light" | "dark";

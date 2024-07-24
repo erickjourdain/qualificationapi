@@ -1,9 +1,9 @@
 import { Box } from "@mui/material";
-import Formulaires from "./Formulaires";
-import Theme from "./Theme";
-import Settings from "./Settings";
-import Quitter from "./Quitter";
-import Runner from "./Runner";
+import Formulaires from "@components/mainnav/Formulaires";
+import Theme from "@components/mainnav/Theme";
+import Settings from "@components/mainnav/Settings";
+import Quitter from "@components/mainnav/Quitter";
+import Runner from "@components/mainnav/Runner";
 
 const Selection = () => {
 

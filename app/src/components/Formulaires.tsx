@@ -1,29 +1,22 @@
 import { useNavigate } from "@tanstack/react-router";
-import { useAtomValue } from "jotai";
-import { Box, Button, Paper, TablePagination, Typography } from "@mui/material";
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import { Route } from "@routes/_mainLayout/_adminLayout/admin/formulaires"
+import { Box, Paper, TablePagination, Typography } from "@mui/material";
+import TableFormulaires from "@components/TableFormulaires";
+import { Route } from "@routes/_mainLayout/formulaires";
 import { FormAPI } from "@/gec-tripetto";
-import { creatorAtom } from "@/stores/mainStore";
-import TableFormulaires from "@components/TableFormulaires"
 
 const Formulaires = () => {
   // Nombre de lignes par page du tableau
   const itemsPerPage = 10;
 
-  // Hook sur l'état du rôle de l'utilisateur
-  const createur = useAtomValue(creatorAtom);
   // Hook de navigation
   const navigate = useNavigate();
   // Hook des paramètres de recherche de la page
   const { page } = Route.useSearch();
   // Hook des données du loader de la page
-  const formulaires = Route.useLoaderData()
+  const formulaires = Route.useLoaderData();
 
   // Sélcetion d'un formulaires
-  const handleSelect = (form: FormAPI) => {
-    if (createur) navigate({ to: `/admin/formulaires/${form.slug}` })
-  }
+  const handleSelect = (_form: FormAPI) => {} 
 
   return (
     <Paper>
@@ -31,9 +24,6 @@ const Formulaires = () => {
         <Typography variant="h5" gutterBottom>
           Liste des Formulaires disponibles
         </Typography>
-          <Button color="primary" variant="contained" startIcon={<AddCircleIcon />} onClick={() => navigate({ to: "/admin/formulaires/ajouter" })}>
-            Nouveau Formulaire
-          </Button>
         <TableFormulaires formulaires={formulaires.data} onSelect={handleSelect} />
         <TablePagination
           rowsPerPageOptions={[itemsPerPage]}

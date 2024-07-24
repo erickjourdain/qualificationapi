@@ -1,6 +1,6 @@
 import { useAtom } from "jotai";
-import { alertAtom } from "../stores/mainStore";
 import { Alert, Snackbar } from "@mui/material";
+import { alertAtom } from "@/stores/mainStore";
 
 const Alerte = () => {
 

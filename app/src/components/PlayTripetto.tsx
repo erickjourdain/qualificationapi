@@ -12,7 +12,7 @@ import translationChat from "@tripetto/runner-chat/runner/translations/fr.json";
 import translationAutoScroll from "@tripetto/runner-autoscroll/runner/translations/fr.json";
 import { ILocale, TTranslation } from "@tripetto/runner/module/l10n";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
-import { runnerAtom } from "../stores/mainStore";
+import { runnerAtom } from "@/stores/mainStore";
 
 type TripettoProps = {
   open: boolean;

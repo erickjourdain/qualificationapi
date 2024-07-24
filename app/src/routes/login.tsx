@@ -1,13 +1,13 @@
-import { useSetAtom } from 'jotai';
+import { useState, useEffect, useCallback } from 'react';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from "react-hook-form";
 import { Avatar, Box, Button, Container, CssBaseline, TextField, Typography } from '@mui/material';
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import { delAuthorisation, login, setAuthorisation } from '../utils/apiCall';
-import manageError from '../utils/manageError';
-import { tokenAtom } from '../stores/mainStore';
-import { useCallback } from 'react';
+import { delAuthorisation, login, setAuthorisation } from '@/utils/apiCall';
+import manageError from '@/utils/manageError';
+import { modeAtom, tokenAtom } from '@/stores/mainStore';
 
 export const Route = createFileRoute('/login')({
   component: Login,
@@ -15,7 +15,9 @@ export const Route = createFileRoute('/login')({
 
 function Login() {
 
+  const mode = useAtomValue(modeAtom);
   const setToken = useSetAtom(tokenAtom);
+  const [color, setColor] = useState<string>("white");
 
   const navigate = useNavigate();
 
@@ -54,6 +56,11 @@ function Login() {
     delAuthorisation()
     mutate({ login: data.login, password: data.password });
   }, []);
+
+  // Mise à jour couleur du lien
+  useEffect(() => {
+    (mode === "light") ? setColor("#000000DE") : setColor("white");
+  }, [mode]);
 
   return (
     <Container component="main" maxWidth="xs">
@@ -105,11 +112,11 @@ function Login() {
           <Typography variant="inherit" color="error">
             {errors.root?.message}
           </Typography>
-          <Link to="/signin">Créer un compte</Link>
+          <Link to="/signin" style={{ color, textDecoration: "underligne" }} >Créer un compte</Link>
           <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} disabled={isPending}>
             {!isPending ? "Login" : "Loading ..."}
           </Button>
-          <Link to="/resetpwd">Mot de passe oublié</Link>
+          <Link to="/resetpwd" style={{ color, textDecoration: "underligne" }} >Mot de passe oublié</Link>
         </Box>
       </Box>
     </Container>

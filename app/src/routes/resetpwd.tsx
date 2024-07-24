@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Alert, Avatar, Box, Button, Container, CssBaseline, TextField, Typography } from '@mui/material';
 import LockResetIcon from '@mui/icons-material/LockReset';
-import { resetPassword } from '../utils/apiCall';
-import manageError from '../utils/manageError';
+import { resetPassword } from '@/utils/apiCall';
+import manageError from '@/utils/manageError';
 
 export const Route = createFileRoute('/resetpwd')({
   component: ResetPwd,

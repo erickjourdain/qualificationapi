@@ -3,7 +3,7 @@ import { useAtom } from "jotai";
 import { IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Tooltip } from "@mui/material";
 import SmartDisplayIcon from '@mui/icons-material/SmartDisplay';
 import CkeckIcon from "@mui/icons-material/Check";
-import { runnerAtom } from "../../stores/mainStore";
+import { runnerAtom } from "@/stores/mainStore";
 
 const runners = ["Classic", "Autoscroll", "Chat"];
 

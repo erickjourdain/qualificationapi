@@ -4,14 +4,14 @@ import { useSetAtom } from "jotai";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Alert, Box, Paper, Typography } from "@mui/material";
-import PlayTripetto from "../PlayTripetto";
-import FormulaireForm from "./FormulaireForm";
-import Loading from "../Loading";
-import { getForm, updateForm } from "../../utils/apiCall";
-import { formatDateTime } from "../../utils/format";
-import { FormAPI } from "../../gec-tripetto";
-import manageError from "../../utils/manageError";
-import { alertAtom } from "../../stores/mainStore";
+import PlayTripetto from "@components/PlayTripetto";
+import FormulaireForm from "@components/admin/FormulaireForm";
+import Loading from "@components/Loading";
+import { getForm, updateForm } from "@/utils/apiCall";
+import { formatDateTime } from "@/utils/format";
+import { FormAPI } from "@/gec-tripetto";
+import manageError from "@/utils/manageError";
+import { alertAtom } from "@/stores/mainStore";
 
 // définition du type pour la mise à jour des données
 type UpdateFormValues = {

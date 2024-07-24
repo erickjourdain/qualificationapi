@@ -4,6 +4,7 @@ import { viteStaticCopy } from "vite-plugin-static-copy";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import jotaiDebugLabel from 'jotai/babel/plugin-debug-label'
 import jotaiReactRefresh from 'jotai/babel/plugin-react-refresh'
+import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -11,6 +12,13 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
 
   return {
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "./src"),
+        "@components": path.resolve(__dirname, "./src/components"),
+        "@routes": path.resolve(__dirname, "./src/routes"),
+      },
+    },
     plugins: [
       TanStackRouterVite(),
       react({ babel: { plugins: [jotaiDebugLabel, jotaiReactRefresh] } }),

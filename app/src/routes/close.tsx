@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { useSetAtom } from 'jotai';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
-import { alertAtom, tokenAtom } from '../stores/mainStore';
-import { delAuthorisation, logout } from '../utils/apiCall';
-import manageError from '../utils/manageError';
 import { Box, Button, Container, CssBaseline, Typography } from '@mui/material';
+import { alertAtom, tokenAtom } from '@/stores/mainStore';
+import { delAuthorisation, logout } from '@/utils/apiCall';
+import manageError from '@/utils/manageError';
 
 export const Route = createFileRoute('/close')({
   component: CloseApp,

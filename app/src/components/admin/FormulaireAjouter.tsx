@@ -4,12 +4,12 @@ import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useSetAtom } from "jotai";
 import { Box, Paper, Typography } from "@mui/material";
-import { FormCreation } from "../../gec-tripetto";
-import { createForm } from "../../utils/apiCall";
-import manageError from "../../utils/manageError";
-import PlayTripetto from "../PlayTripetto";
-import FormulaireForm from "./FormulaireForm";
-import { alertAtom } from "../../stores/mainStore";
+import { FormCreation } from "@/gec-tripetto";
+import { createForm } from "@/utils/apiCall";
+import manageError from "@/utils/manageError";
+import { alertAtom } from "@/stores/mainStore";
+import PlayTripetto from "@components/PlayTripetto";
+import FormulaireForm from "@components/admin/FormulaireForm";
 
 const FormulaireAjouter = () => {
   const navigate = useNavigate();
