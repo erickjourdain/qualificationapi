@@ -1,18 +1,17 @@
-import { useNavigate } from "@tanstack/react-router";
-import { useAtomValue } from "jotai";
+import { useNavigate, useRouteContext } from "@tanstack/react-router";
+import { includes } from "lodash";
 import { Box, Button, Paper, TablePagination, Typography } from "@mui/material";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import { Route } from "@routes/_mainLayout/_adminLayout/admin/formulaires"
+import { Route } from "@/routes/_mainLayout/_auth/_adminLayout/admin/formulaires"
 import { FormAPI } from "@/gec-tripetto";
-import { creatorAtom } from "@/stores/mainStore";
 import TableFormulaires from "@components/TableFormulaires"
 
 const Formulaires = () => {
   // Nombre de lignes par page du tableau
   const itemsPerPage = 10;
 
-  // Hook sur l'état du rôle de l'utilisateur
-  const createur = useAtomValue(creatorAtom);
+  // Hook de récupération du context de la route
+  const context = useRouteContext({ from: "/_mainLayout/_auth" });
   // Hook de navigation
   const navigate = useNavigate();
   // Hook des paramètres de recherche de la page
@@ -20,9 +19,10 @@ const Formulaires = () => {
   // Hook des données du loader de la page
   const formulaires = Route.useLoaderData()
 
-  // Sélcetion d'un formulaires
+  // Sélection d'un formulaires
   const handleSelect = (form: FormAPI) => {
-    if (createur) navigate({ to: `/admin/formulaires/${form.slug}` })
+    if (context.user && includes(["ADMIN", "CREATOR"], context.user.role))  
+      navigate({ to: `/admin/formulaires/${form.slug}` })
   }
 
   return (

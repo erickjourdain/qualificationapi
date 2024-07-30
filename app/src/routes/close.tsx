@@ -3,7 +3,7 @@ import { useSetAtom } from 'jotai';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { Box, Button, Container, CssBaseline, Typography } from '@mui/material';
-import { alertAtom, tokenAtom } from '@/stores/mainStore';
+import { alertAtom } from '@/stores/mainStore';
 import { delAuthorisation, logout } from '@/utils/apiCall';
 import manageError from '@/utils/manageError';
 
@@ -19,7 +19,7 @@ function CloseApp () {
 
   // Chargement de l'état Atom des alertes et du token
   const setAlerte = useSetAtom(alertAtom);
-  const setToken = useSetAtom(tokenAtom);
+  // const setToken = useSetAtom(tokenAtom);
 
   const { error, isError, isSuccess } = useQuery({
     queryKey: ["logout"],
@@ -31,7 +31,8 @@ function CloseApp () {
   useEffect(() => {
     if (isSuccess) {
       delAuthorisation();
-      setToken(null);
+      // setToken(null);
+      localStorage.removeItem("token");
       navigate({ to: "/login" });
     }
   }, [isSuccess]);

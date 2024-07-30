@@ -1,7 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { Box, Paper, TablePagination, Typography } from "@mui/material";
 import TableFormulaires from "@components/TableFormulaires";
-import { Route } from "@routes/_mainLayout/formulaires";
+import { Route } from "@/routes/_mainLayout/_auth/formulaires";
 import { FormAPI } from "@/gec-tripetto";
 
 const Formulaires = () => {

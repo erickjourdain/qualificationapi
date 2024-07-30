@@ -1,11 +1,12 @@
-import AppBar from "@mui/material/AppBar";
 import { useNavigate } from "@tanstack/react-router";
 import { IconButton, Toolbar, Typography } from "@mui/material";
+import AppBar from "@mui/material/AppBar";
 import MenuIcon from "@mui/icons-material/Menu";
 import Selection from "@components/mainnav/Selection";
 
 const MainNav = () => {
 
+  // Chargement Hook de navigation
   const navigate = useNavigate();
 
   return (

@@ -11,7 +11,7 @@ const formSearchSchema = z.object({
 
 type FormSearchSchema = z.infer<typeof formSearchSchema>
 
-export const Route = createFileRoute('/_mainLayout/formulaires')({
+export const Route = createFileRoute('/_mainLayout/_auth/formulaires')({
   component: () => <Formulaires />,
   validateSearch: (search: Record<string, unknown>): FormSearchSchema => formSearchSchema.parse(search),
   loaderDeps: ({ search }) => ({ page: search.page || 1, search: search.search || null }),

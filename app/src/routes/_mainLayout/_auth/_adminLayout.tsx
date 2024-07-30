@@ -1,17 +1,20 @@
-import { createFileRoute, Outlet, useNavigate } from '@tanstack/react-router';
-import { useAtomValue } from 'jotai';
+import { createFileRoute, Outlet, redirect, useNavigate, useRouteContext } from '@tanstack/react-router';
 import { Box, Divider, Drawer, List, ListItem, ListItemIcon, ListItemText, ListSubheader, Toolbar } from '@mui/material'
 import FeedIcon from "@mui/icons-material/Feed";
 import PersonIcon from "@mui/icons-material/Person";
-import { adminAtom } from '@/stores/mainStore';
+import { includes } from 'lodash';
 
-export const Route = createFileRoute('/_mainLayout/_adminLayout')({
+export const Route = createFileRoute('/_mainLayout/_auth/_adminLayout')({
+  beforeLoad: ({ context }) => {
+    if (context.user === null || !includes(["ADMIN", "CREATOR"], context.user.role)) 
+      throw redirect({ to: "/login" });
+  },
   component: AdminLayout,
 })
 
 function AdminLayout() {
-  // Rôle de l'utisateur connecté
-  const isAdmin = useAtomValue(adminAtom);
+
+  const context = useRouteContext({ from: "/_mainLayout/_auth/_adminLayout" });
 
   // Largeur de la barre latérale
   const drawerWidth = 200;
@@ -49,7 +52,7 @@ function AdminLayout() {
               </ListItemIcon>
               <ListItemText primary="Formulaires" />
             </ListItem>
-            {isAdmin &&
+            {context.user && context.user.role === "ADMIN" &&
               <ListItem key="user" onClick={handleUtilisateursClick}>
                 <ListItemIcon>
                   <PersonIcon />

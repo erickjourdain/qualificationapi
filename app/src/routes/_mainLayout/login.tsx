@@ -4,14 +4,17 @@ import { useMutation } from '@tanstack/react-query';
 import { useForm } from "react-hook-form";
 import { Avatar, Box, Button, Container, CssBaseline, Link, TextField, Typography } from '@mui/material';
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import { delAuthorisation, login, setAuthorisation } from '@/utils/apiCall';
+import { delAuthorisation, login } from '@/utils/apiCall';
 import manageError from '@/utils/manageError';
+//import { tokenAtom } from '@/stores/mainStore';
 
-export const Route = createFileRoute('/login')({
+export const Route = createFileRoute('/_mainLayout/login')({
   component: Login,
 })
 
 function Login() {
+
+//  const setToken = useSetAtom(tokenAtom);
 
   const navigate = useNavigate();
 
@@ -33,8 +36,9 @@ function Login() {
     mutationFn: login,
     onSuccess: (response) => {
       // intégration du token dans le Header des futures requêtes
-      setAuthorisation(response.data.token);
+      // setAuthorisation(response.data.token);
       // sauvegarde du token dans le navigateur
+      //setToken(response.data.token);
       localStorage.setItem("token", response.data.token);
       navigate({ to: "/" });
     },

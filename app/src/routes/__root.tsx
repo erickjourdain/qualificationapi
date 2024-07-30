@@ -19,8 +19,5 @@ export const Route = createRootRouteWithContext<AppRouterContext>()({
         <TanStackRouterDevtools position="bottom-right" initialIsOpen={false} />
       </Suspense>
     </>
-  ),
-  notFoundComponent: () => {
-    return <p>This is the notFoundComponent configured on root route</p>
-  }
+  )
 });
