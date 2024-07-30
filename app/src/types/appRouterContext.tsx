@@ -1,7 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
-import { User } from "./user";
+import { AppAuthContext } from "./appAuthContext";
 
 export interface AppRouterContext {
   queryClient: QueryClient,
-  user: User | null,
+  auth: AppAuthContext,
 }

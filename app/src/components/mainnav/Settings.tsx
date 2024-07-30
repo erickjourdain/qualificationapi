@@ -17,7 +17,7 @@ const Settings = () => {
     <Tooltip title="administration l'application">
       <IconButton
         size="large"
-        aria-label="quitter"
+        aria-label="settings"
         onClick={handleClick}
         color="inherit"
       >

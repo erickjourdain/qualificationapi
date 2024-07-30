@@ -4,25 +4,18 @@ import Theme from "@components/mainnav/Theme";
 import Settings from "@components/mainnav/Settings";
 import Quitter from "@components/mainnav/Quitter";
 import Runner from "@components/mainnav/Runner";
-import { includes } from "lodash";
-import { useLocation, useRouteContext } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useAuth } from "@/hooks/auth";
 
 const Selection = () => {
 
-  const location = useLocation();
-  const context = useRouteContext({ from: "/_mainLayout" });
-
-  useEffect(() => {
-    console.log(location);
-  }, []);
+  const auth = useAuth();
 
   return(
     <Box sx={{ display: { xs: "none", sm: "block" } }}>
-      { context && context.user && <Formulaires /> }
+      { auth.isLogged && <Formulaires /> }
       <Theme />
       <Runner />
-      { context && context.user && includes(["ADMIN", "READER"], context.user.role) && <Settings /> }
+      { auth.isCreator && <Settings /> }
       <Quitter />
     </Box>
   )

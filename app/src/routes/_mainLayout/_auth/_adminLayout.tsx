@@ -1,20 +1,19 @@
-import { createFileRoute, Outlet, redirect, useNavigate, useRouteContext } from '@tanstack/react-router';
+import { createFileRoute, Outlet, redirect, useNavigate } from '@tanstack/react-router';
 import { Box, Divider, Drawer, List, ListItem, ListItemIcon, ListItemText, ListSubheader, Toolbar } from '@mui/material'
 import FeedIcon from "@mui/icons-material/Feed";
 import PersonIcon from "@mui/icons-material/Person";
-import { includes } from 'lodash';
+import { useAuth } from '@/hooks/auth';
 
 export const Route = createFileRoute('/_mainLayout/_auth/_adminLayout')({
   beforeLoad: ({ context }) => {
-    if (context.user === null || !includes(["ADMIN", "CREATOR"], context.user.role)) 
-      throw redirect({ to: "/login" });
+    if (!context.auth.isCreator) throw redirect({ to: "/forbidden" });
   },
   component: AdminLayout,
 })
 
 function AdminLayout() {
 
-  const context = useRouteContext({ from: "/_mainLayout/_auth/_adminLayout" });
+  const auth = useAuth();
 
   // Largeur de la barre latérale
   const drawerWidth = 200;
@@ -52,7 +51,7 @@ function AdminLayout() {
               </ListItemIcon>
               <ListItemText primary="Formulaires" />
             </ListItem>
-            {context.user && context.user.role === "ADMIN" &&
+            {auth.isAdmin &&
               <ListItem key="user" onClick={handleUtilisateursClick}>
                 <ListItemIcon>
                   <PersonIcon />

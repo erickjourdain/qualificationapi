@@ -11,15 +11,12 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as SigninImport } from './routes/signin'
-import { Route as ResetpwdImport } from './routes/resetpwd'
-import { Route as LoginImport } from './routes/login'
-import { Route as CloseImport } from './routes/close'
 import { Route as MainLayoutImport } from './routes/_mainLayout'
 import { Route as MainLayoutSigninImport } from './routes/_mainLayout/signin'
 import { Route as MainLayoutResetpwdImport } from './routes/_mainLayout/resetpwd'
-import { Route as MainLayoutNotFoundImport } from './routes/_mainLayout/notFound'
 import { Route as MainLayoutLoginImport } from './routes/_mainLayout/login'
+import { Route as MainLayoutForbiddenImport } from './routes/_mainLayout/forbidden'
+import { Route as MainLayoutCloseImport } from './routes/_mainLayout/close'
 import { Route as MainLayoutAuthImport } from './routes/_mainLayout/_auth'
 import { Route as MainLayoutAuthIndexImport } from './routes/_mainLayout/_auth/index'
 import { Route as MainLayoutAuthFormulairesImport } from './routes/_mainLayout/_auth/formulaires'
@@ -31,26 +28,6 @@ import { Route as MainLayoutAuthAdminLayoutAdminFormulairesAjouterImport } from 
 import { Route as MainLayoutAuthAdminLayoutAdminFormulairesFormSlugImport } from './routes/_mainLayout/_auth/_adminLayout/admin/formulaires/$formSlug'
 
 // Create/Update Routes
-
-const SigninRoute = SigninImport.update({
-  path: '/signin',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const ResetpwdRoute = ResetpwdImport.update({
-  path: '/resetpwd',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const LoginRoute = LoginImport.update({
-  path: '/login',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const CloseRoute = CloseImport.update({
-  path: '/close',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const MainLayoutRoute = MainLayoutImport.update({
   id: '/_mainLayout',
@@ -67,13 +44,18 @@ const MainLayoutResetpwdRoute = MainLayoutResetpwdImport.update({
   getParentRoute: () => MainLayoutRoute,
 } as any)
 
-const MainLayoutNotFoundRoute = MainLayoutNotFoundImport.update({
-  path: '/notFound',
+const MainLayoutLoginRoute = MainLayoutLoginImport.update({
+  path: '/login',
   getParentRoute: () => MainLayoutRoute,
 } as any)
 
-const MainLayoutLoginRoute = MainLayoutLoginImport.update({
-  path: '/login',
+const MainLayoutForbiddenRoute = MainLayoutForbiddenImport.update({
+  path: '/forbidden',
+  getParentRoute: () => MainLayoutRoute,
+} as any)
+
+const MainLayoutCloseRoute = MainLayoutCloseImport.update({
+  path: '/close',
   getParentRoute: () => MainLayoutRoute,
 } as any)
 
@@ -138,34 +120,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainLayoutImport
       parentRoute: typeof rootRoute
     }
-    '/close': {
-      id: '/close'
-      path: '/close'
-      fullPath: '/close'
-      preLoaderRoute: typeof CloseImport
-      parentRoute: typeof rootRoute
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginImport
-      parentRoute: typeof rootRoute
-    }
-    '/resetpwd': {
-      id: '/resetpwd'
-      path: '/resetpwd'
-      fullPath: '/resetpwd'
-      preLoaderRoute: typeof ResetpwdImport
-      parentRoute: typeof rootRoute
-    }
-    '/signin': {
-      id: '/signin'
-      path: '/signin'
-      fullPath: '/signin'
-      preLoaderRoute: typeof SigninImport
-      parentRoute: typeof rootRoute
-    }
     '/_mainLayout/_auth': {
       id: '/_mainLayout/_auth'
       path: ''
@@ -173,18 +127,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainLayoutAuthImport
       parentRoute: typeof MainLayoutImport
     }
+    '/_mainLayout/close': {
+      id: '/_mainLayout/close'
+      path: '/close'
+      fullPath: '/close'
+      preLoaderRoute: typeof MainLayoutCloseImport
+      parentRoute: typeof MainLayoutImport
+    }
+    '/_mainLayout/forbidden': {
+      id: '/_mainLayout/forbidden'
+      path: '/forbidden'
+      fullPath: '/forbidden'
+      preLoaderRoute: typeof MainLayoutForbiddenImport
+      parentRoute: typeof MainLayoutImport
+    }
     '/_mainLayout/login': {
       id: '/_mainLayout/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof MainLayoutLoginImport
-      parentRoute: typeof MainLayoutImport
-    }
-    '/_mainLayout/notFound': {
-      id: '/_mainLayout/notFound'
-      path: '/notFound'
-      fullPath: '/notFound'
-      preLoaderRoute: typeof MainLayoutNotFoundImport
       parentRoute: typeof MainLayoutImport
     }
     '/_mainLayout/resetpwd': {
@@ -276,15 +237,12 @@ export const routeTree = rootRoute.addChildren({
       MainLayoutAuthFormulairesRoute,
       MainLayoutAuthIndexRoute,
     }),
+    MainLayoutCloseRoute,
+    MainLayoutForbiddenRoute,
     MainLayoutLoginRoute,
-    MainLayoutNotFoundRoute,
     MainLayoutResetpwdRoute,
     MainLayoutSigninRoute,
   }),
-  CloseRoute,
-  LoginRoute,
-  ResetpwdRoute,
-  SigninRoute,
 })
 
 /* prettier-ignore-end */
@@ -295,34 +253,19 @@ export const routeTree = rootRoute.addChildren({
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/_mainLayout",
-        "/close",
-        "/login",
-        "/resetpwd",
-        "/signin"
+        "/_mainLayout"
       ]
     },
     "/_mainLayout": {
       "filePath": "_mainLayout.tsx",
       "children": [
         "/_mainLayout/_auth",
+        "/_mainLayout/close",
+        "/_mainLayout/forbidden",
         "/_mainLayout/login",
-        "/_mainLayout/notFound",
         "/_mainLayout/resetpwd",
         "/_mainLayout/signin"
       ]
-    },
-    "/close": {
-      "filePath": "close.tsx"
-    },
-    "/login": {
-      "filePath": "login.tsx"
-    },
-    "/resetpwd": {
-      "filePath": "resetpwd.tsx"
-    },
-    "/signin": {
-      "filePath": "signin.tsx"
     },
     "/_mainLayout/_auth": {
       "filePath": "_mainLayout/_auth.tsx",
@@ -333,12 +276,16 @@ export const routeTree = rootRoute.addChildren({
         "/_mainLayout/_auth/"
       ]
     },
-    "/_mainLayout/login": {
-      "filePath": "_mainLayout/login.tsx",
+    "/_mainLayout/close": {
+      "filePath": "_mainLayout/close.tsx",
       "parent": "/_mainLayout"
     },
-    "/_mainLayout/notFound": {
-      "filePath": "_mainLayout/notFound.tsx",
+    "/_mainLayout/forbidden": {
+      "filePath": "_mainLayout/forbidden.tsx",
+      "parent": "/_mainLayout"
+    },
+    "/_mainLayout/login": {
+      "filePath": "_mainLayout/login.tsx",
       "parent": "/_mainLayout"
     },
     "/_mainLayout/resetpwd": {

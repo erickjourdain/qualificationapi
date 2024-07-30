@@ -6,20 +6,24 @@ import { Box, Button, Container, CssBaseline, Typography } from '@mui/material';
 import { alertAtom } from '@/stores/mainStore';
 import { delAuthorisation, logout } from '@/utils/apiCall';
 import manageError from '@/utils/manageError';
+import { useAuth } from '@/hooks/auth';
 
-export const Route = createFileRoute('/close')({
+export const Route = createFileRoute('/_mainLayout/close')({
   component: CloseApp,
 })
 
 function CloseApp () {
 
+  // Hook de gestion des autorisations
+  const auth = useAuth();
+
+  // Hook de navigation
   const navigate = useNavigate();
 
   const [disconnect, setDisconnect] = useState<boolean>(false);
 
   // Chargement de l'état Atom des alertes et du token
   const setAlerte = useSetAtom(alertAtom);
-  // const setToken = useSetAtom(tokenAtom);
 
   const { error, isError, isSuccess } = useQuery({
     queryKey: ["logout"],
@@ -31,8 +35,8 @@ function CloseApp () {
   useEffect(() => {
     if (isSuccess) {
       delAuthorisation();
-      // setToken(null);
       localStorage.removeItem("token");
+      auth.logout();
       navigate({ to: "/login" });
     }
   }, [isSuccess]);

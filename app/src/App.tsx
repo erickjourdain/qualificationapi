@@ -5,8 +5,10 @@ import { createRouter, RouterProvider } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import Alerte from "@components/Alerte";
+import NotFound from "@components/NotFound";
 import { modeAtom } from "@/stores/mainStore";
 import { routeTree } from "@/routeTree.gen";
+import { AuthProvider, useAuth } from "@/hooks/auth";
 
 // création d'un instance de QueryClient
 const queryClient = new QueryClient({});
@@ -15,7 +17,8 @@ const queryClient = new QueryClient({});
 const router = createRouter({
   routeTree,
   defaultPreload: 'intent',
-  context: { queryClient, user: null, }
+  defaultNotFoundComponent: NotFound,
+  context: { queryClient, auth: undefined!, }
 });
 
 declare module '@tanstack/react-router' {
@@ -25,7 +28,15 @@ declare module '@tanstack/react-router' {
   }
 }
 
+
+function InnerApp() {
+  const auth = useAuth();
+  return <RouterProvider router={router} context={{ queryClient, auth }} />
+}
+
 function App() {
+
+  // Hook d'authentification
 
   // Chargement de l'état Atom du theme
   const mode = useAtomValue(modeAtom);
@@ -45,7 +56,9 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} context={{ queryClient, user: null }} />
+        <AuthProvider>
+          <InnerApp />
+        </AuthProvider>
         <Alerte />
         <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
       </QueryClientProvider>
