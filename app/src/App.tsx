@@ -14,7 +14,7 @@ import { AuthProvider, useAuth } from "@/hooks/auth";
 const queryClient = new QueryClient({});
 
 // création du router
-const router = createRouter({
+export const router = createRouter({
   routeTree,
   defaultPreload: 'intent',
   defaultNotFoundComponent: NotFound,
@@ -27,7 +27,6 @@ declare module '@tanstack/react-router' {
     router: typeof router;
   }
 }
-
 
 function InnerApp() {
   const auth = useAuth();

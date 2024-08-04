@@ -21,6 +21,9 @@ import { Route as MainLayoutAuthImport } from './routes/_mainLayout/_auth'
 import { Route as MainLayoutAuthIndexImport } from './routes/_mainLayout/_auth/index'
 import { Route as MainLayoutAuthFormulairesImport } from './routes/_mainLayout/_auth/formulaires'
 import { Route as MainLayoutAuthAdminLayoutImport } from './routes/_mainLayout/_auth/_adminLayout'
+import { Route as MainLayoutAuthOpportunitesIndexImport } from './routes/_mainLayout/_auth/opportunites/index'
+import { Route as MainLayoutAuthOpportunitesNouvelleImport } from './routes/_mainLayout/_auth/opportunites/nouvelle'
+import { Route as MainLayoutAuthOpportunitesUuidImport } from './routes/_mainLayout/_auth/opportunites/$uuid'
 import { Route as MainLayoutAuthAdminLayoutAdminUtilisateursIndexImport } from './routes/_mainLayout/_auth/_adminLayout/admin/utilisateurs/index'
 import { Route as MainLayoutAuthAdminLayoutAdminFormulairesIndexImport } from './routes/_mainLayout/_auth/_adminLayout/admin/formulaires/index'
 import { Route as MainLayoutAuthAdminLayoutAdminUtilisateursUserSlugImport } from './routes/_mainLayout/_auth/_adminLayout/admin/utilisateurs/$userSlug'
@@ -78,6 +81,24 @@ const MainLayoutAuthAdminLayoutRoute = MainLayoutAuthAdminLayoutImport.update({
   id: '/_adminLayout',
   getParentRoute: () => MainLayoutAuthRoute,
 } as any)
+
+const MainLayoutAuthOpportunitesIndexRoute =
+  MainLayoutAuthOpportunitesIndexImport.update({
+    path: '/opportunites/',
+    getParentRoute: () => MainLayoutAuthRoute,
+  } as any)
+
+const MainLayoutAuthOpportunitesNouvelleRoute =
+  MainLayoutAuthOpportunitesNouvelleImport.update({
+    path: '/opportunites/nouvelle',
+    getParentRoute: () => MainLayoutAuthRoute,
+  } as any)
+
+const MainLayoutAuthOpportunitesUuidRoute =
+  MainLayoutAuthOpportunitesUuidImport.update({
+    path: '/opportunites/$uuid',
+    getParentRoute: () => MainLayoutAuthRoute,
+  } as any)
 
 const MainLayoutAuthAdminLayoutAdminUtilisateursIndexRoute =
   MainLayoutAuthAdminLayoutAdminUtilisateursIndexImport.update({
@@ -183,6 +204,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainLayoutAuthIndexImport
       parentRoute: typeof MainLayoutAuthImport
     }
+    '/_mainLayout/_auth/opportunites/$uuid': {
+      id: '/_mainLayout/_auth/opportunites/$uuid'
+      path: '/opportunites/$uuid'
+      fullPath: '/opportunites/$uuid'
+      preLoaderRoute: typeof MainLayoutAuthOpportunitesUuidImport
+      parentRoute: typeof MainLayoutAuthImport
+    }
+    '/_mainLayout/_auth/opportunites/nouvelle': {
+      id: '/_mainLayout/_auth/opportunites/nouvelle'
+      path: '/opportunites/nouvelle'
+      fullPath: '/opportunites/nouvelle'
+      preLoaderRoute: typeof MainLayoutAuthOpportunitesNouvelleImport
+      parentRoute: typeof MainLayoutAuthImport
+    }
+    '/_mainLayout/_auth/opportunites/': {
+      id: '/_mainLayout/_auth/opportunites/'
+      path: '/opportunites'
+      fullPath: '/opportunites'
+      preLoaderRoute: typeof MainLayoutAuthOpportunitesIndexImport
+      parentRoute: typeof MainLayoutAuthImport
+    }
     '/_mainLayout/_auth/_adminLayout/admin/formulaires/$formSlug': {
       id: '/_mainLayout/_auth/_adminLayout/admin/formulaires/$formSlug'
       path: '/admin/formulaires/$formSlug'
@@ -236,6 +278,9 @@ export const routeTree = rootRoute.addChildren({
         }),
       MainLayoutAuthFormulairesRoute,
       MainLayoutAuthIndexRoute,
+      MainLayoutAuthOpportunitesUuidRoute,
+      MainLayoutAuthOpportunitesNouvelleRoute,
+      MainLayoutAuthOpportunitesIndexRoute,
     }),
     MainLayoutCloseRoute,
     MainLayoutForbiddenRoute,
@@ -273,7 +318,10 @@ export const routeTree = rootRoute.addChildren({
       "children": [
         "/_mainLayout/_auth/_adminLayout",
         "/_mainLayout/_auth/formulaires",
-        "/_mainLayout/_auth/"
+        "/_mainLayout/_auth/",
+        "/_mainLayout/_auth/opportunites/$uuid",
+        "/_mainLayout/_auth/opportunites/nouvelle",
+        "/_mainLayout/_auth/opportunites/"
       ]
     },
     "/_mainLayout/close": {
@@ -313,6 +361,18 @@ export const routeTree = rootRoute.addChildren({
     },
     "/_mainLayout/_auth/": {
       "filePath": "_mainLayout/_auth/index.tsx",
+      "parent": "/_mainLayout/_auth"
+    },
+    "/_mainLayout/_auth/opportunites/$uuid": {
+      "filePath": "_mainLayout/_auth/opportunites/$uuid.tsx",
+      "parent": "/_mainLayout/_auth"
+    },
+    "/_mainLayout/_auth/opportunites/nouvelle": {
+      "filePath": "_mainLayout/_auth/opportunites/nouvelle.tsx",
+      "parent": "/_mainLayout/_auth"
+    },
+    "/_mainLayout/_auth/opportunites/": {
+      "filePath": "_mainLayout/_auth/opportunites/index.tsx",
       "parent": "/_mainLayout/_auth"
     },
     "/_mainLayout/_auth/_adminLayout/admin/formulaires/$formSlug": {

@@ -28,7 +28,7 @@ const Formulaire = () => {
     const setAlerte = useSetAtom(alertAtom);
 
   // Récupération des données de la route
-  const { formSlug } = useParams({ from: "/_mainLayout/_adminLayout/admin/formulaires/$formSlug" });
+  const { formSlug } = useParams({ from: "/_mainLayout/_auth/_adminLayout/admin/formulaires/$formSlug" });
 
   // Définition de l'état du composant pour gestion de la MAJ des données
   // du formulaire Tripetto

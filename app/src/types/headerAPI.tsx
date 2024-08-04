@@ -10,8 +10,8 @@ export type HeaderAPI = {
   prenom: string;
   opportunite: string;
   projet: string;
-  createur: User;
-  gestionnaire: User;
+  createur?: User;
+  gestionnaire?: User;
   createdAt?: number;
   updatedAt?: number;
 }
