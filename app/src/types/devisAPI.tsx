@@ -5,4 +5,4 @@ export type DevisAPI = {
   reference: string;
   createur: User;
   createdAt?: number;
-}
+};

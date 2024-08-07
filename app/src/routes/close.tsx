@@ -1,19 +1,18 @@
-import { useEffect, useState } from 'react';
-import { useSetAtom } from 'jotai';
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useQuery } from '@tanstack/react-query';
-import { Box, Button, Container, CssBaseline, Typography } from '@mui/material';
-import { alertAtom } from '@/stores/mainStore';
-import { delAuthorisation, logout } from '@/utils/apiCall';
-import manageError from '@/utils/manageError';
-import { useAuth } from '@/hooks/auth';
+import { useEffect, useState } from "react";
+import { useSetAtom } from "jotai";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { Box, Button, Container, CssBaseline, Typography } from "@mui/material";
+import { alertAtom } from "@/stores/mainStore";
+import { delAuthorisation, logout } from "@/utils/apiCall";
+import manageError from "@/utils/manageError";
+import { useAuth } from "@/hooks/auth";
 
-export const Route = createFileRoute('/_mainLayout/close')({
+export const Route = createFileRoute("/close")({
   component: CloseApp,
-})
+});
 
-function CloseApp () {
-
+function CloseApp() {
   // Hook de gestion des autorisations
   const auth = useAuth();
 
@@ -29,7 +28,7 @@ function CloseApp () {
     queryKey: ["logout"],
     queryFn: logout,
     enabled: disconnect,
-  })
+  });
 
   // fin du processus de déconnexion
   useEffect(() => {
@@ -61,10 +60,14 @@ function CloseApp () {
         <Typography sx={{ mb: 3, textAlign: "center" }} variant="h5">
           Souhaitez-vous vous déconnecter de l'application?
         </Typography>
-        <Button color="primary" variant="contained" onClick={() => setDisconnect(true)}>
+        <Button
+          color="primary"
+          variant="contained"
+          onClick={() => setDisconnect(true)}
+        >
           Me deconnecter.
         </Button>
       </Box>
     </Container>
-  )
+  );
 }

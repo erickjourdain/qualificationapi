@@ -1,7 +1,15 @@
 import Ajv from "ajv";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { ChangeEvent, useState } from "react";
-import { Box, Button, FormControlLabel, Stack, Switch, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  FormControlLabel,
+  Stack,
+  Switch,
+  TextField,
+  Typography,
+} from "@mui/material";
 import QuizIcon from "@mui/icons-material/Quiz";
 import ClearIcon from "@mui/icons-material/Clear";
 import ContentPasteGoIcon from "@mui/icons-material/ContentPasteGo";
@@ -34,7 +42,13 @@ type State = {
  * @param props FormInputsProps
  * @returns JSX
  */
-const FormulaireForm = ({ form, onSubmit, onFinish, onUpdateFormulaire, onTestFormulaire }: FormulaireFormProps) => {
+const FormulaireForm = ({
+  form,
+  onSubmit,
+  onFinish,
+  onUpdateFormulaire,
+  onTestFormulaire,
+}: FormulaireFormProps) => {
   // définition de l'état du composant pour gestion de la MAJ des données
   // du formulaire Tripetto
   const [state, setState] = useState<State>({
@@ -43,7 +57,8 @@ const FormulaireForm = ({ form, onSubmit, onFinish, onUpdateFormulaire, onTestFo
   });
 
   // définition du texte du bouton de sauvegarde en fonction du contexte
-  const btnSauvegarde = onUpdateFormulaire === undefined ? "Enregistrer" : "Mettre à jour";
+  const btnSauvegarde =
+    onUpdateFormulaire === undefined ? "Enregistrer" : "Mettre à jour";
 
   // validation du formulaire Tripetto
   const validateFormulaire = (value: string) => {
@@ -75,7 +90,11 @@ const FormulaireForm = ({ form, onSubmit, onFinish, onUpdateFormulaire, onTestFo
     const formulaire = getValues("formulaire");
     const valideForm = validateFormulaire(formulaire);
     if (valideForm === true) onTestFormulaire(formulaire);
-    else setError("formulaire", { type: "validation", message: "Formulaire Tripetto invalide." });
+    else
+      setError("formulaire", {
+        type: "validation",
+        message: "Formulaire Tripetto invalide.",
+      });
   };
 
   // copier le presse papier dans le champ formulaire
@@ -149,14 +168,30 @@ const FormulaireForm = ({ form, onSubmit, onFinish, onUpdateFormulaire, onTestFo
       <Stack spacing={2} direction="row">
         {onUpdateFormulaire && (
           <FormControlLabel
-            control={<Switch checked={state.updateFormulaire} onChange={handleChange} name="updateFormulaire" />}
+            control={
+              <Switch
+                checked={state.updateFormulaire}
+                onChange={handleChange}
+                name="updateFormulaire"
+              />
+            }
             label="MAJ Formulaire"
           />
         )}
-        <Button variant="outlined" color="secondary" endIcon={<QuizIcon />} onClick={handleTestFormulaire}>
+        <Button
+          variant="outlined"
+          color="secondary"
+          endIcon={<QuizIcon />}
+          onClick={handleTestFormulaire}
+        >
           Tester
         </Button>
-        <Button variant="outlined" color="primary" endIcon={<ContentPasteGoIcon />} onClick={handlePaste}>
+        <Button
+          variant="outlined"
+          color="primary"
+          endIcon={<ContentPasteGoIcon />}
+          onClick={handlePaste}
+        >
           Coller
         </Button>
         <Button
@@ -192,7 +227,11 @@ const FormulaireForm = ({ form, onSubmit, onFinish, onUpdateFormulaire, onTestFo
       </Typography>
       <Box mt={3}>
         <Stack spacing={2} direction="row">
-          <Button variant="contained" color="primary" onClick={handleSubmit(onSubmit)}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSubmit(onSubmit)}
+          >
             {btnSauvegarde}
           </Button>
           <Button variant="contained" color="warning" onClick={() => reset()}>

@@ -1,6 +1,13 @@
 import { useAtom } from "jotai";
-import { Checkbox, IconButton, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
-import EditIcon from '@mui/icons-material/Edit';
+import {
+  Checkbox,
+  IconButton,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
 import { useAuth } from "@/hooks/auth";
 import { ProduitAPI } from "@/gec-tripetto";
 import { produitAtom } from "@/stores/oppStore";
@@ -11,7 +18,6 @@ interface ProduitItemProps {
 }
 
 const ProduitItem = ({ prodItem, onEdit }: ProduitItemProps) => {
-
   // Hook de Gestion des autorisations
   const auth = useAuth();
   // Hook état global du produit sélectionné
@@ -22,28 +28,36 @@ const ProduitItem = ({ prodItem, onEdit }: ProduitItemProps) => {
   return (
     <ListItem
       secondaryAction={
-        auth.isUser &&
-        <IconButton edge="end" aria-label="edit" color="warning" onClick={onEdit}>
-          <EditIcon />
-        </IconButton>
+        auth.isUser && (
+          <IconButton
+            edge="end"
+            aria-label="edit"
+            color="warning"
+            onClick={onEdit}
+          >
+            <EditIcon />
+          </IconButton>
+        )
       }
-      disablePadding>
+      disablePadding
+    >
       <ListItemButton
         selected={prodItem.id === produit?.id}
-        onClick={() => setProduit(prodItem)}>
+        onClick={() => setProduit(prodItem)}
+      >
         <ListItemIcon>
           <Checkbox
             edge="start"
             checked={prodItem.id === produit?.id}
             tabIndex={-1}
             disableRipple
-            inputProps={{ 'aria-labelledby': labelId }}
+            inputProps={{ "aria-labelledby": labelId }}
           />
         </ListItemIcon>
         <ListItemText primary={prodItem.description} />
       </ListItemButton>
     </ListItem>
-  )
-}
+  );
+};
 
 export default ProduitItem;

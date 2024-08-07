@@ -5,7 +5,7 @@ export type Answer = {
   name: string;
   string: string;
   value: TSerializeTypes;
-}
+};
 
 export type FormAnswers = {
   id: string;

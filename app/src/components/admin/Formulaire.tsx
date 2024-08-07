@@ -25,10 +25,12 @@ const Formulaire = () => {
   const navigate = useNavigate();
 
   // Chargement de l'état Atom des alertes
-    const setAlerte = useSetAtom(alertAtom);
+  const setAlerte = useSetAtom(alertAtom);
 
   // Récupération des données de la route
-  const { formSlug } = useParams({ from: "/_mainLayout/_auth/_adminLayout/admin/formulaires/$formSlug" });
+  const { formSlug } = useParams({
+    from: "/_mainLayout/_auth/_adminLayout/admin/formulaires/$formSlug",
+  });
 
   // Définition de l'état du composant pour gestion de la MAJ des données
   // du formulaire Tripetto
@@ -47,7 +49,7 @@ const Formulaire = () => {
     queryKey: ["getFormId", formSlug],
     queryFn: () => getForm(formSlug),
     select: (data) => {
-      if (data.data.data.length) return data.data.data[0] as FormAPI
+      if (data.data.data.length) return data.data.data[0] as FormAPI;
       else return null;
     },
     refetchOnWindowFocus: false,
@@ -62,7 +64,10 @@ const Formulaire = () => {
   const { mutate } = useMutation({
     mutationFn: updateForm,
     onSuccess: (response) => {
-      setAlerte({ severite: "success", message: "Les données ont été mises à jour" });
+      setAlerte({
+        severite: "success",
+        message: "Les données ont été mises à jour",
+      });
       if (form && form.slug !== response.data.slug) {
         navigate({ to: `/formulaire/${response.data.slug}` });
       } else {
@@ -75,7 +80,11 @@ const Formulaire = () => {
   });
 
   // Lancement de l'appel à la requête de mise à jour lors de la validation du formulaire
-  const onSubmit = (data: { titre: string; description: string | null; formulaire: string }) => {
+  const onSubmit = (data: {
+    titre: string;
+    description: string | null;
+    formulaire: string;
+  }) => {
     if (form) {
       // définition des champs à mettre à jour
       const value: UpdateFormValues = {};
@@ -105,17 +114,18 @@ const Formulaire = () => {
 
   if (isLoading) return <Loading />;
 
-  if (form === null) return (
-    <Paper
-      sx={{
-        marginTop: "10px",
-      }}
-    >
-      <Box px={3} py={2}>
-        <Alert severity="error">Le formulaire recherché n'existe pas</Alert>
-      </Box>
-    </Paper>
-  )
+  if (form === null)
+    return (
+      <Paper
+        sx={{
+          marginTop: "10px",
+        }}
+      >
+        <Box px={3} py={2}>
+          <Alert severity="error">Le formulaire recherché n'existe pas</Alert>
+        </Box>
+      </Paper>
+    );
 
   if (form)
     return (
@@ -127,7 +137,8 @@ const Formulaire = () => {
         >
           <Box px={3} py={2}>
             <Typography variant="h6" sx={{ m: 2 }}>
-              Formulaire <b>{form.titre}</b> Version {form.version} du {formatDateTime(form.updatedAt)}
+              Formulaire <b>{form.titre}</b> Version {form.version} du{" "}
+              {formatDateTime(form.updatedAt)}
             </Typography>
             <FormulaireForm
               form={{
@@ -147,7 +158,7 @@ const Formulaire = () => {
             />
           </Box>
         </Paper>
-        {formulaire.trim() !== "" &&
+        {formulaire.trim() !== "" && (
           <PlayTripetto
             open={dialog}
             onClose={() => setDialog(false)}
@@ -157,9 +168,9 @@ const Formulaire = () => {
               return true;
             }}
           />
-        }
+        )}
       </>
-    )
-}
+    );
+};
 
 export default Formulaire;

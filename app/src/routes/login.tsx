@@ -1,20 +1,32 @@
-import { useCallback } from 'react';
-import { createFileRoute, Link as RouterLink, useNavigate } from '@tanstack/react-router';
-import { useMutation } from '@tanstack/react-query';
+import { useCallback } from "react";
+import {
+  createFileRoute,
+  Link as RouterLink,
+  useNavigate,
+} from "@tanstack/react-router";
+import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import { Avatar, Box, Button, Container, CssBaseline, Link, TextField, Typography } from '@mui/material';
+import {
+  Avatar,
+  Box,
+  Button,
+  Container,
+  CssBaseline,
+  Link,
+  TextField,
+  Typography,
+} from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import { delAuthorisation, login } from '@/utils/apiCall';
-import manageError from '@/utils/manageError';
+import { delAuthorisation, login } from "@/utils/apiCall";
+import manageError from "@/utils/manageError";
 //import { tokenAtom } from '@/stores/mainStore';
 
-export const Route = createFileRoute('/_mainLayout/login')({
+export const Route = createFileRoute("/login")({
   component: Login,
-})
+});
 
 function Login() {
-
-//  const setToken = useSetAtom(tokenAtom);
+  //  const setToken = useSetAtom(tokenAtom);
 
   const navigate = useNavigate();
 
@@ -23,7 +35,7 @@ function Login() {
     register,
     handleSubmit,
     formState: { errors },
-    setError
+    setError,
   } = useForm({
     defaultValues: {
       login: "",
@@ -48,12 +60,15 @@ function Login() {
   });
 
   // Appel de la requête de connexion à l'API
-  const onSubmit = useCallback(async (data: { login: string, password: string }) => {
-    //suppression du token existant et de l'entête des requêtes
-    localStorage.removeItem("token");
-    delAuthorisation()
-    mutate({ login: data.login, password: data.password });
-  }, []);
+  const onSubmit = useCallback(
+    async (data: { login: string; password: string }) => {
+      //suppression du token existant et de l'entête des requêtes
+      localStorage.removeItem("token");
+      delAuthorisation();
+      mutate({ login: data.login, password: data.password });
+    },
+    [],
+  );
 
   return (
     <Container component="main" maxWidth="xs">
@@ -72,7 +87,12 @@ function Login() {
         <Typography component="h1" variant="h5">
           Login
         </Typography>
-        <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate sx={{ mt: 1, width: "100%" }}>
+        <Box
+          component="form"
+          onSubmit={handleSubmit(onSubmit)}
+          noValidate
+          sx={{ mt: 1, width: "100%" }}
+        >
           <TextField
             margin="normal"
             required
@@ -108,7 +128,13 @@ function Login() {
           <Link component={RouterLink} to="/signin" underline="hover">
             Créer un compte
           </Link>
-          <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} disabled={isPending}>
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+            disabled={isPending}
+          >
             {!isPending ? "Login" : "Loading ..."}
           </Button>
           <Link component={RouterLink} to="/resetpwd" underline="hover">

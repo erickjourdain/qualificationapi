@@ -1,8 +1,15 @@
 import { useCallback, useState, MouseEvent } from "react";
 import { useAtom } from "jotai";
-import { IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Tooltip } from "@mui/material";
-import LightModeIcon from '@mui/icons-material/LightMode';
-import DarkModeIcon from '@mui/icons-material/DarkMode';
+import {
+  IconButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Tooltip,
+} from "@mui/material";
+import LightModeIcon from "@mui/icons-material/LightMode";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
 import CkeckIcon from "@mui/icons-material/Check";
 import { modeAtom } from "@/stores/mainStore";
 
@@ -11,7 +18,6 @@ interface Theme {
 }
 
 const Theme = () => {
-
   // Chargement de l'état Atom du theme
   const [mode, setMode] = useAtom(modeAtom);
 
@@ -43,9 +49,7 @@ const Theme = () => {
           color="inherit"
           onClick={handleMenu}
         >
-          {
-            (mode === "light") ? <LightModeIcon /> : <DarkModeIcon />
-          }
+          {mode === "light" ? <LightModeIcon /> : <DarkModeIcon />}
         </IconButton>
       </Tooltip>
       <Menu
@@ -57,33 +61,27 @@ const Theme = () => {
       >
         <MenuItem onClick={() => handleTheme({ mode: "light" })} key="light">
           <>
-            {
-              (mode !== "dark") &&
+            {mode !== "dark" && (
               <ListItemIcon>
                 <CkeckIcon />
               </ListItemIcon>
-            }
-            <ListItemText inset={mode === "dark"}>
-              clair
-            </ListItemText>
+            )}
+            <ListItemText inset={mode === "dark"}>clair</ListItemText>
           </>
         </MenuItem>
         <MenuItem onClick={() => handleTheme({ mode: "dark" })} key="dark">
           <>
-            {
-              (mode === "dark") &&
+            {mode === "dark" && (
               <ListItemIcon>
                 <CkeckIcon />
               </ListItemIcon>
-            }
-            <ListItemText inset={mode !== "dark"}>
-              sombre
-            </ListItemText>
+            )}
+            <ListItemText inset={mode !== "dark"}>sombre</ListItemText>
           </>
         </MenuItem>
-      </Menu >
+      </Menu>
     </>
-  )
-}
+  );
+};
 
 export default Theme;

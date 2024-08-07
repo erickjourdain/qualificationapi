@@ -1,4 +1,4 @@
-import { ProduitAPI } from "./produitAPI"
+import { ProduitAPI } from "./produitAPI";
 
 export type ProduitsAPI = {
   data: ProduitAPI[];
@@ -7,4 +7,4 @@ export type ProduitsAPI = {
   nbElements: number;
   hasPrevious: boolean;
   hasNext: boolean;
-}
+};

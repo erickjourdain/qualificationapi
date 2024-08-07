@@ -11,254 +11,252 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as MainLayoutImport } from './routes/_mainLayout'
-import { Route as MainLayoutSigninImport } from './routes/_mainLayout/signin'
-import { Route as MainLayoutResetpwdImport } from './routes/_mainLayout/resetpwd'
-import { Route as MainLayoutLoginImport } from './routes/_mainLayout/login'
-import { Route as MainLayoutForbiddenImport } from './routes/_mainLayout/forbidden'
-import { Route as MainLayoutCloseImport } from './routes/_mainLayout/close'
-import { Route as MainLayoutAuthImport } from './routes/_mainLayout/_auth'
-import { Route as MainLayoutAuthIndexImport } from './routes/_mainLayout/_auth/index'
-import { Route as MainLayoutAuthFormulairesImport } from './routes/_mainLayout/_auth/formulaires'
-import { Route as MainLayoutAuthAdminLayoutImport } from './routes/_mainLayout/_auth/_adminLayout'
-import { Route as MainLayoutAuthOpportunitesIndexImport } from './routes/_mainLayout/_auth/opportunites/index'
-import { Route as MainLayoutAuthOpportunitesNouvelleImport } from './routes/_mainLayout/_auth/opportunites/nouvelle'
-import { Route as MainLayoutAuthOpportunitesUuidImport } from './routes/_mainLayout/_auth/opportunites/$uuid'
-import { Route as MainLayoutAuthAdminLayoutAdminUtilisateursIndexImport } from './routes/_mainLayout/_auth/_adminLayout/admin/utilisateurs/index'
-import { Route as MainLayoutAuthAdminLayoutAdminFormulairesIndexImport } from './routes/_mainLayout/_auth/_adminLayout/admin/formulaires/index'
-import { Route as MainLayoutAuthAdminLayoutAdminUtilisateursUserSlugImport } from './routes/_mainLayout/_auth/_adminLayout/admin/utilisateurs/$userSlug'
-import { Route as MainLayoutAuthAdminLayoutAdminFormulairesAjouterImport } from './routes/_mainLayout/_auth/_adminLayout/admin/formulaires/ajouter'
-import { Route as MainLayoutAuthAdminLayoutAdminFormulairesFormSlugImport } from './routes/_mainLayout/_auth/_adminLayout/admin/formulaires/$formSlug'
+import { Route as SigninImport } from './routes/signin'
+import { Route as ResetpwdImport } from './routes/resetpwd'
+import { Route as LoginImport } from './routes/login'
+import { Route as ForbiddenImport } from './routes/forbidden'
+import { Route as CloseImport } from './routes/close'
+import { Route as AuthImport } from './routes/_auth'
+import { Route as AuthIndexImport } from './routes/_auth/index'
+import { Route as AuthFormulairesImport } from './routes/_auth/formulaires'
+import { Route as AuthAdminLayoutImport } from './routes/_auth/_adminLayout'
+import { Route as AuthOpportunitesIndexImport } from './routes/_auth/opportunites/index'
+import { Route as AuthOpportunitesNouvelleImport } from './routes/_auth/opportunites/nouvelle'
+import { Route as AuthOpportunitesUuidImport } from './routes/_auth/opportunites/$uuid'
+import { Route as AuthOpportunitesUuidProduitIdImport } from './routes/_auth/opportunites/$uuid/$produitId'
+import { Route as AuthAdminLayoutAdminUtilisateursIndexImport } from './routes/_auth/_adminLayout/admin/utilisateurs/index'
+import { Route as AuthAdminLayoutAdminFormulairesIndexImport } from './routes/_auth/_adminLayout/admin/formulaires/index'
+import { Route as AuthAdminLayoutAdminUtilisateursUserSlugImport } from './routes/_auth/_adminLayout/admin/utilisateurs/$userSlug'
+import { Route as AuthAdminLayoutAdminFormulairesAjouterImport } from './routes/_auth/_adminLayout/admin/formulaires/ajouter'
+import { Route as AuthAdminLayoutAdminFormulairesFormSlugImport } from './routes/_auth/_adminLayout/admin/formulaires/$formSlug'
 
 // Create/Update Routes
 
-const MainLayoutRoute = MainLayoutImport.update({
-  id: '/_mainLayout',
+const SigninRoute = SigninImport.update({
+  path: '/signin',
   getParentRoute: () => rootRoute,
 } as any)
 
-const MainLayoutSigninRoute = MainLayoutSigninImport.update({
-  path: '/signin',
-  getParentRoute: () => MainLayoutRoute,
-} as any)
-
-const MainLayoutResetpwdRoute = MainLayoutResetpwdImport.update({
+const ResetpwdRoute = ResetpwdImport.update({
   path: '/resetpwd',
-  getParentRoute: () => MainLayoutRoute,
+  getParentRoute: () => rootRoute,
 } as any)
 
-const MainLayoutLoginRoute = MainLayoutLoginImport.update({
+const LoginRoute = LoginImport.update({
   path: '/login',
-  getParentRoute: () => MainLayoutRoute,
+  getParentRoute: () => rootRoute,
 } as any)
 
-const MainLayoutForbiddenRoute = MainLayoutForbiddenImport.update({
+const ForbiddenRoute = ForbiddenImport.update({
   path: '/forbidden',
-  getParentRoute: () => MainLayoutRoute,
+  getParentRoute: () => rootRoute,
 } as any)
 
-const MainLayoutCloseRoute = MainLayoutCloseImport.update({
+const CloseRoute = CloseImport.update({
   path: '/close',
-  getParentRoute: () => MainLayoutRoute,
+  getParentRoute: () => rootRoute,
 } as any)
 
-const MainLayoutAuthRoute = MainLayoutAuthImport.update({
+const AuthRoute = AuthImport.update({
   id: '/_auth',
-  getParentRoute: () => MainLayoutRoute,
+  getParentRoute: () => rootRoute,
 } as any)
 
-const MainLayoutAuthIndexRoute = MainLayoutAuthIndexImport.update({
+const AuthIndexRoute = AuthIndexImport.update({
   path: '/',
-  getParentRoute: () => MainLayoutAuthRoute,
+  getParentRoute: () => AuthRoute,
 } as any)
 
-const MainLayoutAuthFormulairesRoute = MainLayoutAuthFormulairesImport.update({
+const AuthFormulairesRoute = AuthFormulairesImport.update({
   path: '/formulaires',
-  getParentRoute: () => MainLayoutAuthRoute,
+  getParentRoute: () => AuthRoute,
 } as any)
 
-const MainLayoutAuthAdminLayoutRoute = MainLayoutAuthAdminLayoutImport.update({
+const AuthAdminLayoutRoute = AuthAdminLayoutImport.update({
   id: '/_adminLayout',
-  getParentRoute: () => MainLayoutAuthRoute,
+  getParentRoute: () => AuthRoute,
 } as any)
 
-const MainLayoutAuthOpportunitesIndexRoute =
-  MainLayoutAuthOpportunitesIndexImport.update({
-    path: '/opportunites/',
-    getParentRoute: () => MainLayoutAuthRoute,
+const AuthOpportunitesIndexRoute = AuthOpportunitesIndexImport.update({
+  path: '/opportunites/',
+  getParentRoute: () => AuthRoute,
+} as any)
+
+const AuthOpportunitesNouvelleRoute = AuthOpportunitesNouvelleImport.update({
+  path: '/opportunites/nouvelle',
+  getParentRoute: () => AuthRoute,
+} as any)
+
+const AuthOpportunitesUuidRoute = AuthOpportunitesUuidImport.update({
+  path: '/opportunites/$uuid',
+  getParentRoute: () => AuthRoute,
+} as any)
+
+const AuthOpportunitesUuidProduitIdRoute =
+  AuthOpportunitesUuidProduitIdImport.update({
+    path: '/$produitId',
+    getParentRoute: () => AuthOpportunitesUuidRoute,
   } as any)
 
-const MainLayoutAuthOpportunitesNouvelleRoute =
-  MainLayoutAuthOpportunitesNouvelleImport.update({
-    path: '/opportunites/nouvelle',
-    getParentRoute: () => MainLayoutAuthRoute,
-  } as any)
-
-const MainLayoutAuthOpportunitesUuidRoute =
-  MainLayoutAuthOpportunitesUuidImport.update({
-    path: '/opportunites/$uuid',
-    getParentRoute: () => MainLayoutAuthRoute,
-  } as any)
-
-const MainLayoutAuthAdminLayoutAdminUtilisateursIndexRoute =
-  MainLayoutAuthAdminLayoutAdminUtilisateursIndexImport.update({
+const AuthAdminLayoutAdminUtilisateursIndexRoute =
+  AuthAdminLayoutAdminUtilisateursIndexImport.update({
     path: '/admin/utilisateurs/',
-    getParentRoute: () => MainLayoutAuthAdminLayoutRoute,
+    getParentRoute: () => AuthAdminLayoutRoute,
   } as any)
 
-const MainLayoutAuthAdminLayoutAdminFormulairesIndexRoute =
-  MainLayoutAuthAdminLayoutAdminFormulairesIndexImport.update({
+const AuthAdminLayoutAdminFormulairesIndexRoute =
+  AuthAdminLayoutAdminFormulairesIndexImport.update({
     path: '/admin/formulaires/',
-    getParentRoute: () => MainLayoutAuthAdminLayoutRoute,
+    getParentRoute: () => AuthAdminLayoutRoute,
   } as any)
 
-const MainLayoutAuthAdminLayoutAdminUtilisateursUserSlugRoute =
-  MainLayoutAuthAdminLayoutAdminUtilisateursUserSlugImport.update({
+const AuthAdminLayoutAdminUtilisateursUserSlugRoute =
+  AuthAdminLayoutAdminUtilisateursUserSlugImport.update({
     path: '/admin/utilisateurs/$userSlug',
-    getParentRoute: () => MainLayoutAuthAdminLayoutRoute,
+    getParentRoute: () => AuthAdminLayoutRoute,
   } as any)
 
-const MainLayoutAuthAdminLayoutAdminFormulairesAjouterRoute =
-  MainLayoutAuthAdminLayoutAdminFormulairesAjouterImport.update({
+const AuthAdminLayoutAdminFormulairesAjouterRoute =
+  AuthAdminLayoutAdminFormulairesAjouterImport.update({
     path: '/admin/formulaires/ajouter',
-    getParentRoute: () => MainLayoutAuthAdminLayoutRoute,
+    getParentRoute: () => AuthAdminLayoutRoute,
   } as any)
 
-const MainLayoutAuthAdminLayoutAdminFormulairesFormSlugRoute =
-  MainLayoutAuthAdminLayoutAdminFormulairesFormSlugImport.update({
+const AuthAdminLayoutAdminFormulairesFormSlugRoute =
+  AuthAdminLayoutAdminFormulairesFormSlugImport.update({
     path: '/admin/formulaires/$formSlug',
-    getParentRoute: () => MainLayoutAuthAdminLayoutRoute,
+    getParentRoute: () => AuthAdminLayoutRoute,
   } as any)
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/_mainLayout': {
-      id: '/_mainLayout'
+    '/_auth': {
+      id: '/_auth'
       path: ''
       fullPath: ''
-      preLoaderRoute: typeof MainLayoutImport
+      preLoaderRoute: typeof AuthImport
       parentRoute: typeof rootRoute
     }
-    '/_mainLayout/_auth': {
-      id: '/_mainLayout/_auth'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof MainLayoutAuthImport
-      parentRoute: typeof MainLayoutImport
-    }
-    '/_mainLayout/close': {
-      id: '/_mainLayout/close'
+    '/close': {
+      id: '/close'
       path: '/close'
       fullPath: '/close'
-      preLoaderRoute: typeof MainLayoutCloseImport
-      parentRoute: typeof MainLayoutImport
+      preLoaderRoute: typeof CloseImport
+      parentRoute: typeof rootRoute
     }
-    '/_mainLayout/forbidden': {
-      id: '/_mainLayout/forbidden'
+    '/forbidden': {
+      id: '/forbidden'
       path: '/forbidden'
       fullPath: '/forbidden'
-      preLoaderRoute: typeof MainLayoutForbiddenImport
-      parentRoute: typeof MainLayoutImport
+      preLoaderRoute: typeof ForbiddenImport
+      parentRoute: typeof rootRoute
     }
-    '/_mainLayout/login': {
-      id: '/_mainLayout/login'
+    '/login': {
+      id: '/login'
       path: '/login'
       fullPath: '/login'
-      preLoaderRoute: typeof MainLayoutLoginImport
-      parentRoute: typeof MainLayoutImport
+      preLoaderRoute: typeof LoginImport
+      parentRoute: typeof rootRoute
     }
-    '/_mainLayout/resetpwd': {
-      id: '/_mainLayout/resetpwd'
+    '/resetpwd': {
+      id: '/resetpwd'
       path: '/resetpwd'
       fullPath: '/resetpwd'
-      preLoaderRoute: typeof MainLayoutResetpwdImport
-      parentRoute: typeof MainLayoutImport
+      preLoaderRoute: typeof ResetpwdImport
+      parentRoute: typeof rootRoute
     }
-    '/_mainLayout/signin': {
-      id: '/_mainLayout/signin'
+    '/signin': {
+      id: '/signin'
       path: '/signin'
       fullPath: '/signin'
-      preLoaderRoute: typeof MainLayoutSigninImport
-      parentRoute: typeof MainLayoutImport
+      preLoaderRoute: typeof SigninImport
+      parentRoute: typeof rootRoute
     }
-    '/_mainLayout/_auth/_adminLayout': {
-      id: '/_mainLayout/_auth/_adminLayout'
+    '/_auth/_adminLayout': {
+      id: '/_auth/_adminLayout'
       path: ''
       fullPath: ''
-      preLoaderRoute: typeof MainLayoutAuthAdminLayoutImport
-      parentRoute: typeof MainLayoutAuthImport
+      preLoaderRoute: typeof AuthAdminLayoutImport
+      parentRoute: typeof AuthImport
     }
-    '/_mainLayout/_auth/formulaires': {
-      id: '/_mainLayout/_auth/formulaires'
+    '/_auth/formulaires': {
+      id: '/_auth/formulaires'
       path: '/formulaires'
       fullPath: '/formulaires'
-      preLoaderRoute: typeof MainLayoutAuthFormulairesImport
-      parentRoute: typeof MainLayoutAuthImport
+      preLoaderRoute: typeof AuthFormulairesImport
+      parentRoute: typeof AuthImport
     }
-    '/_mainLayout/_auth/': {
-      id: '/_mainLayout/_auth/'
+    '/_auth/': {
+      id: '/_auth/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof MainLayoutAuthIndexImport
-      parentRoute: typeof MainLayoutAuthImport
+      preLoaderRoute: typeof AuthIndexImport
+      parentRoute: typeof AuthImport
     }
-    '/_mainLayout/_auth/opportunites/$uuid': {
-      id: '/_mainLayout/_auth/opportunites/$uuid'
+    '/_auth/opportunites/$uuid': {
+      id: '/_auth/opportunites/$uuid'
       path: '/opportunites/$uuid'
       fullPath: '/opportunites/$uuid'
-      preLoaderRoute: typeof MainLayoutAuthOpportunitesUuidImport
-      parentRoute: typeof MainLayoutAuthImport
+      preLoaderRoute: typeof AuthOpportunitesUuidImport
+      parentRoute: typeof AuthImport
     }
-    '/_mainLayout/_auth/opportunites/nouvelle': {
-      id: '/_mainLayout/_auth/opportunites/nouvelle'
+    '/_auth/opportunites/nouvelle': {
+      id: '/_auth/opportunites/nouvelle'
       path: '/opportunites/nouvelle'
       fullPath: '/opportunites/nouvelle'
-      preLoaderRoute: typeof MainLayoutAuthOpportunitesNouvelleImport
-      parentRoute: typeof MainLayoutAuthImport
+      preLoaderRoute: typeof AuthOpportunitesNouvelleImport
+      parentRoute: typeof AuthImport
     }
-    '/_mainLayout/_auth/opportunites/': {
-      id: '/_mainLayout/_auth/opportunites/'
+    '/_auth/opportunites/': {
+      id: '/_auth/opportunites/'
       path: '/opportunites'
       fullPath: '/opportunites'
-      preLoaderRoute: typeof MainLayoutAuthOpportunitesIndexImport
-      parentRoute: typeof MainLayoutAuthImport
+      preLoaderRoute: typeof AuthOpportunitesIndexImport
+      parentRoute: typeof AuthImport
     }
-    '/_mainLayout/_auth/_adminLayout/admin/formulaires/$formSlug': {
-      id: '/_mainLayout/_auth/_adminLayout/admin/formulaires/$formSlug'
+    '/_auth/opportunites/$uuid/$produitId': {
+      id: '/_auth/opportunites/$uuid/$produitId'
+      path: '/$produitId'
+      fullPath: '/opportunites/$uuid/$produitId'
+      preLoaderRoute: typeof AuthOpportunitesUuidProduitIdImport
+      parentRoute: typeof AuthOpportunitesUuidImport
+    }
+    '/_auth/_adminLayout/admin/formulaires/$formSlug': {
+      id: '/_auth/_adminLayout/admin/formulaires/$formSlug'
       path: '/admin/formulaires/$formSlug'
       fullPath: '/admin/formulaires/$formSlug'
-      preLoaderRoute: typeof MainLayoutAuthAdminLayoutAdminFormulairesFormSlugImport
-      parentRoute: typeof MainLayoutAuthAdminLayoutImport
+      preLoaderRoute: typeof AuthAdminLayoutAdminFormulairesFormSlugImport
+      parentRoute: typeof AuthAdminLayoutImport
     }
-    '/_mainLayout/_auth/_adminLayout/admin/formulaires/ajouter': {
-      id: '/_mainLayout/_auth/_adminLayout/admin/formulaires/ajouter'
+    '/_auth/_adminLayout/admin/formulaires/ajouter': {
+      id: '/_auth/_adminLayout/admin/formulaires/ajouter'
       path: '/admin/formulaires/ajouter'
       fullPath: '/admin/formulaires/ajouter'
-      preLoaderRoute: typeof MainLayoutAuthAdminLayoutAdminFormulairesAjouterImport
-      parentRoute: typeof MainLayoutAuthAdminLayoutImport
+      preLoaderRoute: typeof AuthAdminLayoutAdminFormulairesAjouterImport
+      parentRoute: typeof AuthAdminLayoutImport
     }
-    '/_mainLayout/_auth/_adminLayout/admin/utilisateurs/$userSlug': {
-      id: '/_mainLayout/_auth/_adminLayout/admin/utilisateurs/$userSlug'
+    '/_auth/_adminLayout/admin/utilisateurs/$userSlug': {
+      id: '/_auth/_adminLayout/admin/utilisateurs/$userSlug'
       path: '/admin/utilisateurs/$userSlug'
       fullPath: '/admin/utilisateurs/$userSlug'
-      preLoaderRoute: typeof MainLayoutAuthAdminLayoutAdminUtilisateursUserSlugImport
-      parentRoute: typeof MainLayoutAuthAdminLayoutImport
+      preLoaderRoute: typeof AuthAdminLayoutAdminUtilisateursUserSlugImport
+      parentRoute: typeof AuthAdminLayoutImport
     }
-    '/_mainLayout/_auth/_adminLayout/admin/formulaires/': {
-      id: '/_mainLayout/_auth/_adminLayout/admin/formulaires/'
+    '/_auth/_adminLayout/admin/formulaires/': {
+      id: '/_auth/_adminLayout/admin/formulaires/'
       path: '/admin/formulaires'
       fullPath: '/admin/formulaires'
-      preLoaderRoute: typeof MainLayoutAuthAdminLayoutAdminFormulairesIndexImport
-      parentRoute: typeof MainLayoutAuthAdminLayoutImport
+      preLoaderRoute: typeof AuthAdminLayoutAdminFormulairesIndexImport
+      parentRoute: typeof AuthAdminLayoutImport
     }
-    '/_mainLayout/_auth/_adminLayout/admin/utilisateurs/': {
-      id: '/_mainLayout/_auth/_adminLayout/admin/utilisateurs/'
+    '/_auth/_adminLayout/admin/utilisateurs/': {
+      id: '/_auth/_adminLayout/admin/utilisateurs/'
       path: '/admin/utilisateurs'
       fullPath: '/admin/utilisateurs'
-      preLoaderRoute: typeof MainLayoutAuthAdminLayoutAdminUtilisateursIndexImport
-      parentRoute: typeof MainLayoutAuthAdminLayoutImport
+      preLoaderRoute: typeof AuthAdminLayoutAdminUtilisateursIndexImport
+      parentRoute: typeof AuthAdminLayoutImport
     }
   }
 }
@@ -266,28 +264,27 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 export const routeTree = rootRoute.addChildren({
-  MainLayoutRoute: MainLayoutRoute.addChildren({
-    MainLayoutAuthRoute: MainLayoutAuthRoute.addChildren({
-      MainLayoutAuthAdminLayoutRoute:
-        MainLayoutAuthAdminLayoutRoute.addChildren({
-          MainLayoutAuthAdminLayoutAdminFormulairesFormSlugRoute,
-          MainLayoutAuthAdminLayoutAdminFormulairesAjouterRoute,
-          MainLayoutAuthAdminLayoutAdminUtilisateursUserSlugRoute,
-          MainLayoutAuthAdminLayoutAdminFormulairesIndexRoute,
-          MainLayoutAuthAdminLayoutAdminUtilisateursIndexRoute,
-        }),
-      MainLayoutAuthFormulairesRoute,
-      MainLayoutAuthIndexRoute,
-      MainLayoutAuthOpportunitesUuidRoute,
-      MainLayoutAuthOpportunitesNouvelleRoute,
-      MainLayoutAuthOpportunitesIndexRoute,
+  AuthRoute: AuthRoute.addChildren({
+    AuthAdminLayoutRoute: AuthAdminLayoutRoute.addChildren({
+      AuthAdminLayoutAdminFormulairesFormSlugRoute,
+      AuthAdminLayoutAdminFormulairesAjouterRoute,
+      AuthAdminLayoutAdminUtilisateursUserSlugRoute,
+      AuthAdminLayoutAdminFormulairesIndexRoute,
+      AuthAdminLayoutAdminUtilisateursIndexRoute,
     }),
-    MainLayoutCloseRoute,
-    MainLayoutForbiddenRoute,
-    MainLayoutLoginRoute,
-    MainLayoutResetpwdRoute,
-    MainLayoutSigninRoute,
+    AuthFormulairesRoute,
+    AuthIndexRoute,
+    AuthOpportunitesUuidRoute: AuthOpportunitesUuidRoute.addChildren({
+      AuthOpportunitesUuidProduitIdRoute,
+    }),
+    AuthOpportunitesNouvelleRoute,
+    AuthOpportunitesIndexRoute,
   }),
+  CloseRoute,
+  ForbiddenRoute,
+  LoginRoute,
+  ResetpwdRoute,
+  SigninRoute,
 })
 
 /* prettier-ignore-end */
@@ -298,102 +295,97 @@ export const routeTree = rootRoute.addChildren({
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/_mainLayout"
+        "/_auth",
+        "/close",
+        "/forbidden",
+        "/login",
+        "/resetpwd",
+        "/signin"
       ]
     },
-    "/_mainLayout": {
-      "filePath": "_mainLayout.tsx",
+    "/_auth": {
+      "filePath": "_auth.tsx",
       "children": [
-        "/_mainLayout/_auth",
-        "/_mainLayout/close",
-        "/_mainLayout/forbidden",
-        "/_mainLayout/login",
-        "/_mainLayout/resetpwd",
-        "/_mainLayout/signin"
+        "/_auth/_adminLayout",
+        "/_auth/formulaires",
+        "/_auth/",
+        "/_auth/opportunites/$uuid",
+        "/_auth/opportunites/nouvelle",
+        "/_auth/opportunites/"
       ]
     },
-    "/_mainLayout/_auth": {
-      "filePath": "_mainLayout/_auth.tsx",
-      "parent": "/_mainLayout",
+    "/close": {
+      "filePath": "close.tsx"
+    },
+    "/forbidden": {
+      "filePath": "forbidden.tsx"
+    },
+    "/login": {
+      "filePath": "login.tsx"
+    },
+    "/resetpwd": {
+      "filePath": "resetpwd.tsx"
+    },
+    "/signin": {
+      "filePath": "signin.tsx"
+    },
+    "/_auth/_adminLayout": {
+      "filePath": "_auth/_adminLayout.tsx",
+      "parent": "/_auth",
       "children": [
-        "/_mainLayout/_auth/_adminLayout",
-        "/_mainLayout/_auth/formulaires",
-        "/_mainLayout/_auth/",
-        "/_mainLayout/_auth/opportunites/$uuid",
-        "/_mainLayout/_auth/opportunites/nouvelle",
-        "/_mainLayout/_auth/opportunites/"
+        "/_auth/_adminLayout/admin/formulaires/$formSlug",
+        "/_auth/_adminLayout/admin/formulaires/ajouter",
+        "/_auth/_adminLayout/admin/utilisateurs/$userSlug",
+        "/_auth/_adminLayout/admin/formulaires/",
+        "/_auth/_adminLayout/admin/utilisateurs/"
       ]
     },
-    "/_mainLayout/close": {
-      "filePath": "_mainLayout/close.tsx",
-      "parent": "/_mainLayout"
+    "/_auth/formulaires": {
+      "filePath": "_auth/formulaires.tsx",
+      "parent": "/_auth"
     },
-    "/_mainLayout/forbidden": {
-      "filePath": "_mainLayout/forbidden.tsx",
-      "parent": "/_mainLayout"
+    "/_auth/": {
+      "filePath": "_auth/index.tsx",
+      "parent": "/_auth"
     },
-    "/_mainLayout/login": {
-      "filePath": "_mainLayout/login.tsx",
-      "parent": "/_mainLayout"
-    },
-    "/_mainLayout/resetpwd": {
-      "filePath": "_mainLayout/resetpwd.tsx",
-      "parent": "/_mainLayout"
-    },
-    "/_mainLayout/signin": {
-      "filePath": "_mainLayout/signin.tsx",
-      "parent": "/_mainLayout"
-    },
-    "/_mainLayout/_auth/_adminLayout": {
-      "filePath": "_mainLayout/_auth/_adminLayout.tsx",
-      "parent": "/_mainLayout/_auth",
+    "/_auth/opportunites/$uuid": {
+      "filePath": "_auth/opportunites/$uuid.tsx",
+      "parent": "/_auth",
       "children": [
-        "/_mainLayout/_auth/_adminLayout/admin/formulaires/$formSlug",
-        "/_mainLayout/_auth/_adminLayout/admin/formulaires/ajouter",
-        "/_mainLayout/_auth/_adminLayout/admin/utilisateurs/$userSlug",
-        "/_mainLayout/_auth/_adminLayout/admin/formulaires/",
-        "/_mainLayout/_auth/_adminLayout/admin/utilisateurs/"
+        "/_auth/opportunites/$uuid/$produitId"
       ]
     },
-    "/_mainLayout/_auth/formulaires": {
-      "filePath": "_mainLayout/_auth/formulaires.tsx",
-      "parent": "/_mainLayout/_auth"
+    "/_auth/opportunites/nouvelle": {
+      "filePath": "_auth/opportunites/nouvelle.tsx",
+      "parent": "/_auth"
     },
-    "/_mainLayout/_auth/": {
-      "filePath": "_mainLayout/_auth/index.tsx",
-      "parent": "/_mainLayout/_auth"
+    "/_auth/opportunites/": {
+      "filePath": "_auth/opportunites/index.tsx",
+      "parent": "/_auth"
     },
-    "/_mainLayout/_auth/opportunites/$uuid": {
-      "filePath": "_mainLayout/_auth/opportunites/$uuid.tsx",
-      "parent": "/_mainLayout/_auth"
+    "/_auth/opportunites/$uuid/$produitId": {
+      "filePath": "_auth/opportunites/$uuid/$produitId.tsx",
+      "parent": "/_auth/opportunites/$uuid"
     },
-    "/_mainLayout/_auth/opportunites/nouvelle": {
-      "filePath": "_mainLayout/_auth/opportunites/nouvelle.tsx",
-      "parent": "/_mainLayout/_auth"
+    "/_auth/_adminLayout/admin/formulaires/$formSlug": {
+      "filePath": "_auth/_adminLayout/admin/formulaires/$formSlug.tsx",
+      "parent": "/_auth/_adminLayout"
     },
-    "/_mainLayout/_auth/opportunites/": {
-      "filePath": "_mainLayout/_auth/opportunites/index.tsx",
-      "parent": "/_mainLayout/_auth"
+    "/_auth/_adminLayout/admin/formulaires/ajouter": {
+      "filePath": "_auth/_adminLayout/admin/formulaires/ajouter.tsx",
+      "parent": "/_auth/_adminLayout"
     },
-    "/_mainLayout/_auth/_adminLayout/admin/formulaires/$formSlug": {
-      "filePath": "_mainLayout/_auth/_adminLayout/admin/formulaires/$formSlug.tsx",
-      "parent": "/_mainLayout/_auth/_adminLayout"
+    "/_auth/_adminLayout/admin/utilisateurs/$userSlug": {
+      "filePath": "_auth/_adminLayout/admin/utilisateurs/$userSlug.tsx",
+      "parent": "/_auth/_adminLayout"
     },
-    "/_mainLayout/_auth/_adminLayout/admin/formulaires/ajouter": {
-      "filePath": "_mainLayout/_auth/_adminLayout/admin/formulaires/ajouter.tsx",
-      "parent": "/_mainLayout/_auth/_adminLayout"
+    "/_auth/_adminLayout/admin/formulaires/": {
+      "filePath": "_auth/_adminLayout/admin/formulaires/index.tsx",
+      "parent": "/_auth/_adminLayout"
     },
-    "/_mainLayout/_auth/_adminLayout/admin/utilisateurs/$userSlug": {
-      "filePath": "_mainLayout/_auth/_adminLayout/admin/utilisateurs/$userSlug.tsx",
-      "parent": "/_mainLayout/_auth/_adminLayout"
-    },
-    "/_mainLayout/_auth/_adminLayout/admin/formulaires/": {
-      "filePath": "_mainLayout/_auth/_adminLayout/admin/formulaires/index.tsx",
-      "parent": "/_mainLayout/_auth/_adminLayout"
-    },
-    "/_mainLayout/_auth/_adminLayout/admin/utilisateurs/": {
-      "filePath": "_mainLayout/_auth/_adminLayout/admin/utilisateurs/index.tsx",
-      "parent": "/_mainLayout/_auth/_adminLayout"
+    "/_auth/_adminLayout/admin/utilisateurs/": {
+      "filePath": "_auth/_adminLayout/admin/utilisateurs/index.tsx",
+      "parent": "/_auth/_adminLayout"
     }
   }
 }

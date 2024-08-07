@@ -1,9 +1,9 @@
 import { useMemo } from "react";
 import { useAtomValue } from "jotai";
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
-import { createRouter, RouterProvider } from '@tanstack/react-router';
+import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import Alerte from "@components/Alerte";
 import NotFound from "@components/NotFound";
 import { modeAtom } from "@/stores/mainStore";
@@ -16,12 +16,12 @@ const queryClient = new QueryClient({});
 // création du router
 export const router = createRouter({
   routeTree,
-  defaultPreload: 'intent',
+  defaultPreload: "intent",
   defaultNotFoundComponent: NotFound,
-  context: { queryClient, auth: undefined!, }
+  context: { queryClient, auth: undefined! },
 });
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface Register {
     // This infers the type of our router and registers it across your entire project
     router: typeof router;
@@ -30,11 +30,10 @@ declare module '@tanstack/react-router' {
 
 function InnerApp() {
   const auth = useAuth();
-  return <RouterProvider router={router} context={{ queryClient, auth }} />
+  return <RouterProvider router={router} context={{ queryClient, auth }} />;
 }
 
 function App() {
-
   // Hook d'authentification
 
   // Chargement de l'état Atom du theme
@@ -45,7 +44,7 @@ function App() {
     () =>
       createTheme({
         palette: {
-          mode: (mode === "dark") ? "dark" : "light",
+          mode: mode === "dark" ? "dark" : "light",
         },
       }),
     [mode],
@@ -59,7 +58,10 @@ function App() {
           <InnerApp />
         </AuthProvider>
         <Alerte />
-        <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
+        <ReactQueryDevtools
+          initialIsOpen={false}
+          buttonPosition="bottom-left"
+        />
       </QueryClientProvider>
     </ThemeProvider>
   );

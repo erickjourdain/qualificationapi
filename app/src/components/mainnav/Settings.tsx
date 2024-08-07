@@ -4,7 +4,6 @@ import { IconButton, Tooltip } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 
 const Settings = () => {
-
   // Chargement du Hook de navigation
   const navigate = useNavigate();
 

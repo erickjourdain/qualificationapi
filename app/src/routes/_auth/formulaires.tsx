@@ -1,19 +1,31 @@
-import { useEffect, useState } from 'react';
-import { createFileRoute } from '@tanstack/react-router';
-import { useAtomValue } from 'jotai';
-import { Box, IconButton, InputAdornment, Paper, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import ClearIcon from '@mui/icons-material/Clear';
-import { formsAtom } from '@/stores/oppStore';
-import { formatDateTime } from '@/utils/format';
-import { FormAPI } from '@/gec-tripetto';
+import { useEffect, useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { useAtomValue } from "jotai";
+import {
+  Box,
+  IconButton,
+  InputAdornment,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TablePagination,
+  TableRow,
+  TextField,
+  Typography,
+} from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import ClearIcon from "@mui/icons-material/Clear";
+import { formsAtom } from "@/stores/oppStore";
+import { formatDateTime } from "@/utils/format";
+import { FormAPI } from "@/gec-tripetto";
 
-export const Route = createFileRoute('/_mainLayout/_auth/formulaires')({
+export const Route = createFileRoute("/_auth/formulaires")({
   component: Formulaires,
-})
+});
 
 function Formulaires() {
-
   // Definition du nombre d'éléments à afficher
   const itemsPerPage = 10;
 
@@ -31,11 +43,13 @@ function Formulaires() {
   // Mise à jour des données à afficher
   useEffect(() => {
     const filter = new RegExp(String.raw`${search.trim()}`, "i");
-    const filteredItems = (search.trim().length)
-      ? formulaires.filter(value => value.titre.search(filter) >= 0)
+    const filteredItems = search.trim().length
+      ? formulaires.filter((value) => value.titre.search(filter) >= 0)
       : formulaires;
     setNbData(filteredItems.length);
-    setData(filteredItems.slice((page - 1) * itemsPerPage, (page) * itemsPerPage));
+    setData(
+      filteredItems.slice((page - 1) * itemsPerPage, page * itemsPerPage),
+    );
   }, [formulaires, search, page]);
 
   return (
@@ -45,7 +59,7 @@ function Formulaires() {
           Liste des Formulaires disponibles
         </Typography>
 
-        <Box sx={{ display: "flex", justifyContent: "right" }} >
+        <Box sx={{ display: "flex", justifyContent: "right" }}>
           <TextField
             id="input-search"
             label="Recherche"
@@ -61,7 +75,7 @@ function Formulaires() {
                 <IconButton onClick={() => setSearch("")}>
                   <ClearIcon />
                 </IconButton>
-              )
+              ),
             }}
             variant="standard"
           />
@@ -92,11 +106,10 @@ function Formulaires() {
           component="div"
           count={nbData}
           rowsPerPage={itemsPerPage}
-          page={(page !== undefined) ? page - 1 : 0}
+          page={page !== undefined ? page - 1 : 0}
           onPageChange={(_evt, newPage) => setPage(newPage + 1)}
         />
       </Box>
     </Paper>
-  )
-
+  );
 }

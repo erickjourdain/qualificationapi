@@ -1,21 +1,30 @@
-import { useMutation } from '@tanstack/react-query';
-import { createFileRoute, Link } from '@tanstack/react-router'
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { Alert, Avatar, Box, Button, Container, CssBaseline, TextField, Typography } from '@mui/material';
-import LockResetIcon from '@mui/icons-material/LockReset';
-import { resetPassword } from '@/utils/apiCall';
-import manageError from '@/utils/manageError';
+import { useMutation } from "@tanstack/react-query";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import {
+  Alert,
+  Avatar,
+  Box,
+  Button,
+  Container,
+  CssBaseline,
+  TextField,
+  Typography,
+} from "@mui/material";
+import LockResetIcon from "@mui/icons-material/LockReset";
+import { resetPassword } from "@/utils/apiCall";
+import manageError from "@/utils/manageError";
 
-export const Route = createFileRoute('/_mainLayout/resetpwd')({
+export const Route = createFileRoute("/resetpwd")({
   component: ResetPwd,
-})
+});
 
 interface Inputs {
   password: string;
   confirmPassword: string;
   token: string;
-};
+}
 
 function ResetPwd() {
   const [pwdChanged, setPwdChanged] = useState<boolean>(false);
@@ -48,22 +57,25 @@ function ResetPwd() {
     mutate(payload);
   };
 
-  if (pwdChanged) return (
-    <Container component="main" maxWidth="md">
-      <Box
-        sx={{
-          marginTop: 8,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <CssBaseline />
-        <Alert severity="success">Votre mot de passe a été modifié vous pouvez vous connected.</Alert>
-        <Link to="/login">login</Link>
-      </Box>
-    </Container>
-  )
+  if (pwdChanged)
+    return (
+      <Container component="main" maxWidth="md">
+        <Box
+          sx={{
+            marginTop: 8,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <CssBaseline />
+          <Alert severity="success">
+            Votre mot de passe a été modifié vous pouvez vous connected.
+          </Alert>
+          <Link to="/login">login</Link>
+        </Box>
+      </Container>
+    );
 
   return (
     <Container component="main" maxWidth="xs">
@@ -82,7 +94,12 @@ function ResetPwd() {
         <Typography component="h1" variant="h5">
           Mise à jour mot de passe
         </Typography>
-        <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate sx={{ mt: 1, width: "100%" }}>
+        <Box
+          component="form"
+          onSubmit={handleSubmit(onSubmit)}
+          noValidate
+          sx={{ mt: 1, width: "100%" }}
+        >
           <TextField
             margin="normal"
             required
@@ -98,11 +115,13 @@ function ResetPwd() {
               },
               max: {
                 value: 25,
-                message: "Le mot de passe ne peut contenir plus de 25 caractères.",
+                message:
+                  "Le mot de passe ne peut contenir plus de 25 caractères.",
               },
               pattern: {
                 value: /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W)/g,
-                message: "Le mot de passe doit contenir au moins un nombre, une minuscule, une majuscule et un caractère spécial.",
+                message:
+                  "Le mot de passe doit contenir au moins un nombre, une minuscule, une majuscule et un caractère spécial.",
               },
             })}
             error={errors.password ? true : false}
@@ -119,7 +138,9 @@ function ResetPwd() {
             type="password"
             {...register("confirmPassword", {
               validate: {
-                confirm: (value, values) => value === values.password || "Les mots de passe sont différents.",
+                confirm: (value, values) =>
+                  value === values.password ||
+                  "Les mots de passe sont différents.",
               },
             })}
             error={errors.confirmPassword ? true : false}
@@ -144,11 +165,17 @@ function ResetPwd() {
           <Typography variant="inherit" color="error">
             {errors.root?.message}
           </Typography>
-          <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} disabled={isPending}>
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+            disabled={isPending}
+          >
             {!isPending ? "Enregistrer" : "Loading ..."}
           </Button>
         </Box>
       </Box>
     </Container>
-  )
+  );
 }

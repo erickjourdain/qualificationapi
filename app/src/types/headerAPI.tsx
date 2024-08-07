@@ -14,4 +14,4 @@ export type HeaderAPI = {
   gestionnaire?: User;
   createdAt?: number;
   updatedAt?: number;
-}
+};

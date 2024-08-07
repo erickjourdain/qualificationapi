@@ -9,4 +9,4 @@ export type ProduitAPI = {
   gestionnaire: User;
   createdAt?: number;
   updatedAt?: number;
-}
+};

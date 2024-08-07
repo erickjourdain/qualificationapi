@@ -13,7 +13,7 @@ import FormulaireForm from "@components/admin/FormulaireForm";
 
 const FormulaireAjouter = () => {
   const navigate = useNavigate();
-  
+
   // Chargement de l'état Atom des alertes
   const setAlerte = useSetAtom(alertAtom);
 
@@ -26,7 +26,10 @@ const FormulaireAjouter = () => {
   const { mutate } = useMutation({
     mutationFn: createForm,
     onSuccess: (response) => {
-      setAlerte({ severite: "success", message: "Les données ont été sauvegardées" });
+      setAlerte({
+        severite: "success",
+        message: "Les données ont été sauvegardées",
+      });
       navigate({ to: `/formulaire/${response.data.slug}` });
     },
     onError: (error: Error) => {
@@ -35,11 +38,18 @@ const FormulaireAjouter = () => {
   });
 
   // Lancement de l'appel à la requête de mise à jour lors de la validation du formulaire
-  const onSubmit = (data: { titre: string; description: string | null; formulaire: string }) => {
+  const onSubmit = (data: {
+    titre: string;
+    description: string | null;
+    formulaire: string;
+  }) => {
     const value: FormCreation = {
       titre: data.titre,
-      description: data.description && !isEmpty(data.description.trim()) ? data.description.trim() : null,
-      formulaire: data.formulaire
+      description:
+        data.description && !isEmpty(data.description.trim())
+          ? data.description.trim()
+          : null,
+      formulaire: data.formulaire,
     };
     mutate(value);
   };
@@ -65,7 +75,7 @@ const FormulaireAjouter = () => {
           />
         </Box>
       </Paper>
-      {state.trim() !== "" &&
+      {state.trim() !== "" && (
         <PlayTripetto
           open={dialog}
           onClose={() => setDialog(false)}
@@ -76,7 +86,7 @@ const FormulaireAjouter = () => {
             return true;
           }}
         />
-      }
+      )}
     </>
   );
 };

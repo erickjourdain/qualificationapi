@@ -3,7 +3,19 @@ import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
-import { Box, Button, FormControl, FormControlLabel, InputLabel, MenuItem, Select, Stack, Switch, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  FormControl,
+  FormControlLabel,
+  InputLabel,
+  MenuItem,
+  Select,
+  Stack,
+  Switch,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { Role, User } from "@/gec-tripetto";
 import { updateUser } from "@/utils/apiCall";
 import manageError from "@/utils/manageError";
@@ -25,7 +37,7 @@ type UpdateFormProps = {
 
 const UtilisateurForm = ({ user, onUpdated }: UpdateFormProps) => {
   const roles = ["ADMIN", "CREATOR", "USER", "READER"];
-  
+
   // Chargement de l'état Atom des alertes
   const setAlerte = useSetAtom(alertAtom);
 
@@ -61,11 +73,14 @@ const UtilisateurForm = ({ user, onUpdated }: UpdateFormProps) => {
   const { mutate, isPending } = useMutation({
     mutationFn: updateUser,
     onSuccess: (rep: AxiosResponse) => {
-      setAlerte({ severite: "success", message: "Les données ont été mises à jour" } );
+      setAlerte({
+        severite: "success",
+        message: "Les données ont été mises à jour",
+      });
       onUpdated(rep.data);
     },
     onError: (error: Error) => {
-      setAlerte({ severite: "error", message: manageError(error) } );
+      setAlerte({ severite: "error", message: manageError(error) });
     },
   });
 
@@ -82,7 +97,11 @@ const UtilisateurForm = ({ user, onUpdated }: UpdateFormProps) => {
         display="flex"
         flexWrap="wrap"
         justifyContent="space-around"
-        sx={{ mt: 2, "& .MuiTextField-root": { flex: "0 0 30%", m: 1 }, "& .MuiFormControlLabel-root": { flex: "0 0 30%", m: 1 } }}
+        sx={{
+          mt: 2,
+          "& .MuiTextField-root": { flex: "0 0 30%", m: 1 },
+          "& .MuiFormControlLabel-root": { flex: "0 0 30%", m: 1 },
+        }}
       >
         <TextField
           id="nom"
@@ -125,7 +144,12 @@ const UtilisateurForm = ({ user, onUpdated }: UpdateFormProps) => {
               render={({ field }) => (
                 <>
                   <InputLabel id="role-select-label">role</InputLabel>
-                  <Select id="role-select" labelId="role-select-label" label="role" {...field}>
+                  <Select
+                    id="role-select"
+                    labelId="role-select-label"
+                    label="role"
+                    {...field}
+                  >
                     {roles.map((r) => (
                       <MenuItem value={r} key={r}>
                         {r}
@@ -141,23 +165,39 @@ const UtilisateurForm = ({ user, onUpdated }: UpdateFormProps) => {
           name="validated"
           control={control}
           render={({ field: { value, onChange } }) => (
-            <FormControlLabel control={<Switch checked={value} onChange={onChange} />} label="validé" />
+            <FormControlLabel
+              control={<Switch checked={value} onChange={onChange} />}
+              label="validé"
+            />
           )}
         />
         <Controller
           name="locked"
           control={control}
           render={({ field: { value, onChange } }) => (
-            <FormControlLabel control={<Switch checked={value} onChange={onChange} />} label="bloqué" />
+            <FormControlLabel
+              control={<Switch checked={value} onChange={onChange} />}
+              label="bloqué"
+            />
           )}
         />
       </Box>
       <Box mt={3} display="flex" alignItems="flex-start">
         <Stack spacing={2} direction="row">
-          <Button variant="contained" color="primary" disabled={isPending} type="submit">
+          <Button
+            variant="contained"
+            color="primary"
+            disabled={isPending}
+            type="submit"
+          >
             {!isPending ? "Mettre à jour" : "Loading..."}
           </Button>
-          <Button variant="contained" color="warning" disabled={isPending} onClick={() => reset()}>
+          <Button
+            variant="contained"
+            color="warning"
+            disabled={isPending}
+            onClick={() => reset()}
+          >
             Reset
           </Button>
         </Stack>

@@ -3,4 +3,4 @@ export type AnwserUpdate = {
   statut?: string;
   devis?: string | null;
   reponse?: string;
-}
+};

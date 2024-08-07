@@ -3,7 +3,15 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
 import { useSetAtom, useAtomValue } from "jotai";
 import { sfEqual } from "spring-filter-query-builder";
-import { Alert, Box, Button, Paper, Skeleton, TextField, Typography } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  Paper,
+  Skeleton,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { User } from "@/gec-tripetto";
 import { displayAlert, loggedUser } from "@/atomState";
 import { getResetPwdToken, getUsers } from "@/utils/apiCall";
@@ -17,7 +25,9 @@ const Utilisateur = () => {
   const currentUser = useAtomValue(loggedUser);
 
   // Récupération des données de la route
-  const { userSlug } = useParams({ from: "/_mainLayout/_adminLayout/admin/utilisateurs/$userSlug" });
+  const { userSlug } = useParams({
+    from: "/_mainLayout/_adminLayout/admin/utilisateurs/$userSlug",
+  });
 
   // Définition des variables d'état du composant
   const [user, setUser] = useState<User | null>(null);
@@ -25,7 +35,12 @@ const Utilisateur = () => {
   const [token, setToken] = useState<string | null>(null);
   const [tokenCopy, setTokenCopy] = useState<boolean>(false);
 
-  const { data: dataUser, error, isLoading, isError } = useQuery({
+  const {
+    data: dataUser,
+    error,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["user", userSlug],
     queryFn: () => {
       const filter = `filter=${sfEqual("slug", userSlug ? userSlug : "")}`;
@@ -38,18 +53,24 @@ const Utilisateur = () => {
   const { data: dataToken } = useQuery({
     queryKey: ["resetPwdToken"],
     queryFn: () => {
-      if (user) return getResetPwdToken(user?.id)
+      if (user) return getResetPwdToken(user?.id);
       else return Promise.resolve(null);
     },
-    enabled: pwdToken && !!user && (token === null),
-  })
+    enabled: pwdToken && !!user && token === null,
+  });
 
   // Mise à jour des données suite récupération de l'utilisateur
   useEffect(() => {
     if (dataUser) {
       if (dataUser?.data.data.length !== 1)
-        setAlerte({ severite: "warning", message: "Erreur lors du chargement de l'utilisateur" });
-      if (currentUser?.role === "ADMIN" || dataUser?.data.data[0].id !== currentUser?.id) {
+        setAlerte({
+          severite: "warning",
+          message: "Erreur lors du chargement de l'utilisateur",
+        });
+      if (
+        currentUser?.role === "ADMIN" ||
+        dataUser?.data.data[0].id !== currentUser?.id
+      ) {
         const us = dataUser?.data.data[0] as User;
         setUser(us);
         if (us.resetPwdToken !== null) {
@@ -57,7 +78,10 @@ const Utilisateur = () => {
           setPwdToken(true);
         }
       } else
-        setAlerte({ severite: "warning", message: "Vous ne disposez pas des droits pour accéder à cette page" });
+        setAlerte({
+          severite: "warning",
+          message: "Vous ne disposez pas des droits pour accéder à cette page",
+        });
     }
   }, [dataUser]);
   // Mise à jour du token
@@ -68,18 +92,18 @@ const Utilisateur = () => {
   useEffect(() => {
     if (isError) setAlerte({ severite: "error", message: manageError(error) });
   }, [isError]);
-  // 
+  //
   useEffect(() => {
-      setToken(null);
-      setPwdToken(false);
-      setTokenCopy(false);
-  },[]);
+    setToken(null);
+    setPwdToken(false);
+    setTokenCopy(false);
+  }, []);
 
   // Lancement de la mise à jour des données de l'utilisateur
   const handleUpdate = (newUser: User) => {
     setUser(newUser);
-  }
-  
+  };
+
   if (isLoading)
     return (
       <>
@@ -99,15 +123,37 @@ const Utilisateur = () => {
             Profil {user.prenom} {user.nom}
           </Typography>
           <UtilisateurForm user={user} onUpdated={handleUpdate} />
-          < Box sx={{ mt: 3 }}>
-            {!token && <Button onClick={() => setPwdToken(true)}>Changer mot de passe</Button>}
-            {token && !tokenCopy &&
+          <Box sx={{ mt: 3 }}>
+            {!token && (
+              <Button onClick={() => setPwdToken(true)}>
+                Changer mot de passe
+              </Button>
+            )}
+            {token && !tokenCopy && (
               <>
-                <Button onClick={() => { navigator.clipboard.writeText(token); setTokenCopy(true)}}>Copier Token</Button>
-                <TextField sx={{ mt: 1 }} id="outlined-basic" label={token} variant="outlined" disabled fullWidth />
+                <Button
+                  onClick={() => {
+                    navigator.clipboard.writeText(token);
+                    setTokenCopy(true);
+                  }}
+                >
+                  Copier Token
+                </Button>
+                <TextField
+                  sx={{ mt: 1 }}
+                  id="outlined-basic"
+                  label={token}
+                  variant="outlined"
+                  disabled
+                  fullWidth
+                />
               </>
-            }
-            {token && tokenCopy && <Alert severity="success">Le token a été copié dans le presse papier</Alert>}
+            )}
+            {token && tokenCopy && (
+              <Alert severity="success">
+                Le token a été copié dans le presse papier
+              </Alert>
+            )}
           </Box>
         </Box>
       </Paper>

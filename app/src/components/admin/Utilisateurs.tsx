@@ -2,9 +2,17 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useSetAtom } from "jotai";
-import { Box, Paper, Table, TableBody, TableCell, TablePagination, TableRow } from "@mui/material";
-import CheckBoxIcon from "@mui/icons-material/CheckBox"
-import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import {
+  Box,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TablePagination,
+  TableRow,
+} from "@mui/material";
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import Typography from "@mui/material/Typography";
 import TableHead from "@mui/material/TableHead";
 import { User, UsersAPI } from "@/gec-tripetto";
@@ -14,7 +22,6 @@ import manageError from "@/utils/manageError";
 import Loading from "../Loading";
 
 const Utilisateurs = () => {
-
   const itemsPerPage = 10;
 
   // Chargement de l'état Atom des alertes
@@ -30,7 +37,13 @@ const Utilisateurs = () => {
 
   const { data, error, isError, isLoading } = useQuery({
     queryKey: ["users", page],
-    queryFn: () => getUsers(null, ["id", "prenom", "nom", "validated", "role", "locked", "slug"], page + 1, itemsPerPage),
+    queryFn: () =>
+      getUsers(
+        null,
+        ["id", "prenom", "nom", "validated", "role", "locked", "slug"],
+        page + 1,
+        itemsPerPage,
+      ),
     select: (response) => response.data as UsersAPI,
     refetchOnWindowFocus: false,
   });
@@ -53,10 +66,10 @@ const Utilisateurs = () => {
   };
 
   const icon = (val: boolean) => {
-    return (val) ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />
-  }
+    return val ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />;
+  };
 
-  if (isLoading) return <Loading />
+  if (isLoading) return <Loading />;
 
   if (users)
     return (
@@ -76,7 +89,13 @@ const Utilisateurs = () => {
             </TableHead>
             <TableBody>
               {users.map((user) => (
-                <TableRow key={user.id} onDoubleClick={() => navigate({ to: `/admin/utilisateurs/${user.slug}` })} sx={{ cursor: "pointer "}}>
+                <TableRow
+                  key={user.id}
+                  onDoubleClick={() =>
+                    navigate({ to: `/admin/utilisateurs/${user.slug}` })
+                  }
+                  sx={{ cursor: "pointer " }}
+                >
                   <TableCell>{`${user.prenom} ${user.nom}`}</TableCell>
                   <TableCell>{user.role}</TableCell>
                   <TableCell>{icon(user.validated)}</TableCell>

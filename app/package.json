@@ -9,7 +9,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "format": "prettier --write ./src"
   },
   "dependencies": {
     "@tanstack/query-core": "^5.51.9",
@@ -46,11 +47,13 @@
     "ajv": "^8.16.0",
     "axios": "^1.7.2",
     "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.7",
     "jotai": "^2.8.4",
     "lodash": "^4.17.21",
     "luxon": "^3.4.4",
+    "prettier": "3.3.3",
     "react-hook-form": "^7.52.1",
     "spring-filter-query-builder": "^1.1.0",
     "typescript": "^5.2.2",

@@ -1,14 +1,20 @@
 import { useCallback, useState, MouseEvent } from "react";
 import { useAtom } from "jotai";
-import { IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Tooltip } from "@mui/material";
-import SmartDisplayIcon from '@mui/icons-material/SmartDisplay';
+import {
+  IconButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Tooltip,
+} from "@mui/material";
+import SmartDisplayIcon from "@mui/icons-material/SmartDisplay";
 import CkeckIcon from "@mui/icons-material/Check";
 import { runnerAtom } from "@/stores/mainStore";
 
 const runners = ["Classic", "Autoscroll", "Chat"];
 
 const Runner = () => {
-
   // Chargement de l'état Atom du runner Tripetto
   const [runner, setRunner] = useAtom(runnerAtom);
 
@@ -53,21 +59,18 @@ const Runner = () => {
         {runners.map((value) => {
           return (
             <MenuItem onClick={() => handleRunner(value)} key={value}>
-              {
-                (value === runner) &&
+              {value === runner && (
                 <ListItemIcon>
                   <CkeckIcon />
                 </ListItemIcon>
-              }
-              <ListItemText inset={value !== runner}>
-                {value}
-              </ListItemText>
+              )}
+              <ListItemText inset={value !== runner}>{value}</ListItemText>
             </MenuItem>
           );
         })}
-      </Menu >
+      </Menu>
     </>
-  )
-}
+  );
+};
 
 export default Runner;

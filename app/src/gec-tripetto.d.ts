@@ -27,11 +27,13 @@ export {
   AnwserUpdate,
   ChildrenProps,
   FormAPI,
-  Answer, FormAnswers,
+  Answer,
+  FormAnswers,
   FormCreation,
   FormsAPI,
   LockAPI,
-  Role, User,
+  Role,
+  User,
   Runner,
   UserCreation,
   UsersAPI,
@@ -41,6 +43,5 @@ export {
   ProduitsAPI,
   HeaderCreation,
   Statut,
-  AppRouterContext
-}
-
+  AppRouterContext,
+};

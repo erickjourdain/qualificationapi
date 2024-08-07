@@ -7,18 +7,17 @@ import Runner from "@components/mainnav/Runner";
 import { useAuth } from "@/hooks/auth";
 
 const Selection = () => {
-
   const auth = useAuth();
 
-  return(
+  return (
     <Box sx={{ display: { xs: "none", sm: "block" } }}>
-      { auth.isLogged && <Formulaires /> }
+      {auth.isLogged && <Formulaires />}
       <Theme />
       <Runner />
-      { auth.isCreator && <Settings /> }
+      {auth.isCreator && <Settings />}
       <Quitter />
     </Box>
-  )
-}
+  );
+};
 
 export default Selection;

@@ -1,4 +1,3 @@
-
 import { useAtom } from "jotai";
 import { Export, IDefinition, Import, Instance } from "@tripetto/runner";
 import { ChatRunner } from "@tripetto/runner-chat";
@@ -11,7 +10,14 @@ import translationClassic from "@tripetto/runner-classic/runner/translations/fr.
 import translationChat from "@tripetto/runner-chat/runner/translations/fr.json";
 import translationAutoScroll from "@tripetto/runner-autoscroll/runner/translations/fr.json";
 import { ILocale, TTranslation } from "@tripetto/runner/module/l10n";
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
 import { runnerAtom } from "@/stores/mainStore";
 
 type TripettoProps = {
@@ -22,7 +28,13 @@ type TripettoProps = {
   onSubmit?: (instance: Instance) => boolean;
 };
 
-const PlayTripetto = ({ open, onClose, form, data, onSubmit }: TripettoProps) => {
+const PlayTripetto = ({
+  open,
+  onClose,
+  form,
+  data,
+  onSubmit,
+}: TripettoProps) => {
   let runner: JSX.Element;
 
   // Chargement de l'état Atom du runner
@@ -79,7 +91,13 @@ const PlayTripetto = ({ open, onClose, form, data, onSubmit }: TripettoProps) =>
   }
 
   return (
-    <Dialog open={open} fullWidth maxWidth="md" onClose={onClose} scroll="paper" >
+    <Dialog
+      open={open}
+      fullWidth
+      maxWidth="md"
+      onClose={onClose}
+      scroll="paper"
+    >
       <DialogTitle>Formulaire Qualification</DialogTitle>
       <DialogContent dividers>
         <DialogContentText sx={{ width: "90%" }}>{runner}</DialogContentText>

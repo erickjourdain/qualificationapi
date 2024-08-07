@@ -1,5 +1,12 @@
 import axios, { AxiosRequestConfig, AxiosError } from "axios";
-import { AnwserUpdate, FormCreation, HeaderAPI, HeaderCreation, User, UserCreation } from "../gec-tripetto";
+import {
+  AnwserUpdate,
+  FormCreation,
+  HeaderAPI,
+  HeaderCreation,
+  User,
+  UserCreation,
+} from "../gec-tripetto";
 import { sfEqual } from "spring-filter-query-builder";
 
 // Création de l'instance Axios pour les requêtes vers l'API
@@ -47,23 +54,30 @@ const delAuthorisation = () => {
   instance.defaults.headers.common["Authorization"] = "";
 };
 
-const getForms = (filter: string | null = null, page = 1, include: string[] = [], size = 10) => {
+const getForms = (
+  filter: string | null = null,
+  page = 1,
+  include: string[] = [],
+  size = 10,
+) => {
   let url = `/data/forms?page=${page}&size=${size}`;
   if (filter) url += `&filter=${filter}`;
   if (include.length) url += `&include=${include.join(",")}`;
   return instance.request({
     method: "GET",
     url: encodeURI(url),
-  })
-}
+  });
+};
 
 const getFormsInit = (initForm: number, page = 1) => {
   // lancement de la requête
   return instance.request({
     method: "GET",
-    url: encodeURI(`/data/forms?filter=${sfEqual("initForm", initForm)}&page=${page}&size=${50}&include=id`),
+    url: encodeURI(
+      `/data/forms?filter=${sfEqual("initForm", initForm)}&page=${page}&size=${50}&include=id`,
+    ),
   });
-}
+};
 
 const getForm = (slug: string | undefined, include = []) => {
   const searchParams = slug ? sfEqual("slug", slug) : "";
@@ -83,7 +97,13 @@ const createForm = (payload: FormCreation) => {
   });
 };
 
-const updateForm = (payload: { id?: number; titre?: string; description?: string | null; formulaire?: string; createur?: number }) => {
+const updateForm = (payload: {
+  id?: number;
+  titre?: string;
+  description?: string | null;
+  formulaire?: string;
+  createur?: number;
+}) => {
   return instance.request({
     method: "PATCH",
     url: `/data/forms/${payload.id}`,
@@ -92,7 +112,11 @@ const updateForm = (payload: { id?: number; titre?: string; description?: string
 };
 
 //const saveAnswer = (payload: { reponse: string; donnees: string; formulaire: number; createur: number }) => {
-const saveAnswer = (payload: { reponse: string; produit: number, formulaire: number }) => {
+const saveAnswer = (payload: {
+  reponse: string;
+  produit: number;
+  formulaire: number;
+}) => {
   return instance.request({
     method: "POST",
     url: "/data/answers",
@@ -100,11 +124,16 @@ const saveAnswer = (payload: { reponse: string; produit: number, formulaire: num
   });
 };
 
-const getAnswers = (filter: string | null, page: number = 1, include: string[] = [], size: number = 10) => {  
-let url = "";
-url = `/data/answers?page=${page}&size=${size}&order=desc(id)`;
-if (filter) url += `&filter=${filter}`;
-if (include.length) url += `&include=${include.join(",")}`;
+const getAnswers = (
+  filter: string | null,
+  page: number = 1,
+  include: string[] = [],
+  size: number = 10,
+) => {
+  let url = "";
+  url = `/data/answers?page=${page}&size=${size}&order=desc(id)`;
+  if (filter) url += `&filter=${filter}`;
+  if (include.length) url += `&include=${include.join(",")}`;
   return instance.request({
     method: "GET",
     url: encodeURI(url),
@@ -168,7 +197,12 @@ const getCurrentUser = () => {
   });
 };
 
-const getUsers = (filter: string | null = null, include: string[] = [], page: number = 1, size: number = 10) => {
+const getUsers = (
+  filter: string | null = null,
+  include: string[] = [],
+  page: number = 1,
+  size: number = 10,
+) => {
   // construction du chemin d'interrogation de l'API
   const params: string[] = [];
   if (filter) params.push(filter);
@@ -196,31 +230,35 @@ const updateUser = (payload: User) => {
     url: `/data/users/${payload.id}`,
     data: payload,
   });
-}
+};
 
 const getResetPwdToken = (id: number) => {
   return instance.request({
     method: "GET",
     url: `/data/users/reset-token/${id}`,
-  })
-}
+  });
+};
 
-const resetPassword = (payload: { password: string, token: string }) => {
+const resetPassword = (payload: { password: string; token: string }) => {
   return instance.request({
     method: "POST",
     url: "/reset-password",
     data: payload,
-  })
-}
+  });
+};
 
 const logout = () => {
   return instance.request({
     method: "GET",
     url: "/auth/logout",
-  })
-}
+  });
+};
 
-const getHeaders = (page: number = 1, filter: string = "", include: string[] = []) => {
+const getHeaders = (
+  page: number = 1,
+  filter: string = "",
+  include: string[] = [],
+) => {
   let url = "";
   url = `/data/headers?page=${page}&order=desc(id)`;
   if (filter.length) url += `&filter=${filter}`;
@@ -228,18 +266,22 @@ const getHeaders = (page: number = 1, filter: string = "", include: string[] = [
   return instance.request({
     method: "GET",
     url: encodeURI(url),
-  })
-}
+  });
+};
 
 const updateHeader = (payload: HeaderAPI) => {
   return instance.request({
     method: "PATCH",
     url: encodeURI(`/data/headers/${payload.id}`),
-    data: payload
-  })
-}
+    data: payload,
+  });
+};
 
-const getProduits = (page: number = 1, filter: string = "", include: string[] = []) => {
+const getProduits = (
+  page: number = 1,
+  filter: string = "",
+  include: string[] = [],
+) => {
   let url = "";
   url = `/data/produits?page=${page}&order=desc(id)`;
   if (filter.length) url += `&filter=${filter}`;
@@ -247,47 +289,47 @@ const getProduits = (page: number = 1, filter: string = "", include: string[] = 
   return instance.request({
     method: "GET",
     url: encodeURI(url),
-  })
-}
+  });
+};
 
-const updateProduit = (payload: { id: number, description: string }) => {
+const updateProduit = (payload: { id: number; description: string }) => {
   return instance.request({
     method: "PATCH",
     url: encodeURI(`/data/produits/${payload.id}`),
     data: payload,
-  })
-}
+  });
+};
 
-const createProduit = (payload: { header: number, description: string }) => {
+const createProduit = (payload: { header: number; description: string }) => {
   return instance.request({
     method: "POST",
     url: "/data/produits",
     data: payload,
-  })
-}
+  });
+};
 
 const createHeadersWithProducts = (payload: HeaderCreation) => {
   return instance.request({
     method: "POST",
     url: "/data/headers/with-products",
     data: payload,
-  })
-}
+  });
+};
 
-const addDevisAnswer = (payload: {id: number, devis: string}) => {
+const addDevisAnswer = (payload: { id: number; devis: string }) => {
   return instance.request({
     method: "PATCH",
     url: `data/answers/devis/${payload.id}`,
-    data: { devis: payload.devis }
-  })
-}
+    data: { devis: payload.devis },
+  });
+};
 
 const getDirectories = (id: number) => {
   return instance.request({
     method: "GET",
     url: `data/headers/dir/${id}`,
-  })
-}
+  });
+};
 
 export {
   apiRequest,

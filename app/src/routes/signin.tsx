@@ -1,15 +1,24 @@
-import { useState } from 'react';
-import { createFileRoute } from '@tanstack/react-router';
-import { useForm } from 'react-hook-form';
-import { useMutation } from '@tanstack/react-query';
-import { Alert, Avatar, Box, Button, Container, CssBaseline, TextField, Typography } from '@mui/material';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import { createUser, delAuthorisation } from '@/utils/apiCall';
-import manageError from '@/utils/manageError';
+import { useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { useForm } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
+import {
+  Alert,
+  Avatar,
+  Box,
+  Button,
+  Container,
+  CssBaseline,
+  TextField,
+  Typography,
+} from "@mui/material";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import { createUser, delAuthorisation } from "@/utils/apiCall";
+import manageError from "@/utils/manageError";
 
-export const Route = createFileRoute('/_mainLayout/signin')({
+export const Route = createFileRoute("/signin")({
   component: Signin,
-})
+});
 
 interface Inputs {
   prenom: string;
@@ -17,10 +26,9 @@ interface Inputs {
   login: string;
   password: string;
   confirmPassword: string;
-};
+}
 
-function Signin () {
-
+function Signin() {
   const [created, setCreated] = useState(false);
 
   // Définition des éléments pour la validation du formulaire
@@ -66,7 +74,9 @@ function Signin () {
           }}
         >
           <CssBaseline />
-          <Alert severity="success">Votre compte est créé. Un administrateur va le valider.</Alert>
+          <Alert severity="success">
+            Votre compte est créé. Un administrateur va le valider.
+          </Alert>
         </Box>
       </Container>
     );
@@ -89,7 +99,12 @@ function Signin () {
           Enregistrement
         </Typography>
       </Box>
-      <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate sx={{ mt: 1, width: "100%" }}>
+      <Box
+        component="form"
+        onSubmit={handleSubmit(onSubmit)}
+        noValidate
+        sx={{ mt: 1, width: "100%" }}
+      >
         <TextField
           margin="normal"
           required
@@ -159,11 +174,13 @@ function Signin () {
             },
             max: {
               value: 25,
-              message: "Le mot de passe ne peut contenir plus de 25 caractères.",
+              message:
+                "Le mot de passe ne peut contenir plus de 25 caractères.",
             },
             pattern: {
               value: /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W)/g,
-              message: "Le mot de passe doit contenir au moins un nombre, une minuscule, une majuscule et un caractère spécial.",
+              message:
+                "Le mot de passe doit contenir au moins un nombre, une minuscule, une majuscule et un caractère spécial.",
             },
           })}
           error={errors.password ? true : false}
@@ -180,7 +197,9 @@ function Signin () {
           type="password"
           {...register("confirmPassword", {
             validate: {
-              confirm: (value, values) => value === values.password || "Les mots de passe sont différents.",
+              confirm: (value, values) =>
+                value === values.password ||
+                "Les mots de passe sont différents.",
             },
           })}
           error={errors.confirmPassword ? true : false}
@@ -191,7 +210,13 @@ function Signin () {
         <Typography variant="inherit" color="error">
           {errors.root?.message}
         </Typography>
-        <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} disabled={isPending}>
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          sx={{ mt: 3, mb: 2 }}
+          disabled={isPending}
+        >
           {!isPending ? "Enregistrer" : "Loading ..."}
         </Button>
       </Box>

@@ -7,4 +7,4 @@ export type HeaderCreation = {
   opportunite: string;
   projet: string;
   produits: string[];
-}
+};

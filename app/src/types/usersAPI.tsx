@@ -1,4 +1,4 @@
-import { User } from "./user"
+import { User } from "./user";
 
 export type UsersAPI = {
   data: User[];
@@ -7,4 +7,4 @@ export type UsersAPI = {
   nbElements: number;
   hasPrevious: boolean;
   hasNext: boolean;
-}
+};
