@@ -43,7 +43,7 @@ const ProduitEdit = ({ prodItem, onClose }: ProduitEditProps) => {
     setValue,
   } = useForm<Inputs>();
 
-  const labelId = `checkbox-produit-${prodItem.id}`;
+  //const labelId = `checkbox-produit-${prodItem.id}`;
 
   // Chargement des données lors de la mise à jour du produit
   useEffect(() => {
@@ -51,6 +51,7 @@ const ProduitEdit = ({ prodItem, onClose }: ProduitEditProps) => {
       setValue("id", produit.id);
       setValue("description", produit.description);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [produit]);
 
   // Enregistrement du produit
@@ -103,16 +104,17 @@ const ProduitEdit = ({ prodItem, onClose }: ProduitEditProps) => {
       <ListItemButton selected={prodItem.id === produit?.id}>
         <ListItemIcon>
           <Checkbox
+            id={`checkbox-selection-${prodItem.id}`}
             edge="start"
             checked={prodItem.id === produit?.id}
             tabIndex={-1}
             disableRipple
-            inputProps={{ "aria-labelledby": labelId }}
           />
         </ListItemIcon>
         <ListItemText>
           <TextField
             sx={{ width: "80%" }}
+            id={`description-${produit?.id}`}
             {...register("description", {
               required: "La description du produit est obligatoire",
               minLength: {

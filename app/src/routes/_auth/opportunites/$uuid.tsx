@@ -1,6 +1,11 @@
 import { useCallback, useEffect } from "react";
 import { useAtom, useSetAtom } from "jotai";
-import { createFileRoute, Outlet, useNavigate, useRouter } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Outlet,
+  useNavigate,
+  useRouter,
+} from "@tanstack/react-router";
 import { sfEqual } from "spring-filter-query-builder";
 import { Box, Chip, Paper, Stack } from "@mui/material";
 import ServerError from "@/components/ServerError";
@@ -14,7 +19,7 @@ export const Route = createFileRoute("/_auth/opportunites/$uuid")({
   component: Opportunite,
   loader: async ({ context, params }) => {
     const { data: headers } = await context.queryClient.fetchQuery({
-      queryKey: ["getHeader", params.uuid],
+      queryKey: ["opportunite", params.uuid],
       queryFn: () => {
         const filter = sfEqual("uuid", params.uuid).toString();
         return getHeaders(1, filter);
@@ -65,18 +70,19 @@ function Opportunite() {
   useEffect(() => {
     setOpportunite(data.header);
     setProduit(data.produits[0]);
-    return () => { 
+    return () => {
       setOpportunite(null);
       setProduit(null);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  
+
   // Chargement de la page lors du changement de produit
   useEffect(() => {
-    if (produit) navigate({ to: `/opportunites/${data.header.uuid}/${produit.id}`})
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [produit])
+    if (produit)
+      navigate({ to: `/opportunites/${data.header.uuid}/${produit.id}` });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [produit]);
 
   /*****************************/
   // ouvrir l'explorateur de fichier

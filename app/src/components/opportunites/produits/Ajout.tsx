@@ -35,7 +35,10 @@ const ProduitAdd = ({ onClose }: ProduitAddtProps) => {
   // Enregistrement du produit
   const { mutate, isPending } = useMutation({
     mutationFn: (inputs: Inputs) =>
-      createProduit({ header: data.header.id, description: inputs.description }),
+      createProduit({
+        header: data.header.id,
+        description: inputs.description,
+      }),
     onSuccess: () => {
       setAlerte({
         severite: "success",
@@ -58,6 +61,7 @@ const ProduitAdd = ({ onClose }: ProduitAddtProps) => {
       <TextField
         sx={{ width: "80%" }}
         size="small"
+        id="description"
         label="description du produit à ajouter"
         {...register("description", {
           required: "La description du produit est obligatoire",

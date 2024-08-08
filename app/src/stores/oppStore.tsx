@@ -10,4 +10,7 @@ const opportuniteAtom = atom<HeaderAPI | null>(null);
 // Atom pour le stockage du produit sélectionné
 const produitAtom = atom<ProduitAPI | null>(null);
 
-export { formsAtom, opportuniteAtom, produitAtom };
+// Atom pour le stockage du formulaire sélectionné
+const formAtom = atom<FormAPI | null>(null);
+
+export { formsAtom, formAtom, opportuniteAtom, produitAtom };

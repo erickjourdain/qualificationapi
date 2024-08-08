@@ -53,7 +53,8 @@ function ResetPwd() {
   });
 
   const onSubmit = (data: Inputs) => {
-    const { confirmPassword, ...payload } = data;
+    // const { confirmPassword, ...payload } = data;
+    const { ...payload } = data;
     mutate(payload);
   };
 

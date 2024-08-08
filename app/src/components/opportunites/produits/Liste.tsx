@@ -25,10 +25,13 @@ const Produits = ({ produits }: ProduitsProps) => {
   const [ajout, setAjout] = useState<boolean>(false);
 
   // Editer le produit
-  const onEdit = useCallback((prod: ProduitAPI) => {
-    setProduit(prod);
-    setModification(true);
-  }, [setProduit]);
+  const onEdit = useCallback(
+    (prod: ProduitAPI) => {
+      setProduit(prod);
+      setModification(true);
+    },
+    [setProduit],
+  );
 
   // Fermeture de la modification d'un produit
   const handleClose = (update: boolean) => {

@@ -23,7 +23,7 @@ const ProduitItem = ({ prodItem, onEdit }: ProduitItemProps) => {
   // Hook état global du produit sélectionné
   const [produit, setProduit] = useAtom(produitAtom);
 
-  const labelId = `checkbox-produit-${prodItem.id}`;
+  //const labelId = `checkbox-produit-${prodItem.id}`;
 
   return (
     <ListItem
@@ -47,11 +47,11 @@ const ProduitItem = ({ prodItem, onEdit }: ProduitItemProps) => {
       >
         <ListItemIcon>
           <Checkbox
+            id={`checkbox-selection-${prodItem.id}`}
             edge="start"
             checked={prodItem.id === produit?.id}
             tabIndex={-1}
             disableRipple
-            inputProps={{ "aria-labelledby": labelId }}
           />
         </ListItemIcon>
         <ListItemText primary={prodItem.description} />

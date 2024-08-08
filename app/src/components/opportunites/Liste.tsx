@@ -30,7 +30,7 @@ const Liste = () => {
   const auth = useAuth();
   // Hook de navigation
   const navigate = useNavigate();
-  
+
   // Hook des paramètres de recherche de la page
   const { page, search } = Route.useSearch();
   // Hook des données du loader de la page
@@ -106,7 +106,6 @@ const Liste = () => {
               <TableRow
                 key={opp.id}
                 onDoubleClick={() =>
-
                   navigate({ to: `/opportunites/${opp.uuid}` })
                 }
               >

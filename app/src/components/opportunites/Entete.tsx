@@ -122,6 +122,7 @@ const Entete = ({ header, onUpdated }: EnteteProps) => {
             <FormControlLabel
               control={
                 <Switch
+                  id="modification"
                   checked={!disabled}
                   onChange={() => setDisabled(!disabled)}
                 />

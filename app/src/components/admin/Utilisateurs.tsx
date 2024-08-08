@@ -58,6 +58,7 @@ const Utilisateurs = () => {
   // gestion des erreurs de chargement des données
   useEffect(() => {
     if (isError) setAlerte({ severite: "error", message: manageError(error) });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isError]);
 
   // Gestion du changement de page du tableau de résultat
