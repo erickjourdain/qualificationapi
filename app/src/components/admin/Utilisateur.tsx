@@ -26,7 +26,7 @@ const Utilisateur = () => {
 
   // Récupération des données de la route
   const { userSlug } = useParams({
-    from: "/_mainLayout/_adminLayout/admin/utilisateurs/$userSlug",
+    from: "/_auth/_adminLayout/admin/utilisateurs/$userSlug",
   });
 
   // Définition des variables d'état du composant
@@ -83,6 +83,7 @@ const Utilisateur = () => {
           message: "Vous ne disposez pas des droits pour accéder à cette page",
         });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataUser]);
   // Mise à jour du token
   useEffect(() => {
@@ -91,6 +92,7 @@ const Utilisateur = () => {
   // Gestion des erreurs de chargement des données
   useEffect(() => {
     if (isError) setAlerte({ severite: "error", message: manageError(error) });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isError]);
   //
   useEffect(() => {

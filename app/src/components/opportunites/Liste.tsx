@@ -45,7 +45,12 @@ const Liste = () => {
   // Décalage du lancement de changement de page suite modification champ de recherche
   useEffect(() => {
     const timeOutId = setTimeout(() => {
-      navigate({ search: { page: 1, search: newSearch } });
+      navigate({
+        search: {
+          page: 1,
+          search: newSearch.trim().length ? newSearch.trim() : undefined,
+        },
+      });
     }, 500);
     return () => clearTimeout(timeOutId);
   }, [navigate, newSearch]);

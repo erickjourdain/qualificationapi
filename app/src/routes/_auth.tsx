@@ -13,7 +13,7 @@ import { formsAtom } from "@/stores/oppStore";
 
 export const Route = createFileRoute("/_auth")({
   loader: async ({ context }) => {
-    if (!!context.auth.user) return context.auth.user;
+    if (context.auth.user) return context.auth.user;
     const token = localStorage.getItem("token") || null;
     if (token) {
       setAuthorisation(token);
@@ -40,8 +40,12 @@ function Auth() {
 
   // Mise à jour des données utilisateurs
   useEffect(() => {
-    auth.login(user);
-    router.invalidate();
+    async function login() {
+      await auth.login(user);
+      await router.invalidate();
+    }
+    login();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   // Chargement des formulaires dans la session
@@ -68,6 +72,7 @@ function Auth() {
     );
     setFormulaires(forms);
     if (hasNextPage) fetchNextPage();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   // Sauvegarde des formaulaires dans la session

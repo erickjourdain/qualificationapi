@@ -27,7 +27,7 @@ const ProduitAdd = ({ onClose }: ProduitAddtProps) => {
 
   // Création du hook de gestion de la form
   const {
-    formState: { errors },
+    formState: { errors, isDirty },
     handleSubmit,
     register,
   } = useForm<Inputs>();
@@ -51,9 +51,10 @@ const ProduitAdd = ({ onClose }: ProduitAddtProps) => {
     },
   });
 
-  // Validation de la description du produit
+  // Validation du nouveau produit
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    mutate(data);
+    if (isDirty) mutate(data);
+    else onClose(false);
   };
 
   return (

@@ -1,4 +1,4 @@
-import { useAtom } from "jotai";
+import { useNavigate } from "@tanstack/react-router";
 import {
   Checkbox,
   IconButton,
@@ -10,7 +10,7 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import { useAuth } from "@/hooks/auth";
 import { ProduitAPI } from "@/gec-tripetto";
-import { produitAtom } from "@/stores/oppStore";
+import { Route } from "@/routes/_auth/opportunites/$uuid";
 
 interface ProduitItemProps {
   prodItem: ProduitAPI;
@@ -20,10 +20,10 @@ interface ProduitItemProps {
 const ProduitItem = ({ prodItem, onEdit }: ProduitItemProps) => {
   // Hook de Gestion des autorisations
   const auth = useAuth();
-  // Hook état global du produit sélectionné
-  const [produit, setProduit] = useAtom(produitAtom);
-
-  //const labelId = `checkbox-produit-${prodItem.id}`;
+  // Hook de navigation
+  const navigate = useNavigate();
+  // Hook récupération produit sélectionné
+  const { selection } = Route.useLoaderData();
 
   return (
     <ListItem
@@ -42,14 +42,20 @@ const ProduitItem = ({ prodItem, onEdit }: ProduitItemProps) => {
       disablePadding
     >
       <ListItemButton
-        selected={prodItem.id === produit?.id}
-        onClick={() => setProduit(prodItem)}
+        selected={prodItem.id === selection.produit}
+        onClick={() =>
+          navigate({
+            search: (prev) => {
+              return { ...prev, produit: prodItem.id };
+            },
+          })
+        }
       >
         <ListItemIcon>
           <Checkbox
             id={`checkbox-selection-${prodItem.id}`}
             edge="start"
-            checked={prodItem.id === produit?.id}
+            checked={prodItem.id === selection.produit}
             tabIndex={-1}
             disableRipple
           />

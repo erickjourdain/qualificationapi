@@ -29,7 +29,7 @@ const Formulaire = () => {
 
   // Récupération des données de la route
   const { formSlug } = useParams({
-    from: "/_mainLayout/_auth/_adminLayout/admin/formulaires/$formSlug",
+    from: "/_auth/_adminLayout/admin/formulaires/$formSlug",
   });
 
   // Définition de l'état du composant pour gestion de la MAJ des données
@@ -58,6 +58,7 @@ const Formulaire = () => {
   // Gestion des erreurs de chargement des données
   useEffect(() => {
     if (isError) setAlerte({ severite: "error", message: manageError(error) });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isError]);
 
   // définition de la requête de mise à jour du formulaire
@@ -94,13 +95,14 @@ const Formulaire = () => {
         case null:
           if (form.description !== null) value.description = null;
           break;
-        default:
+        default: {
           const description = data.description.trim();
           if (description !== form.description?.trim()) {
             if (!isEmpty(description)) value.description = data.description;
             else value.description = null;
           }
           break;
+        }
       }
       if (updated) {
         value.formulaire = data.formulaire;

@@ -1,4 +1,4 @@
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { Export, IDefinition, Import, Instance } from "@tripetto/runner";
 import { ChatRunner } from "@tripetto/runner-chat";
 import { AutoscrollRunner } from "@tripetto/runner-autoscroll";
@@ -18,7 +18,7 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-import { runnerAtom } from "@/stores/mainStore";
+import { runnerAtom, stylesTripetto } from "@/stores/mainStore";
 
 type TripettoProps = {
   open: boolean;
@@ -39,6 +39,8 @@ const PlayTripetto = ({
 
   // Chargement de l'état Atom du runner
   const [tripettoRunner] = useAtom(runnerAtom);
+  // Chargement du style de visualisation du formulaire
+  const styles = useAtomValue(stylesTripetto);
 
   const onImport = (instance: Instance) => {
     const values: Import.IFieldByName[] = [];
@@ -60,6 +62,7 @@ const PlayTripetto = ({
           definition={form}
           locale={localeChat as unknown as ILocale}
           translations={translationChat as unknown as TTranslation}
+          styles={styles}
           onImport={onImport}
           onSubmit={onSubmit}
         />
@@ -71,6 +74,7 @@ const PlayTripetto = ({
           definition={form}
           locale={localeAutoScroll as unknown as ILocale}
           translations={translationAutoScroll as unknown as TTranslation}
+          styles={styles}
           onImport={onImport}
           onSubmit={onSubmit}
         />
@@ -83,6 +87,7 @@ const PlayTripetto = ({
           definition={form}
           locale={localeClassic as unknown as ILocale}
           translations={translationClassic as unknown as TTranslation}
+          styles={styles}
           onImport={onImport}
           onSubmit={onSubmit}
         />

@@ -67,6 +67,7 @@ function Login() {
       delAuthorisation();
       mutate({ login: data.login, password: data.password });
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 

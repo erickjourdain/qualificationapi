@@ -8,6 +8,7 @@ import {
 import { AppAuthContext } from "@/types/appAuthContext";
 import { User } from "@/gec-tripetto";
 import { includes } from "lodash";
+import { sleep } from "@/utils/sleep";
 
 const AuthContext = createContext<AppAuthContext | null>(null);
 
@@ -19,12 +20,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isCreator = isLogged && includes(["ADMIN", "CREATOR"], user.role);
   const isUser = isLogged && includes(["ADMIN", "CREATOR", "USER"], user.role);
 
-  const login = useCallback((user: User) => {
+  const login = useCallback(async (user: User) => {
     setUser(user);
+    await sleep(250);
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
     setUser(null);
+    await sleep(250);
   }, []);
 
   return (

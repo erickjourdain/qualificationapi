@@ -1,9 +1,7 @@
 import { useCallback, useState } from "react";
-import { useAtom } from "jotai";
 import { Box, Button, List, Typography } from "@mui/material";
 import ProduitItem from "./Item";
 import { ProduitAPI } from "@/gec-tripetto";
-import { produitAtom } from "@/stores/oppStore";
 import { useAuth } from "@/hooks/auth";
 import ProduitEdit from "./Edit";
 import { router } from "@/App";
@@ -16,26 +14,20 @@ interface ProduitsProps {
 const Produits = ({ produits }: ProduitsProps) => {
   // Hook de Gestion des autorisations
   const auth = useAuth();
-  // Hook état global du produit sélectionné
-  const [produit, setProduit] = useAtom(produitAtom);
 
   // Etat local modification produit
-  const [modification, setModification] = useState<boolean>(false);
+  const [modification, setModification] = useState<ProduitAPI | null>(null);
   // Etat local ajout produit
   const [ajout, setAjout] = useState<boolean>(false);
 
   // Editer le produit
-  const onEdit = useCallback(
-    (prod: ProduitAPI) => {
-      setProduit(prod);
-      setModification(true);
-    },
-    [setProduit],
-  );
+  const onEdit = useCallback((prod: ProduitAPI) => {
+    setModification(prod);
+  }, []);
 
   // Fermeture de la modification d'un produit
   const handleClose = (update: boolean) => {
-    setModification(false);
+    setModification(null);
     setAjout(false);
     if (update) router.invalidate();
   };
@@ -45,7 +37,7 @@ const Produits = ({ produits }: ProduitsProps) => {
       <Box>
         <List component="nav" aria-label="liste produits">
           {produits.map((prod) => {
-            if (modification && prod.id == produit?.id)
+            if (modification && prod.id == modification.id)
               return (
                 <ProduitEdit
                   key={prod.id}

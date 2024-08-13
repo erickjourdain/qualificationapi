@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useAtom, useSetAtom } from "jotai";
+import { useSetAtom } from "jotai";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import {
@@ -15,9 +15,9 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
 import { alertAtom } from "@/stores/mainStore";
 import { ProduitAPI } from "@/gec-tripetto";
-import { produitAtom } from "@/stores/oppStore";
 import manageError from "@/utils/manageError";
 import { updateProduit } from "@/utils/apiCall";
+import { Route } from "@/routes/_auth/opportunites/$uuid";
 
 interface Inputs {
   id: number;
@@ -32,12 +32,12 @@ interface ProduitEditProps {
 const ProduitEdit = ({ prodItem, onClose }: ProduitEditProps) => {
   // Hook état global du produit sélectionné
   const setAlerte = useSetAtom(alertAtom);
-  // Hook état global du produit sélectionné
-  const [produit] = useAtom(produitAtom);
+  // Hook récupération produit sélectionné
+  const { selection } = Route.useLoaderData();
 
   // Création du hook de gestion de la form
   const {
-    formState: { errors },
+    formState: { errors, isDirty },
     handleSubmit,
     register,
     setValue,
@@ -47,12 +47,10 @@ const ProduitEdit = ({ prodItem, onClose }: ProduitEditProps) => {
 
   // Chargement des données lors de la mise à jour du produit
   useEffect(() => {
-    if (produit) {
-      setValue("id", produit.id);
-      setValue("description", produit.description);
-    }
+    setValue("id", prodItem.id);
+    setValue("description", prodItem.description);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [produit]);
+  }, [prodItem]);
 
   // Enregistrement du produit
   const { mutate, isPending } = useMutation({
@@ -72,7 +70,8 @@ const ProduitEdit = ({ prodItem, onClose }: ProduitEditProps) => {
 
   // Validation de la description du produit
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    mutate(data);
+    if (isDirty) mutate(data);
+    else onClose(false);
   };
 
   return (
@@ -101,12 +100,12 @@ const ProduitEdit = ({ prodItem, onClose }: ProduitEditProps) => {
       }
       disablePadding
     >
-      <ListItemButton selected={prodItem.id === produit?.id}>
+      <ListItemButton selected={prodItem.id === selection.produit}>
         <ListItemIcon>
           <Checkbox
             id={`checkbox-selection-${prodItem.id}`}
             edge="start"
-            checked={prodItem.id === produit?.id}
+            checked={prodItem.id === selection.produit}
             tabIndex={-1}
             disableRipple
           />
@@ -114,7 +113,7 @@ const ProduitEdit = ({ prodItem, onClose }: ProduitEditProps) => {
         <ListItemText>
           <TextField
             sx={{ width: "80%" }}
-            id={`description-${produit?.id}`}
+            id={`description-${selection.produit}`}
             {...register("description", {
               required: "La description du produit est obligatoire",
               minLength: {
