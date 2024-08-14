@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import Favicon from "react-favicon";
 import { useAtomValue } from "jotai";
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
@@ -6,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import Alerte from "@components/Alerte";
 import NotFound from "@components/NotFound";
+import AppFavicon from "@components/mainnav/Favicon";
 import { modeAtom } from "@/stores/mainStore";
 import { routeTree } from "@/routeTree.gen";
 import { AuthProvider, useAuth } from "@/hooks/auth";
@@ -53,6 +55,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      <Favicon url={AppFavicon} />
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <InnerApp />

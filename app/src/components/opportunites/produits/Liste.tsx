@@ -87,7 +87,9 @@ const Produits = ({ produits }: ProduitsProps) => {
 
   return (
     <Box>
-      <Typography variant="h6">Liste des produits</Typography>
+      <Typography variant="h6" color="secondary">
+        Liste des produits
+      </Typography>
       {produits.map((prod) => {
         return (
           <Chip

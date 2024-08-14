@@ -3,7 +3,17 @@ import { find, findIndex, map, uniqBy } from "lodash";
 import { z } from "zod";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { sfAnd, sfEqual } from "spring-filter-query-builder";
-import { Box, Chip, Paper, Stack } from "@mui/material";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Chip,
+  Paper,
+  Stack,
+  Typography,
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ServerError from "@/components/ServerError";
 import Entete from "@/components/opportunites/Entete";
 import Produits from "@/components/opportunites/produits/Liste";
@@ -21,6 +31,7 @@ import {
 } from "@/utils/apiCall";
 import Info from "@/components/opportunites/qualification/Info";
 import Reponse from "@/components/opportunites/qualification/Reponse";
+import { formatDateTime } from "@/utils/format";
 
 const formSearchSchema = z.object({
   produit: z.optional(z.number()),
@@ -192,9 +203,27 @@ function Opportunite() {
           />
         )}
       </Stack>
+      <Typography variant="caption">
+        {`créé le ${formatDateTime(data.header.createdAt)} par ${data.header.createur?.nom} ${data.header.createur?.prenom}`}
+        <br />
+        {`modifié le ${formatDateTime(data.header.updatedAt)} par ${data.header.gestionnaire?.nom} ${data.header.gestionnaire?.prenom}`}
+      </Typography>
       <Paper>
-        <Box px={3} py={2}>
-          <Entete header={data.header} onUpdated={onChange} />
+        <Box px={1}>
+          <Accordion>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="detail-opportunite"
+              id="detail-header"
+            >
+              <Typography variant="h6" color="secondary">
+                Détail
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Entete header={data.header} onUpdated={onChange} />
+            </AccordionDetails>
+          </Accordion>
         </Box>
       </Paper>
       <Paper>

@@ -55,7 +55,7 @@ const InputDevis = ({ initValue, onSubmit }: InputDevisProps) => {
         }
       />
       <FormHelperText error={!!error} id="outlined-devis-helper-text">
-        DEV1234567-V1
+        ex: DEV1234567-V1
       </FormHelperText>
     </FormControl>
   );
