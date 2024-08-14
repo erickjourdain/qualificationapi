@@ -110,7 +110,7 @@ export const Route = createFileRoute("/_auth/opportunites/$uuid")({
       deps.version ||
       (selectedForm
         ? find(reponses, (r) => r.formulaire.id === selectedForm && r.courante)
-            ?.id
+          ?.id
         : null);
 
     // Vérouillage de la réponse sélectionnée
@@ -208,24 +208,20 @@ function Opportunite() {
         <br />
         {`modifié le ${formatDateTime(data.header.updatedAt)} par ${data.header.gestionnaire?.nom} ${data.header.gestionnaire?.prenom}`}
       </Typography>
-      <Paper>
-        <Box px={1}>
-          <Accordion>
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="detail-opportunite"
-              id="detail-header"
-            >
-              <Typography variant="h6" color="secondary">
-                Détail
-              </Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Entete header={data.header} onUpdated={onChange} />
-            </AccordionDetails>
-          </Accordion>
-        </Box>
-      </Paper>
+      <Accordion>
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="detail-opportunite"
+          id="detail-header"
+        >
+          <Typography variant="h6" color="secondary">
+            Détail
+          </Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Entete header={data.header} onUpdated={onChange} />
+        </AccordionDetails>
+      </Accordion>
       <Paper>
         <Box px={3} py={2}>
           <Produits produits={data.produits} />
