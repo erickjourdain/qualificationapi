@@ -1,7 +1,7 @@
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import { IChatStyles } from "@tripetto/runner-chat";
-import { Info } from "@/gec-tripetto";
+import { FormAPI, Info } from "@/gec-tripetto";
 
 // Atom pour le stockage du theme
 const modeAtom = atomWithStorage<string | null>(
@@ -9,7 +9,7 @@ const modeAtom = atomWithStorage<string | null>(
   localStorage.getItem("mode"),
 );
 
-// Atom pour le style de visualisation des formulaires
+// Atom pour le style de visualisation des formulaires Tripetto
 const stylesTripetto = atom<IChatStyles>((get) => {
   return {
     color: get(modeAtom) === "dark" ? "white" : "black",
@@ -25,4 +25,7 @@ const runnerAtom = atomWithStorage<string | null>(
 // Atom pour le stockage des alertes d'information
 const alertAtom = atom<Info | null>(null);
 
-export { modeAtom, alertAtom, runnerAtom, stylesTripetto };
+// Atom pour les stockage des formaulires
+const formsAtom = atom<FormAPI[]>([]);
+
+export { modeAtom, alertAtom, runnerAtom, stylesTripetto, formsAtom };

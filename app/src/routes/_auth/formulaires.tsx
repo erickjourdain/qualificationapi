@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
-import { formsAtom } from "@/stores/oppStore";
+import { formsAtom } from "@/stores/mainStore";
 import { formatDateTime } from "@/utils/format";
 import { FormAPI } from "@/gec-tripetto";
 

@@ -1,4 +1,11 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+} from "@mui/material";
 import { FormEvent, useEffect, useState } from "react";
 
 interface InputProduitProps {
@@ -9,8 +16,13 @@ interface InputProduitProps {
   onClose: () => void;
 }
 
-const InputProduit = ({ open, ajout, description, onClose, onSubmit }: InputProduitProps) => {
-
+const InputProduit = ({
+  open,
+  ajout,
+  description,
+  onClose,
+  onSubmit,
+}: InputProduitProps) => {
   // Etat local du composant
   const [error, setError] = useState<boolean>(false);
 
@@ -23,21 +35,21 @@ const InputProduit = ({ open, ajout, description, onClose, onSubmit }: InputProd
       open={open}
       onClose={onClose}
       PaperProps={{
-        component: 'form',
+        component: "form",
         onSubmit: (event: FormEvent<HTMLFormElement>) => {
           event.preventDefault();
           const formData = new FormData(event.currentTarget);
           const formJson = Object.fromEntries((formData as FormData).entries());
-          if (formJson.produit.toString().trim().length < 5) setError(true)
+          if (formJson.produit.toString().trim().length < 5) setError(true);
           else
-            (description !== formJson.produit.toString().trim())
+            description !== formJson.produit.toString().trim()
               ? onSubmit(formJson.produit.toString().trim())
-              : onClose()
+              : onClose();
         },
       }}
     >
       <DialogTitle>
-        {(ajout) ? "Ajouter un produit" : "Modifier le produit"}
+        {ajout ? "Ajouter un produit" : "Modifier le produit"}
       </DialogTitle>
       <DialogContent>
         <TextField
@@ -59,11 +71,11 @@ const InputProduit = ({ open, ajout, description, onClose, onSubmit }: InputProd
           Annuler
         </Button>
         <Button variant="contained" color="primary" type="submit">
-          {(ajout) ? "Ajouter" : "Modifier"}
+          {ajout ? "Ajouter" : "Modifier"}
         </Button>
       </DialogActions>
     </Dialog>
-  )
-}
+  );
+};
 
 export default InputProduit;

@@ -7,7 +7,7 @@ import { Export, Instance } from "@tripetto/runner";
 import { Autocomplete, Box, Stack, TextField } from "@mui/material";
 import { Route as RteOpp } from "@/routes/_auth/opportunites/$uuid";
 import { FormAPI } from "@/gec-tripetto";
-import { formsAtom } from "@/stores/oppStore";
+import { formsAtom } from "@/stores/mainStore";
 import PlayTripetto from "@/components/PlayTripetto";
 import { saveAnswer } from "@/utils/apiCall";
 import { alertAtom } from "@/stores/mainStore";

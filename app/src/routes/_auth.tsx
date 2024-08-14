@@ -9,7 +9,7 @@ import { router } from "@/App";
 import { getCurrentUser, getForms, setAuthorisation } from "@/utils/apiCall";
 import { useAuth } from "@/hooks/auth";
 import { FormAPI, FormsAPI, User } from "@/gec-tripetto";
-import { formsAtom } from "@/stores/oppStore";
+import { formsAtom } from "@/stores/mainStore";
 
 export const Route = createFileRoute("/_auth")({
   loader: async ({ context }) => {

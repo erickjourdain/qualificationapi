@@ -3,8 +3,8 @@ import { useNavigate } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
 import { Box, Chip, IconButton, Typography } from "@mui/material";
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { Route as RteOpp } from "@/routes/_auth/opportunites/$uuid";
 import { ProduitAPI } from "@/gec-tripetto";
 import { useAuth } from "@/hooks/auth";
@@ -27,7 +27,6 @@ const Produits = ({ produits }: ProduitsProps) => {
   // Hook état global du produit sélectionné
   const setAlerte = useSetAtom(alertAtom);
 
-
   // Etat local d'ouverture de la fenêtre de dialogue
   const [open, setOpen] = useState<boolean>(false);
   const [ajout, setAjout] = useState<boolean>(false);
@@ -37,12 +36,12 @@ const Produits = ({ produits }: ProduitsProps) => {
   const { mutate, isPending } = useMutation({
     mutationKey: ["produitOpportunite"],
     mutationFn: (value: string) => {
-      return (ajout)
+      return ajout
         ? createProduit({
-          header: header.id,
-          description: value,
-        })
-        : updateProduit({ id: selection.produit, description: value })
+            header: header.id,
+            description: value,
+          })
+        : updateProduit({ id: selection.produit, description: value });
     },
     onSuccess: ({ data: reponse }) => {
       setAlerte({
@@ -76,36 +75,41 @@ const Produits = ({ produits }: ProduitsProps) => {
   const handleAjout = useCallback(() => {
     setAjout(true);
     setDescription("");
-    setOpen(true)
-  }, [])
+    setOpen(true);
+  }, []);
 
   // Ouverture boite de dialogue pour modifictaion d'un produit
   const handleChange = useCallback((value: string) => {
     setAjout(false);
     setDescription(value);
     setOpen(true);
-  }, [])
+  }, []);
 
   return (
     <Box>
       <Typography variant="h6">Liste des produits</Typography>
-      {
-        produits.map(prod => {
-          return <Chip
+      {produits.map((prod) => {
+        return (
+          <Chip
             key={prod.id}
             sx={{ mr: 2 }}
             label={prod.description}
             disabled={isPending}
-            icon={(prod.id === selection.produit) ? <CheckCircleIcon /> : <></>}
+            icon={prod.id === selection.produit ? <CheckCircleIcon /> : <></>}
             color="primary"
-            variant={(prod.id === selection.produit) ? "filled" : "outlined"}
-            onClick={() => navigate({ search: (prev) => { return { ...prev, produit: prod.id } } })}
+            variant={prod.id === selection.produit ? "filled" : "outlined"}
+            onClick={() =>
+              navigate({
+                search: (prev) => {
+                  return { ...prev, produit: prod.id };
+                },
+              })
+            }
             onDoubleClick={() => handleChange(prod.description)}
           />
-        })
-      }
-      {
-        auth.isUser &&
+        );
+      })}
+      {auth.isUser && (
         <IconButton
           aria-label="ajout-produit"
           disabled={isPending}
@@ -113,7 +117,7 @@ const Produits = ({ produits }: ProduitsProps) => {
         >
           <AddCircleIcon color="primary" />
         </IconButton>
-      }
+      )}
       <InputProduit
         open={open}
         ajout={ajout}
