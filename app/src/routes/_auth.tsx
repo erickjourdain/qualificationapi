@@ -25,6 +25,7 @@ export const Route = createFileRoute("/_auth")({
     } else throw redirect({ to: "/login" });
   },
   onError: () => {
+    localStorage.removeItem("token");
     throw redirect({ to: "/login" });
   },
   component: Auth,

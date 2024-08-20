@@ -324,10 +324,17 @@ const addDevisAnswer = (payload: { id: number; devis: string }) => {
   });
 };
 
-const getDirectories = (id: number) => {
+const getGECOpp = (opp: string) => {
   return instance.request({
     method: "GET",
-    url: `data/headers/dir/${id}`,
+    url: `opportunite/${opp}`,
+  });
+};
+
+const getGECProjet = (proj: string) => {
+  return instance.request({
+    method: "GET",
+    url: `projet/${proj}`,
   });
 };
 
@@ -362,5 +369,6 @@ export {
   createProduit,
   updateProduit,
   addDevisAnswer,
-  getDirectories,
+  getGECOpp,
+  getGECProjet,
 };

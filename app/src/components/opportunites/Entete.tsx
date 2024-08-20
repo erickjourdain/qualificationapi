@@ -96,11 +96,17 @@ const Entete = ({ header, onUpdated }: EnteteProps) => {
   return (
     <Box
       component="form"
+      id="detail-opportunite-form"
       noValidate
       autoComplete="off"
       onSubmit={handleSubmit(onSubmit)}
     >
-      <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+      <Grid
+        id="inputs"
+        container
+        rowSpacing={1}
+        columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+      >
         <Grid item xs={12} sm={6} md={4}>
           <TextField
             required
@@ -245,7 +251,7 @@ const Entete = ({ header, onUpdated }: EnteteProps) => {
       </Grid>
 
       {auth.isUser && (
-        <Box sx={{ textAlign: "end" }}>
+        <Box sx={{ textAlign: "end" }} id="form-control">
           <FormControlLabel
             control={
               <Switch

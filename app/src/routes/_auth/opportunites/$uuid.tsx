@@ -1,6 +1,8 @@
 import { useCallback } from "react";
 import { find, findIndex, map, uniqBy } from "lodash";
 import { z } from "zod";
+import { AxiosResponse } from "axios";
+import { useSetAtom } from "jotai";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { sfAnd, sfEqual } from "spring-filter-query-builder";
 import {
@@ -25,6 +27,8 @@ import unlockVersion from "@/utils/unlockVersion";
 import { AnswerAPI, FormAPI, HeaderAPI, ProduitAPI } from "@/gec-tripetto";
 import {
   getAnswers,
+  getGECOpp,
+  getGECProjet,
   getHeaders,
   getProduits,
   lockAnswer,
@@ -32,6 +36,8 @@ import {
 import Info from "@/components/opportunites/qualification/Info";
 import Reponse from "@/components/opportunites/qualification/Reponse";
 import { formatDateTime } from "@/utils/format";
+import { alertAtom } from "@/stores/mainStore";
+import manageError from "@/utils/manageError";
 
 const formSearchSchema = z.object({
   produit: z.optional(z.number()),
@@ -110,7 +116,7 @@ export const Route = createFileRoute("/_auth/opportunites/$uuid")({
       deps.version ||
       (selectedForm
         ? find(reponses, (r) => r.formulaire.id === selectedForm && r.courante)
-          ?.id
+            ?.id
         : null);
 
     // Vérouillage de la réponse sélectionnée
@@ -165,24 +171,51 @@ function Opportunite() {
   const data = Route.useLoaderData();
   // Hook pour l'utilisation du router
   const router = useRouter();
+  // Hook de gestion des alertes globales
+  const setAlerte = useSetAtom(alertAtom);
 
   // Remise à jour des données suite à modification de l'opportunité
   const onChange = useCallback(() => {
     router.invalidate();
   }, [router]);
 
-  /*****************************/
+
   // ouvrir l'explorateur de fichier
-  // code à compléter et modifier
   const openFolder = useCallback(async (type: string) => {
-    const path: string = "";
+
     try {
-      window.alert(`Ouverture du répertoire ${type} ${path}`);
+      let gecDirectory: AxiosResponse<string, string>;
+
+      // Lancement de la requête de récupération du répertoire GEC'App
+      // au format chaine de caractère (string)
+      switch (type) {
+        case "opportunite":
+          gecDirectory = await getGECOpp(data.header.opportunite);
+          break;
+        case "projet":
+          gecDirectory = await getGECProjet(data.header.opportunite);
+          break;
+        default:
+          throw new Error(`Type de répertoire ${type} inconnu`);
+      }
+
+      if (!gecDirectory.data) {
+        throw new Error("Le répertoire recherché est inaccessible");
+      }
+
+      // modification de la chaine retournée pour tenir compte 
+      // des différents OS du serveur
+      let path = gecDirectory.data.replace("/", "\\\\");
+      path = path.replaceAll("/", "\\\\");
+
+      // ouverture du répetoire
+      window.location = `opengecapp:${path}` as string & Location;
     } catch (error) {
-      console.log(`Erreur ouverture répertoire ${type} ${path}`);
+      console.error("Impossible d'ouvrir le répertoire demandé", error);
+      setAlerte({ severite: "error", message: manageError(error) });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  /*****************************/
 
   return (
     <Box sx={{ "& .MuiPaper-root": { mt: "20px" } }}>
@@ -203,19 +236,19 @@ function Opportunite() {
           />
         )}
       </Stack>
-      <Typography variant="caption">
+      <Typography variant="caption" id="info-opportunite">
         {`créé le ${formatDateTime(data.header.createdAt)} par ${data.header.createur?.nom} ${data.header.createur?.prenom}`}
         <br />
         {`modifié le ${formatDateTime(data.header.updatedAt)} par ${data.header.gestionnaire?.nom} ${data.header.gestionnaire?.prenom}`}
       </Typography>
-      <Accordion>
+      <Accordion sx={{ px: 1 }}>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
           aria-controls="detail-opportunite"
           id="detail-header"
         >
           <Typography variant="h6" color="secondary">
-            Détail
+            Détail opportunité
           </Typography>
         </AccordionSummary>
         <AccordionDetails>

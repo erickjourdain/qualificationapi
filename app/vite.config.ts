@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import { viteStaticCopy } from "vite-plugin-static-copy";
+import { nodePolyfills } from "vite-plugin-node-polyfills";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import jotaiDebugLabel from 'jotai/babel/plugin-debug-label'
 import jotaiReactRefresh from 'jotai/babel/plugin-react-refresh'
@@ -29,6 +30,13 @@ export default defineConfig(({ mode }) => {
             dest: "."
           }
         ]
+      }),
+      nodePolyfills({
+        globals: {
+          Buffer: true, // can also be 'build', 'dev', or false
+          global: true,
+          process: true,
+        },
       })
     ],
     build: {
