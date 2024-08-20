@@ -1,5 +1,6 @@
 const path = require("path");
 const copy = require("copy-webpack-plugin");
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const webpack = require("webpack");
 
 module.exports = (env) => {
@@ -57,7 +58,8 @@ module.exports = (env) => {
       }),
       new copy({
         patterns: [{ from: "node_modules/@tripetto/builder/fonts/", to: "." }],
-      })
+      }),
+      new NodePolyfillPlugin(),
     ],
     performance: {
       hints: false,

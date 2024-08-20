@@ -6,17 +6,18 @@ import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import TabQualif from "./TabQualif";
-import { AnswerAPI, AnswersAPI, FormAPI, ProduitAPI } from "../../gec-tripetto";
+import { AnswerAPI, AnswersAPI, FormAPI, HeaderAPI, ProduitAPI } from "../../gec-tripetto";
 import { getAnswers } from "../../utils/apiCall";
 import { useAtomValue } from "jotai";
 import { loggedUser } from "../../atomState";
 
 interface QualificationsProps {
+  header: HeaderAPI;
   produit: ProduitAPI | null;
   nbAffichage: number;
 }
 
-const Qualifications = ({ produit, nbAffichage }: QualificationsProps) => {
+const Qualifications = ({ header, produit, nbAffichage }: QualificationsProps) => {
 
   const queryClient = useQueryClient();
 
@@ -94,6 +95,7 @@ const Qualifications = ({ produit, nbAffichage }: QualificationsProps) => {
             return (
               <TabQualif
                 show={`${produit.id}-${formulaire.id}` === selectedTab}
+                header={header}
                 formulaire={formulaire} 
                 key={formulaire.id} 
                 produit={produit} 

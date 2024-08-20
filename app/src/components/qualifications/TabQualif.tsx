@@ -3,12 +3,13 @@ import { Export } from "@tripetto/runner";
 import { Instance } from "@tripetto/runner/module";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAtomValue, useSetAtom } from "jotai";
+import createReport from "docx-templates";
 import Box from "@mui/material/Box";
 import Fab from "@mui/material/Fab";
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
-import PrintIcon from "@mui/icons-material/Print";
+import SaveIcon from "@mui/icons-material/Save";
 import { displayAlert, loggedUser } from "../../atomState";
-import { AnswerAPI, FormAPI, ProduitAPI, Statut } from "../../gec-tripetto";
+import { AnswerAPI, FormAPI, HeaderAPI, ProduitAPI, Statut } from "../../gec-tripetto";
 import manageError from "../../utils/manageError";
 import { addDevisAnswer, getAnswer, unlockAnswer, updateAnswer } from "../../utils/apiCall";
 import PlayTripetto from "../PlayTripetto";
@@ -16,14 +17,38 @@ import HeaderAnswer from "./HeaderAnswer";
 import Version from "./Version";
 import DisplayTripetto from "./DisplayTripetto";
 import Devis from "./Devis";
+import { formatDateTime } from "../../utils/format";
+import decodeFormulaire from "../../utils/decodeFormulaire";
+import saveDataToFile from "../../utils/download";
+
+interface Question {
+  label: string;
+  reponse: string;
+}
+
+interface Rapport {
+  date_rapport: string;
+  raison_sociale: string;
+  contact: string;
+  opportunite: string;
+  date_creation: string;
+  createur_opportunite: string;
+  produit: string;
+  formulaire: string;
+  version: number;
+  date_qualification: string;
+  gestionnaire_formulaire: string;
+  questions: Question[];
+}
 
 interface TabQualifProps {
   show: boolean;
+  header: HeaderAPI;
   formulaire: FormAPI;
   produit: ProduitAPI;
 }
 
-const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
+const TabQualif = ({ show, header, formulaire, produit }: TabQualifProps) => {
 
   // Chargement de l'utilisateur connecté
   const user = useAtomValue(loggedUser);
@@ -169,63 +194,44 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
   }
 
   // Impreesion du formulaire
-  const printForm = async () => {
+  const saveForm = async () => {
     if (answer) {
-      // création du tableau avec les réponses au question du formulaire
-      const fields = JSON.parse(answer.reponse).fields.map((field: Export.IExportableField) => { return { name: field.name, value: field.value } });
-      // création du document HTML pour l'impression
-      const html = `
-        <!DOCTYPE html>
-        <html lang="fr">
-        <head>
-          <meta charset="UTF-8" />
-          <meta name="robots" content="noindex" />
-          <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
-          <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-          <meta property="og:title" content="Formulaire" />
-          <meta property="og:description" content="Reponse au Formulaire" />
-          <title>Formulaire</title>
-        </head>
-        
-        <body>
-          <div id="RunnerElement">
-            Chargement des données...
-          </div>
-          <script src="https://cdn.jsdelivr.net/npm/@tripetto/runner"></script>
-          <script src="https://cdn.jsdelivr.net/npm/@tripetto/runner-classic"></script>
-          <script type="module">
-          const urls = [
-            "https://cdn.jsdelivr.net/npm/@tripetto/runner-classic/runner/locales/fr.json", 
-            "https://cdn.jsdelivr.net/npm/@tripetto/runner-classic/runner/translations/fr.json"
-          ];
-          const requests = urls.map(url=>fetch(url));
-          Promise.all(requests)
-          .then(responses => {
-            const locale = responses[0].json();
-            const translations = responses[1].json();
-            TripettoClassic.run({
-              element: document.getElementById("RunnerElement"),
-              definition: ${(formulaire.formulaire)},
-              onImport: (instance) => { TripettoRunner.Import.fields(instance, ${JSON.stringify(fields)}) },
-              locale,
-              translations,
-            });
-            window.onafterprint = (event) => {
-              window.close();
-            };
-            setTimeout(() => {
-              window.print();
-            }, 500);        
-          })
-          .catch(err => document.getElementById("RunnerElement").innerHTML("Erreur durant le chargement des données..."));
-          </script>
-        </body>
-        
-        </html>   
-      `
-      // Ouverture du popup pour impression
-      const windowFeatures = "left=100,top=100,width=1200,height=800";
-      window.open(URL.createObjectURL(new Blob([html], { type: "text/html" })), "Impression Formulaire", windowFeatures);
+      const curDate = new Date();
+      const rapport: Rapport = {
+        date_rapport: formatDateTime(curDate.getTime()),
+        raison_sociale: header.societe,
+        contact: `${header.nom} ${header.prenom}`,
+        opportunite: (header.opportunite && header.opportunite.length)
+          ? header.opportunite : "Opportunité",
+        date_creation: formatDateTime(header.createdAt),
+        createur_opportunite: `${header.createur?.nom} ${header.createur?.prenom}`,
+        produit: produit.description,
+        formulaire: formulaire.titre,
+        version: answer.version,
+        date_qualification: formatDateTime(answer.updatedAt),
+        gestionnaire_formulaire: `${answer.gestionnaire.nom} ${answer.gestionnaire.prenom}`,
+        questions: [],
+      };
+  
+      // const iframeContent = $("iframe").contents();
+      const iframe = document.querySelector("iframe");
+      rapport.questions = decodeFormulaire(iframe);
+  
+      const template = await fetch("/assets/rapport tripetto.docx").then((res) =>
+        res.arrayBuffer(),
+      );
+  
+      const report = await createReport({
+        template: new Uint8Array(template), // l'erreur est lié aux Polyfills node.js qui ne sont pas intégrés par défaut. Ne pas en tenir compte de l'erreur
+        data: rapport,
+        cmdDelimiter: ["{{", "}}"],
+      });
+  
+      saveDataToFile(
+        report,
+        `${curDate.toISOString().split('T')[0].replace(/-/g, '')}-${header.societe} ${formulaire.titre} V${answer.version}.docx`,
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      );
     }
   }
 
@@ -257,11 +263,11 @@ const TabQualif = ({ show, formulaire, produit }: TabQualifProps) => {
                     </Fab>
                   }
                   <Fab
-                    onClick={() => printForm()}
+                    onClick={() => saveForm()}
                     color="primary"
                     sx={{ ml: 2 }}
                     size="medium">
-                    <PrintIcon />
+                    <SaveIcon />
                   </Fab>
                 </Box>
                 <DisplayTripetto

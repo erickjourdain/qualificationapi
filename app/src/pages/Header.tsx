@@ -126,7 +126,7 @@ const Header = () => {
       </Paper>
       <Paper>
         <Box px={3} py={2}>
-          <Qualifications produit={produit} nbAffichage={nbAffichage}/>
+          <Qualifications header={header} produit={produit} nbAffichage={nbAffichage}/>
         </Box>
       </Paper>
     </Box>
