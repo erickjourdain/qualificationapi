@@ -1,25 +1,29 @@
 import React, { useEffect, useState } from "react";
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
+import { useMutation } from "@tanstack/react-query";
 import Box from "@mui/material/Box";
-import List from "@mui/material/List";
-import { Button, Typography } from "@mui/material";
+import { Chip, IconButton, Typography } from "@mui/material";
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { ProduitAPI, ProduitsAPI } from "../../gec-tripetto";
-import { loggedUser } from "../../atomState";
-import ProduitItem from "./ProduitItem";
-import ProduitEdit from "./ProduitEdit";
-import ProduitAdd from "./ProduitAdd";
+import { displayAlert, loggedUser } from "../../atomState";
+import InputProduit from "./InputProduit";
+import { createProduit, updateProduit } from "../../utils/apiCall";
+import manageError from "../../utils/manageError";
 
 interface ProduitsProps {
   headerId: number;
   produits: ProduitsAPI;
   onChange: () => void;
-  onSelect: (produit: ProduitAPI) => void
+  onSelect: (produit: ProduitAPI) => void;
 }
 
 const Produits = ({ headerId, produits, onChange, onSelect }: ProduitsProps) => {
 
   // Chargement de l'utilisateur connecté
   const user = useAtomValue(loggedUser);
+  // Chargement de l'état Atom de gestion des alertes
+  const setAlerte = useSetAtom(displayAlert);
 
   // State: le produit sélectionné
   const [produit, setProduit] = useState<ProduitAPI | null>(null);
@@ -27,6 +31,8 @@ const Produits = ({ headerId, produits, onChange, onSelect }: ProduitsProps) => 
   const [modification, setModification] = useState<boolean>(false);
   // State: ajout d'un produi
   const [ajout, setAjout] = useState<boolean>(false);
+  // State: varibale description
+  const [description, setDescription] = useState<string>("");
 
   // Définition du produit sélectionné lors de la mise à joour de liste
   useEffect(() => {
@@ -36,68 +42,88 @@ const Produits = ({ headerId, produits, onChange, onSelect }: ProduitsProps) => 
   // Mise à jour du produit sélectionné
   useEffect(() => {
     if (produit) {
-      onSelect(produit);
       setAjout(false);
+      setModification(false);
+      setDescription("");
+      onSelect(produit);
     }
   }, [produit]);
 
+  // Enregistrement du produit
+  const { mutate, isPending } = useMutation({
+    mutationKey: ["produitOpportunite"],
+    mutationFn: (value: string) => {
+      return (ajout)
+        ? createProduit({
+          header: headerId,
+          description: value,
+        })
+        : updateProduit({ id: produit?.id || 0, description: value })
+    },
+    onSuccess: () => {
+      setAlerte({
+        severite: "success",
+        message: "enregistrement du produit réalisé",
+      });
+      onChange();
+    },
+    onError: (error) => {
+      setAlerte({ severite: "error", message: manageError(error) });
+    },
+  });
+
   // Editer le produit
   const onEdit = (prod: ProduitAPI) => {
-    setProduit(prod);
     setModification(true);
+    setDescription(prod.description);
   }
 
   // Fermeture de la modification d'un produit
-  const handleClose = (update: boolean) => {
+  const handleClose = () => {
     setModification(false);
     setAjout(false);
-    if (update) onChange();
   }
 
-  const ListProduits = () => {
-    return (
-      <Box>
-        <List component="nav" aria-label="liste produits">
-          {
-            produits.data.map((prod) => {
-              if (modification && (prod.id == produit?.id))
-                return <ProduitEdit
-                  key={prod.id}
-                  produit={prod}
-                  selected={prod.id === produit?.id}
-                  onClose={(update: boolean) => handleClose(update)}
-                />
-              else
-                return <ProduitItem
-                  key={prod.id}
-                  produit={prod}
-                  selected={prod.id === produit?.id}
-                  onSelect={() => setProduit(prod)}
-                  onEdit={() => onEdit(prod)}
-                />
-            })
-          }
-        </List>
-        {
-          (user?.role !== "READER") && ajout && 
-          <ProduitAdd header={headerId} onClose={(update: boolean) => handleClose(update)}/>
-        }
-        {
-          (user?.role !== "READER") && !ajout &&
-          <Box display="flex" justifyContent="flex-end">
-            <Button color="primary" onClick={() => setAjout(true)}>
-              Ajouter un produit
-              </Button>
-          </Box>
-        }
-      </Box>
-    )
+  // Lancement de l'enregistrement
+  const handleSubmit = (value: string) => {
+    mutate(value);
   }
 
   return (
     <Box>
-      <Typography variant="h6">Produits</Typography>
-      <ListProduits />
+      <Typography variant="h6">Liste des produits</Typography>
+      {
+        produits.data.map(prod => {
+          return <Chip
+            key={prod.id}
+            sx={{ mr: 2 }}
+            label={prod.description}
+            disabled={isPending}
+            icon={(prod.id === produit?.id) ? <CheckCircleIcon /> : <></>}
+            color="primary"
+            variant={(prod.id === produit?.id) ? "filled" : "outlined"}
+            onClick={() => setProduit(prod)}
+            onDoubleClick={() => onEdit(prod)}
+          />
+        })
+      }
+      {
+        user?.role !== "READER" &&
+        <IconButton
+          aria-label="ajout-produit"
+          disabled={isPending || ajout}
+          onClick={() => setAjout(true)}
+        >
+          <AddCircleIcon color="primary" />
+        </IconButton>
+      }
+      <InputProduit
+        open={ajout || modification}
+        ajout={ajout}
+        description={description}
+        onClose={handleClose}
+        onSubmit={handleSubmit}
+      />
     </Box>
   )
 }
