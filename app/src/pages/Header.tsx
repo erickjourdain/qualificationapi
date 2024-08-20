@@ -5,7 +5,7 @@ import { sfEqual } from "spring-filter-query-builder";
 import { useSetAtom } from "jotai";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
-import { getDirectories, getHeaders, getProduits } from "../utils/apiCall";
+import { getGECOpp, getGECProjet, getHeaders, getProduits } from "../utils/apiCall";
 import manageError from "../utils/manageError";
 import { displayAlert } from "../atomState";
 import Formulaire from "../components/header/Formulaire";
@@ -15,6 +15,7 @@ import Loading from "../components/Loading";
 import Produits from "../components/header/Produits";
 import Qualifications from "../components/qualifications/Qualifications";
 import { ProduitAPI, ProduitsAPI } from "../gec-tripetto";
+import { AxiosResponse } from "axios";
 
 const Header = () => {
 
@@ -92,13 +93,38 @@ const Header = () => {
   // ouvrir l'explorateur de fichier
   // code à compléter et modifier
   const openFolder = async (type: string) => {
-    let path: string = "";
+    const path: string = "";
+
     try {
-      const directories = await getDirectories(header.id);
-      if (type === "projet") path = directories.data.projet;
-      if (type === "opportunite") path = directories.data.opportunite;
-      window.open(`opengecapp:${path}`);
+      let gecDirectory: AxiosResponse<string, string>;
+
+      // Lancement de la requête de récupération du répertoire GEC'App
+      // au format chaine de caractère (string)
+      switch (type) {
+        case "opportunite":
+          gecDirectory = await getGECOpp(header.opportunite);
+          break;
+        case "projet":
+          gecDirectory = await getGECProjet(header.projet);
+          break;
+        default:
+          throw new Error(`Type de répertoire ${type} inconnu`);
+      }
+
+      if (!gecDirectory.data) {
+        throw new Error("Le répertoire recherché est inaccessible");
+      }
+
+      // modification de la chaine retournée pour tenir compte 
+      // des différents OS du serveur
+      let path = gecDirectory.data.replace("/", "\\\\");
+      path = path.replaceAll("/", "\\\\");
+
+      // ouverture du répetoire
+      window.location = `opengecapp:${path}` as string & Location;
     } catch (error) {
+      console.log(`Erreur ouverture répertoire ${type} ${path}`);
+      console.error("Impossible d'ouvrir le répertoire demandé", error);
       setAlerte({ severite: "error", message: manageError(error) });
     }
   }

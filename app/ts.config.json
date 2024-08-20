@@ -1,7 +1,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "target": "ES6",
+    "target": "ES2021",
     "module": "CommonJS",
     "moduleResolution": "Node",
     "resolveJsonModule": true,
@@ -9,7 +9,7 @@
     "newLine": "LF",
     "baseUrl": "./src",
     "jsx": "react-jsx",
-    "lib": ["es6", "dom", "DOM.Iterable"],
+    "lib": ["ES2021", "dom", "DOM.Iterable"],
     "strict": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
