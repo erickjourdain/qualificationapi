@@ -4,6 +4,7 @@ import { ClassicRunner } from "@tripetto/runner-classic";
 import { ILocale, TTranslation } from "@tripetto/runner/module/l10n";
 import translationClassic from "@tripetto/runner-classic/runner/translations/fr.json";
 import localeClassic from "@tripetto/runner-classic/runner/locales/fr.json";
+import Loading from "../Loading";
 
 type DisplayTripettoProps = {
   form: IDefinition;
@@ -18,20 +19,23 @@ const DisplayTripetto = ({ form, data, render }: DisplayTripettoProps) => {
 
   useEffect(() => {
     setReady(false);
-    setValues([]);
-    const val: Import.IFieldByName[] = [];
-    for (let index = 0; index < data.fields.length; index++) {
-      val.push({
-        name: data.fields[index].name,
-        value: data.fields[index].value,
-      });
-    }
-    setValues(val);
-    setReady(true);
+    setTimeout(() => {
+      setValues([]);
+      const val: Import.IFieldByName[] = [];
+      for (let index = 0; index < data.fields.length; index++) {
+        val.push({
+          name: data.fields[index].name,
+          value: data.fields[index].value,
+        });
+      }
+      setValues(val);
+      setReady(true);
+    }, 250);
   }, [data, render, form]);
 
+  if (!ready) return (<Loading/>)
+  
   return (
-    render && ready &&
     <ClassicRunner
       definition={form}
       locale={localeClassic as unknown as ILocale}
