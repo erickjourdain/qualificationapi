@@ -9,11 +9,12 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import FeedIcon from "@mui/icons-material/Feed";
 import PersonIcon from "@mui/icons-material/Person";
+import SummarizeIcon from '@mui/icons-material/Summarize';
 import Divider from "@mui/material/Divider";
 import ListSubheader from "@mui/material/ListSubheader";
 import GeneralLayout from "./GeneralLayout";
 
-type typeMenu = "formulaires" | "utilisateurs";
+type typeMenu = "formulaires" | "utilisateurs" | "rapports";
 type typeContext = { menu: typeMenu };
 
 const AdminLayout = () => {
@@ -56,6 +57,12 @@ const AdminLayout = () => {
                 <PersonIcon />
               </ListItemIcon>
               <ListItemText primary="Utilisateurs" />
+            </ListItem>
+            <ListItem key="rapport" onClick={() => changedMenu("rapports")}>
+              <ListItemIcon>
+                <SummarizeIcon />
+              </ListItemIcon>
+              <ListItemText primary="Rapports" />
             </ListItem>
           </List>
         </Box>

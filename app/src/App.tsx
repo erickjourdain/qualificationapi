@@ -72,7 +72,7 @@ function App() {
             {
               path: "form/ajouter",
               element: <AddForm />
-            }
+            },
           ]
         },
       ]
