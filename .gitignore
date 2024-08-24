@@ -4,6 +4,9 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+### DS_STORE ###
+.DS_STORE
+
 ### Logs ###
 logs/
 
