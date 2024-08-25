@@ -24,13 +24,13 @@ module.exports = (env) => {
           test: /\.tsx?$/,
           exclude: /node_modules/,
           enforce: "pre",
-            use: [
-                {
-                    loader: 'ts-loader',
-                    options: {
-                        configFile: path.resolve('./ts.config.json'),
-                    },
-                },
+          use: [
+            {
+              loader: 'ts-loader',
+              options: {
+                configFile: path.resolve('./ts.config.json'),
+              },
+            },
             , "source-map-loader"],
         },
         {

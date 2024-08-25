@@ -1,11 +1,11 @@
 package lne.intra.formsapi.controller;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -69,13 +69,12 @@ public class ReportController {
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @GetMapping("")
   @PreAuthorize("hasAnyAuthority('admin:read','creator:read','user:read')")
-  public ResponseEntity<Resource> getReport() throws AppException, MalformedURLException {
+  public ResponseEntity<InputStreamResource> getReport() throws AppException, FileNotFoundException {
     
-    Resource resource = fileService.getReport();
     return ResponseEntity.ok()
       .header(HttpHeaders.CONTENT_DISPOSITION, 
-        "attachement; filename=\"" + resource.getFilename() + "\"")
-      .contentType(MediaType.APPLICATION_OCTET_STREAM)
-      .body(resource);
+        "attachement; filename=\"rapport.docx\"")
+        .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+        .body(fileService.getReport());
   }
 }

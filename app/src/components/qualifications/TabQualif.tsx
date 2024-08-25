@@ -11,7 +11,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import { displayAlert, loggedUser } from "../../atomState";
 import { AnswerAPI, FormAPI, HeaderAPI, ProduitAPI, Statut } from "../../gec-tripetto";
 import manageError from "../../utils/manageError";
-import { addDevisAnswer, getAnswer, unlockAnswer, updateAnswer } from "../../utils/apiCall";
+import { addDevisAnswer, getAnswer, getReport, unlockAnswer, updateAnswer } from "../../utils/apiCall";
 import PlayTripetto from "../PlayTripetto";
 import HeaderAnswer from "./HeaderAnswer";
 import Version from "./Version";
@@ -212,26 +212,28 @@ const TabQualif = ({ show, header, formulaire, produit }: TabQualifProps) => {
         gestionnaire_formulaire: `${answer.gestionnaire.nom} ${answer.gestionnaire.prenom}`,
         questions: [],
       };
-  
+
       // const iframeContent = $("iframe").contents();
       const iframe = document.querySelector("iframe");
       rapport.questions = decodeFormulaire(iframe);
-  
-      const template = await fetch("/assets/rapport tripetto.docx").then((res) =>
-        res.arrayBuffer(),
-      );
-  
-      const report = await createReport({
-        template: new Uint8Array(template), // l'erreur est lié aux Polyfills node.js qui ne sont pas intégrés par défaut. Ne pas en tenir compte de l'erreur
-        data: rapport,
-        cmdDelimiter: ["{{", "}}"],
-      });
-  
-      saveDataToFile(
-        report,
-        `${curDate.toISOString().split('T')[0].replace(/-/g, '')}-${header.societe} ${formulaire.titre} V${answer.version}.docx`,
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      );
+
+      try {
+        const template = await getReport();
+
+        const report = await createReport({
+          template: new Uint8Array(template.data), // l'erreur est lié aux Polyfills node.js qui ne sont pas intégrés par défaut. Ne pas en tenir compte de l'erreur
+          data: rapport,
+          cmdDelimiter: ["{{", "}}"],
+        });
+
+        saveDataToFile(
+          report,
+          `${curDate.toISOString().split('T')[0].replace(/-/g, '')}-${header.societe} ${formulaire.titre} V${answer.version}.docx`,
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        );
+      } catch (e) {
+        setAlerte({ severite: "error", message: manageError(e) });
+      }
     }
   }
 

@@ -287,14 +287,35 @@ const getGECOpp = (opp: string) => {
     method: "GET",
     url: `opportunite/${opp}`,
   });
-};
+}
 
 const getGECProjet = (proj: string) => {
   return instance.request({
     method: "GET",
     url: `projet/${proj}`,
   });
-};
+}
+
+const getReport = () => {
+  return instance.request({
+    method: "GET",
+    url: "data/reports",
+    responseType: "arraybuffer",
+  })
+}
+
+const uploadReport = (fichier: File) => {
+  const formData = new FormData();
+  formData.append("file", fichier);
+  return instance.request({
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    },
+    method: "PATCH",
+    url: "data/reports/upload",
+    data: formData,
+  })
+}
 
 export {
   apiRequest,
@@ -329,4 +350,6 @@ export {
   addDevisAnswer,
   getGECOpp,
   getGECProjet,
+  getReport,
+  uploadReport,
 };

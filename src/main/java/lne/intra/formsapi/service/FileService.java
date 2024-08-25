@@ -1,14 +1,12 @@
 package lne.intra.formsapi.service;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,10 +33,11 @@ public class FileService {
     file.transferTo(new File(dir + "/rapport.docx"));
   }
 
-  public Resource getReport() throws MalformedURLException {
+  public InputStreamResource getReport() throws FileNotFoundException {
     String dir = System.getProperty("user.dir") + "/" + lneIntraFormsapiUpload + "/reports";
-    String file = dir + "/rapport.docx";
-    Path path = Paths.get(file);
-    return new UrlResource(path.toUri());
+    File file = new File(dir + "/rapport.docx");
+    return new InputStreamResource(new FileInputStream(file));
+    //Path path = Paths.get(file);
+    //return new UrlResource(path.toUri());
   }
 }
