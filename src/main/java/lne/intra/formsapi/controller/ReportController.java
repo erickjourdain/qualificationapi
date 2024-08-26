@@ -1,11 +1,11 @@
 package lne.intra.formsapi.controller;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -63,13 +63,20 @@ public class ReportController {
     return ResponseEntity.ok(response);
   }
 
+  /**
+   * Contrôleur de récupération du fichier Rapport.docx
+   * 
+   * @return
+   * @throws AppException
+   * @throws MalformedURLException
+   */
   @Operation(summary = "Téléchargement du fichier rapport", description = "Accès limité aux rôle `ADMIN`, `CREATOR` et 'USER'")
   @ApiResponse(responseCode = "200", description = "Fichier Rapport", content = @Content(mediaType = "application/octet-stream"))
   @ApiResponse(responseCode = "400", description = "Erreur lors du téléchargement", content = @Content(mediaType = "application/json"))
   @ApiResponse(responseCode = "403", description = "Accès non autorisé ou token invalide", content = @Content(mediaType = "application/text"))
   @GetMapping("")
   @PreAuthorize("hasAnyAuthority('admin:read','creator:read','user:read')")
-  public ResponseEntity<InputStreamResource> getReport() throws AppException, FileNotFoundException {
+  public ResponseEntity<Resource> getReport() throws AppException, MalformedURLException {
     
     return ResponseEntity.ok()
       .header(HttpHeaders.CONTENT_DISPOSITION, 
