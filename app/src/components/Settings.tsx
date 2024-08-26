@@ -38,6 +38,16 @@ const Settings = () => {
     setAnchorEl(null);
   };
 
+  const handleNavigAdmin = () => {
+    handleClose();
+    navigate("/admin");
+  }
+
+  const handleNavigClose = () => {
+    handleClose();
+    navigate("/close");
+  }
+
   return (
     <Box sx={{ display: { xs: "none", sm: "block" } }}>
 
@@ -79,11 +89,11 @@ const Settings = () => {
         {isAdmin() &&
           [
             <Divider key="divider" />,
-            <MenuItem key="admin" onClick={() => navigate("/admin")}>Administration</MenuItem>
+            <MenuItem key="admin" onClick={handleNavigAdmin}>Administration</MenuItem>
           ]
         }
       </Menu>
-      <IconButton color="inherit" onClick={() => navigate("/close")}><LogoutIcon /></IconButton>
+      <IconButton color="inherit" onClick={handleNavigClose}><LogoutIcon /></IconButton>
     </Box>
   );
 };

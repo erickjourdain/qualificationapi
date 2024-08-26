@@ -1,20 +1,25 @@
 import React, { useEffect } from "react";
-import { Navigate, Outlet } from "react-router";
-import { useSetAtom } from "jotai";
+import { matchRoutes, Navigate, Outlet, useLocation } from "react-router";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useQuery } from "@tanstack/react-query";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Toolbar from "@mui/material/Toolbar";
 import Container from "@mui/material/Container";
-import { loggedUser } from "../atomState";
+import { environnementInfo, loggedUser } from "../atomState";
 import { getCurrentUser } from "../utils/apiCall";
 import ApplicationMainNav from "../components/ApplicationMainNav";
 import GeneralLayout from "./GeneralLayout";
+import { Alert } from "@mui/material";
 
 const MainLayout = () => {
 
   // Chargement de l'état Atom de l'utilisateur courant
   const setUser = useSetAtom(loggedUser);
+  // Etat Atom de l'environnement de travail
+  const info = useAtomValue(environnementInfo);
+  
+  const location = useLocation();
 
   // Chargement de l'utilisateur connecté
   const {
@@ -49,6 +54,10 @@ const MainLayout = () => {
       <Box component="main" sx={{ flexGrow: 1 }}>
         <Toolbar />
         <Container maxWidth="lg" sx={{ mb: 4 }}>
+          {
+            info && !!!matchRoutes([{ path: "/admin" }], location) && 
+            <Alert severity="warning" variant="filled" sx={{ mb: 2 }} >{info}</Alert>
+          }
           <Outlet />
         </Container>
       </Box>
