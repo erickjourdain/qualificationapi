@@ -122,7 +122,7 @@ const Reponse = () => {
     );
 
     const report = await createReport({
-      template, // l'erreur est lié aux Polyfills node.js qui ne sont pas intégrés par défaut. Ne pas en tenir compte de l'erreur
+      template: new Uint8Array(template),
       data: rapport,
       cmdDelimiter: ["{{", "}}"],
     });

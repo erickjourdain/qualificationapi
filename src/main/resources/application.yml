@@ -11,4 +11,5 @@ lne:
     formsapi:
       version: 0.9.9
       api: 1
+      upload: upload
    

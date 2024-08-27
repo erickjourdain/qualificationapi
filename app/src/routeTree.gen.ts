@@ -24,6 +24,7 @@ import { Route as AuthOpportunitesIndexImport } from './routes/_auth/opportunite
 import { Route as AuthOpportunitesNouvelleImport } from './routes/_auth/opportunites/nouvelle'
 import { Route as AuthOpportunitesUuidImport } from './routes/_auth/opportunites/$uuid'
 import { Route as AuthAdminLayoutAdminUtilisateursIndexImport } from './routes/_auth/_adminLayout/admin/utilisateurs/index'
+import { Route as AuthAdminLayoutAdminRapportsIndexImport } from './routes/_auth/_adminLayout/admin/rapports/index'
 import { Route as AuthAdminLayoutAdminFormulairesIndexImport } from './routes/_auth/_adminLayout/admin/formulaires/index'
 import { Route as AuthAdminLayoutAdminUtilisateursUserSlugImport } from './routes/_auth/_adminLayout/admin/utilisateurs/$userSlug'
 import { Route as AuthAdminLayoutAdminFormulairesAjouterImport } from './routes/_auth/_adminLayout/admin/formulaires/ajouter'
@@ -94,6 +95,12 @@ const AuthOpportunitesUuidRoute = AuthOpportunitesUuidImport.update({
 const AuthAdminLayoutAdminUtilisateursIndexRoute =
   AuthAdminLayoutAdminUtilisateursIndexImport.update({
     path: '/admin/utilisateurs/',
+    getParentRoute: () => AuthAdminLayoutRoute,
+  } as any)
+
+const AuthAdminLayoutAdminRapportsIndexRoute =
+  AuthAdminLayoutAdminRapportsIndexImport.update({
+    path: '/admin/rapports/',
     getParentRoute: () => AuthAdminLayoutRoute,
   } as any)
 
@@ -237,6 +244,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthAdminLayoutAdminFormulairesIndexImport
       parentRoute: typeof AuthAdminLayoutImport
     }
+    '/_auth/_adminLayout/admin/rapports/': {
+      id: '/_auth/_adminLayout/admin/rapports/'
+      path: '/admin/rapports'
+      fullPath: '/admin/rapports'
+      preLoaderRoute: typeof AuthAdminLayoutAdminRapportsIndexImport
+      parentRoute: typeof AuthAdminLayoutImport
+    }
     '/_auth/_adminLayout/admin/utilisateurs/': {
       id: '/_auth/_adminLayout/admin/utilisateurs/'
       path: '/admin/utilisateurs'
@@ -256,6 +270,7 @@ export const routeTree = rootRoute.addChildren({
       AuthAdminLayoutAdminFormulairesAjouterRoute,
       AuthAdminLayoutAdminUtilisateursUserSlugRoute,
       AuthAdminLayoutAdminFormulairesIndexRoute,
+      AuthAdminLayoutAdminRapportsIndexRoute,
       AuthAdminLayoutAdminUtilisateursIndexRoute,
     }),
     AuthFormulairesRoute,
@@ -321,6 +336,7 @@ export const routeTree = rootRoute.addChildren({
         "/_auth/_adminLayout/admin/formulaires/ajouter",
         "/_auth/_adminLayout/admin/utilisateurs/$userSlug",
         "/_auth/_adminLayout/admin/formulaires/",
+        "/_auth/_adminLayout/admin/rapports/",
         "/_auth/_adminLayout/admin/utilisateurs/"
       ]
     },
@@ -358,6 +374,10 @@ export const routeTree = rootRoute.addChildren({
     },
     "/_auth/_adminLayout/admin/formulaires/": {
       "filePath": "_auth/_adminLayout/admin/formulaires/index.tsx",
+      "parent": "/_auth/_adminLayout"
+    },
+    "/_auth/_adminLayout/admin/rapports/": {
+      "filePath": "_auth/_adminLayout/admin/rapports/index.tsx",
       "parent": "/_auth/_adminLayout"
     },
     "/_auth/_adminLayout/admin/utilisateurs/": {

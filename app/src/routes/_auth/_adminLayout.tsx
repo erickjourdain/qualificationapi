@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import FeedIcon from "@mui/icons-material/Feed";
 import PersonIcon from "@mui/icons-material/Person";
+import SummarizeIcon from '@mui/icons-material/Summarize';
 import { useAuth } from "@/hooks/auth";
 
 export const Route = createFileRoute("/_auth/_adminLayout")({
@@ -45,6 +46,11 @@ function AdminLayout() {
     navigate({ to: "/admin/utilisateurs" });
   };
 
+  // Navigation vers la gestion des utilisateurs
+  const handleRapportsClick = () => {
+    navigate({ to: "/admin/rapports" });
+  };
+
   return (
     <>
       <Drawer
@@ -69,12 +75,20 @@ function AdminLayout() {
               <ListItemText primary="Formulaires" />
             </ListItem>
             {auth.isAdmin && (
-              <ListItem key="user" onClick={handleUtilisateursClick}>
-                <ListItemIcon>
-                  <PersonIcon />
-                </ListItemIcon>
-                <ListItemText primary="Utilisateurs" />
-              </ListItem>
+              <>
+                <ListItem key="user" onClick={handleUtilisateursClick}>
+                  <ListItemIcon>
+                    <PersonIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Utilisateurs" />
+                </ListItem>
+                <ListItem key="rapport" onClick={handleRapportsClick}>
+                  <ListItemIcon>
+                    <SummarizeIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Rapports" />
+                </ListItem>
+              </>
             )}
           </List>
         </Box>

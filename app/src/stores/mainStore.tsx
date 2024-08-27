@@ -25,7 +25,7 @@ const runnerAtom = atomWithStorage<string | null>(
 // Atom pour le stockage des alertes d'information
 const alertAtom = atom<Info | null>(null);
 
-// Atom pour les stockage des formaulires
+// Atom pour les stockage des formulaires
 const formsAtom = atom<FormAPI[]>([]);
 
 export { modeAtom, alertAtom, runnerAtom, stylesTripetto, formsAtom };

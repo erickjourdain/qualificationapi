@@ -3,6 +3,7 @@ import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
 import { Box, Container, Toolbar } from "@mui/material";
 import MainNav from "@components/MainNav";
 import NotFound from "@/components/NotFound";
+import Alerte from "@components/Alerte";
 import { AppRouterContext } from "@/gec-tripetto";
 
 const TanStackRouterDevtools =
@@ -29,6 +30,7 @@ function rootComponent() {
           <Container maxWidth="lg" sx={{ mt: 4 }}>
             <Outlet />
           </Container>
+          <Alerte />
         </Box>
       </Box>
       <Suspense>

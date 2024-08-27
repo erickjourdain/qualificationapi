@@ -338,6 +338,27 @@ const getGECProjet = (proj: string) => {
   });
 };
 
+const getReport = () => {
+  return instance.request({
+    method: "GET",
+    url: "data/reports",
+    responseType: "arraybuffer",
+  })
+}
+
+const uploadReport = (fichier: File) => {
+  const formData = new FormData();
+  formData.append("file", fichier);
+  return instance.request({
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    },
+    method: "PATCH",
+    url: "data/reports/upload",
+    data: formData,
+  })
+}
+
 export {
   apiRequest,
   setAuthorisation,
@@ -371,4 +392,6 @@ export {
   addDevisAnswer,
   getGECOpp,
   getGECProjet,
+  getReport,
+  uploadReport,
 };
