@@ -7,7 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import NotFound from "@components/NotFound";
 import AppFavicon from "@components/mainnav/Favicon";
-import { modeAtom } from "@/stores/mainStore";
+import { envAtom, modeAtom, store } from "@/stores/mainStore";
 import { routeTree } from "@/routeTree.gen";
 import { AuthProvider, useAuth } from "@/hooks/auth";
 
@@ -59,10 +59,14 @@ function App() {
         <AuthProvider>
           <InnerApp />
         </AuthProvider>
-        <ReactQueryDevtools
-          initialIsOpen={false}
-          buttonPosition="bottom-left"
-        />
+        {
+          store.get(envAtom) === "production"
+            ? <></>
+            : <ReactQueryDevtools
+              initialIsOpen={false}
+              buttonPosition="bottom-left"
+            />
+        }
       </QueryClientProvider>
     </ThemeProvider>
   );

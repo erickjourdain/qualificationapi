@@ -13,14 +13,15 @@ import {
   Typography,
 } from "@mui/material";
 import { User } from "@/gec-tripetto";
-import { displayAlert, loggedUser } from "@/atomState";
+import { loggedUser } from "@/atomState";
 import { getResetPwdToken, getUsers } from "@/utils/apiCall";
 import manageError from "@/utils/manageError";
 import UtilisateurForm from "@components/admin/UtilisateurForm";
+import { alertAtom } from "@/stores/mainStore";
 
 const Utilisateur = () => {
   // Chargement de l'état Atom des alertes
-  const setAlerte = useSetAtom(displayAlert);
+  const setAlerte = useSetAtom(alertAtom);
   // Chargement de l'état Atom des alertes
   const currentUser = useAtomValue(loggedUser);
 

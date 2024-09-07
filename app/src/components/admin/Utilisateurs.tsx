@@ -16,16 +16,16 @@ import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import Typography from "@mui/material/Typography";
 import TableHead from "@mui/material/TableHead";
 import { User, UsersAPI } from "@/gec-tripetto";
-import { displayAlert } from "@/atomState";
 import { getUsers } from "@/utils/apiCall";
 import manageError from "@/utils/manageError";
 import Loading from "../Loading";
+import { alertAtom } from "@/stores/mainStore";
 
 const Utilisateurs = () => {
   const itemsPerPage = 10;
 
   // Chargement de l'état Atom des alertes
-  const setAlerte = useSetAtom(displayAlert);
+  const setAlerte = useSetAtom(alertAtom);
   const navigate = useNavigate();
 
   // State: page du tableau

@@ -8,10 +8,11 @@ import {
   UserCreation,
 } from "../gec-tripetto";
 import { sfEqual } from "spring-filter-query-builder";
+import { apiAtom, store,  } from "@/stores/mainStore";
 
 // Création de l'instance Axios pour les requêtes vers l'API
 const instance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: `${store.get(apiAtom)}${import.meta.env.VITE_API_PATHNAME}`,
   timeout: 5000,
 });
 
