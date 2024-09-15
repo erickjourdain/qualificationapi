@@ -22,6 +22,7 @@ import AdminLayout from "./layout/AdminLayout";
 import Headers from "./pages/Headers";
 import AddHeader from "./pages/AddHeader";
 import Header from "./pages/Header";
+import Documentation from "./pages/Documentation";
 
 // création d'un instance de QueryClient
 const queryClient = new QueryClient({});
@@ -51,7 +52,11 @@ function App() {
         },
         {
           path: "opportunite/:uuid",
-          element: isLogged() ? <Header /> : <NotAllowed />
+          element: isLogged() ? <Header /> : <NotAllowed />,
+        },
+        {
+          path: "documentation",
+          element: isLogged() ? <Documentation /> : <NotAllowed />,
         },
         {
           path: "admin",

@@ -38,6 +38,11 @@ const Settings = () => {
     setAnchorEl(null);
   };
 
+  const handleNavigDoc = () => {
+    handleClose();
+    navigate("documentation");
+  }
+
   const handleNavigAdmin = () => {
     handleClose();
     navigate("/admin");
@@ -86,9 +91,11 @@ const Settings = () => {
             </MenuItem>
           );
         })}
+        <Divider key="divider-1"/>
+        <MenuItem key="documentation" onClick={handleNavigDoc}>Documentation</MenuItem>
         {isAdmin() &&
           [
-            <Divider key="divider" />,
+            <Divider key="divider-2" />,
             <MenuItem key="admin" onClick={handleNavigAdmin}>Administration</MenuItem>
           ]
         }
