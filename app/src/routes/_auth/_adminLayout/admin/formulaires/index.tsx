@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useAtomValue } from "jotai";
+import { z } from "zod";
 import {
   Box,
   IconButton,
@@ -21,8 +22,21 @@ import { formsAtom } from "@/stores/mainStore";
 import { formatDateTime } from "@/utils/format";
 import { FormAPI } from "@/gec-tripetto";
 
+const formSearchSchema = z.object({
+  page: z.optional(z.number()),
+  search: z.optional(z.string()),
+});
+
+type FormSearchSchema = z.infer<typeof formSearchSchema>;
+
 export const Route = createFileRoute("/_auth/_adminLayout/admin/formulaires/")({
   component: () => <Formulaires />,
+  validateSearch: (search: Record<string, unknown>): FormSearchSchema =>
+    formSearchSchema.parse(search),
+  loaderDeps: ({ search }) => ({
+    page: search.page || 1,
+    search: search.search || "",
+  }),
 });
 
 function Formulaires() {
@@ -32,16 +46,15 @@ function Formulaires() {
   // Hook de navigation
   const navigate = useNavigate();
 
+  // Hook des paramètres de recherche de la page
+  const { page, search } = Route.useLoaderDeps();
+
   // Hook de stockage des formulaires
   const formulaires = useAtomValue(formsAtom);
   const [data, setData] = useState<FormAPI[]>([]);
 
-  // State de gestion de la page affichée
-  const [page, setPage] = useState<number>(1);
   // Etat local de gestion du nombre de formulaires sélectionnés
   const [nbData, setNbData] = useState<number>(0);
-  // Etat local de gestion du champ de recherche
-  const [search, setSearch] = useState<string>("");
 
   // Mise à jour des données à afficher
   useEffect(() => {
@@ -67,7 +80,7 @@ function Formulaires() {
             id="input-search"
             label="Recherche"
             value={search}
-            onChange={(e) => setSearch(e.currentTarget.value)}
+            onChange={(e) => navigate({ search: { page: 1, search: e.currentTarget.value } })}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -75,7 +88,7 @@ function Formulaires() {
                 </InputAdornment>
               ),
               endAdornment: (
-                <IconButton onClick={() => setSearch("")}>
+                <IconButton onClick={() => navigate({ search: { page: 1, search: undefined } })}>
                   <ClearIcon />
                 </IconButton>
               ),
@@ -115,7 +128,7 @@ function Formulaires() {
           count={nbData}
           rowsPerPage={itemsPerPage}
           page={page !== undefined ? page - 1 : 0}
-          onPageChange={(_evt, newPage) => setPage(newPage + 1)}
+          onPageChange={(_evt, newPage) => navigate({ search: (prev) => ({ ...prev, page: newPage + 1 }) })}
         />
       </Box>
     </Paper>

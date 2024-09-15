@@ -1,7 +1,4 @@
-import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { useSetAtom } from "jotai";
 import {
   Box,
   Paper,
@@ -15,62 +12,20 @@ import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import Typography from "@mui/material/Typography";
 import TableHead from "@mui/material/TableHead";
-import { User, UsersAPI } from "@/gec-tripetto";
-import { getUsers } from "@/utils/apiCall";
-import manageError from "@/utils/manageError";
-import Loading from "../Loading";
-import { alertAtom } from "@/stores/mainStore";
+import { Route } from "@/routes/_auth/_adminLayout/admin/utilisateurs";
 
 const Utilisateurs = () => {
-  const itemsPerPage = 10;
-
-  // Chargement de l'état Atom des alertes
-  const setAlerte = useSetAtom(alertAtom);
+  // Hook de navigation
   const navigate = useNavigate();
 
-  // State: page du tableau
-  const [page, setPage] = useState(0);
-  // State: utilisateurs
-  const [users, setUsers] = useState<User[]>([]);
-  // State: nombre utilisateurs
-  const [nbUsers, setNbUsers] = useState<number>(0);
-
-  const { data, error, isError, isLoading } = useQuery({
-    queryKey: ["users", page],
-    queryFn: () =>
-      getUsers(
-        null,
-        ["id", "prenom", "nom", "validated", "role", "locked", "slug"],
-        page + 1,
-        itemsPerPage,
-      ),
-    select: (response) => response.data as UsersAPI,
-    refetchOnWindowFocus: false,
-  });
-
-  useEffect(() => {
-    if (data) {
-      setUsers(data?.data);
-      setNbUsers(data?.nbElements);
-    }
-  }, [data]);
-
-  // gestion des erreurs de chargement des données
-  useEffect(() => {
-    if (isError) setAlerte({ severite: "error", message: manageError(error) });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isError]);
-
-  // Gestion du changement de page du tableau de résultat
-  const handleChangePage = (_event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
+  // Hook des paramètres de recherche de la page
+  const { page } = Route.useSearch();
+  // Hook des données du loader de la page
+  const users = Route.useLoaderData();
 
   const icon = (val: boolean) => {
     return val ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />;
   };
-
-  if (isLoading) return <Loading />;
 
   if (users)
     return (
@@ -89,7 +44,7 @@ const Utilisateurs = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {users.map((user) => (
+              {users.data.map((user) => (
                 <TableRow
                   key={user.id}
                   onDoubleClick={() =>
@@ -106,12 +61,14 @@ const Utilisateurs = () => {
             </TableBody>
           </Table>{" "}
           <TablePagination
-            rowsPerPageOptions={[itemsPerPage]}
+            rowsPerPageOptions={[10]}
             component="div"
-            count={nbUsers}
-            rowsPerPage={itemsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
+            count={users.nbElements}
+            rowsPerPage={10}
+            page={page !== undefined ? page - 1 : 0}
+            onPageChange={(_evt, newPage) =>
+              navigate({ search: (prev) => ({ ...prev, page: newPage + 1 }) })
+            }
           />
         </Box>
       </Paper>

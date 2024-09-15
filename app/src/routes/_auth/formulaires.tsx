@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useAtomValue } from "jotai";
+import { z } from "zod";
 import {
   Box,
   IconButton,
@@ -20,30 +21,51 @@ import ClearIcon from "@mui/icons-material/Clear";
 import { formsAtom } from "@/stores/mainStore";
 import { formatDateTime } from "@/utils/format";
 import { FormAPI } from "@/gec-tripetto";
+import PlayTripetto from "@/components/PlayTripetto";
+
+const formSearchSchema = z.object({
+  page: z.optional(z.number()),
+  search: z.optional(z.string()),
+});
+
+type FormSearchSchema = z.infer<typeof formSearchSchema>;
 
 export const Route = createFileRoute("/_auth/formulaires")({
   component: Formulaires,
+  validateSearch: (search: Record<string, unknown>): FormSearchSchema =>
+    formSearchSchema.parse(search),
+  loaderDeps: ({ search }) => ({
+    page: search.page || 1,
+    search: search.search || "",
+  }),
 });
 
 function Formulaires() {
   // Definition du nombre d'éléments à afficher
   const itemsPerPage = 10;
 
+  // Hook de navigation
+  const navigate = useNavigate();
+
+  // Hook des paramètres de recherche de la page
+  const { page, search } = Route.useLoaderDeps();
+
   // Hook de stockage des formulaires
   const formulaires = useAtomValue(formsAtom);
   const [data, setData] = useState<FormAPI[]>([]);
 
-  // Etat local de gestion de la page affichée
-  const [page, setPage] = useState<number>(1);
   // Etat local de gestion du nombre de formulaires sélectionnés
   const [nbData, setNbData] = useState<number>(0);
-  // Etat local de gestion du champ de recherche
-  const [search, setSearch] = useState<string>("");
+
+  // Etat local de gestion du test du formulaire
+  const [test, setTest] = useState<boolean>(false);
+  // Etat local du formulaire sélectionné
+  const [formulaire, setFormulaire] = useState<string>("");
 
   // Mise à jour des données à afficher
   useEffect(() => {
     const filter = new RegExp(String.raw`${search.trim()}`, "i");
-    const filteredItems = search.trim().length
+    const filteredItems = (search && search.trim().length)
       ? formulaires.filter((value) => value.titre.search(filter) >= 0)
       : formulaires;
     setNbData(filteredItems.length);
@@ -64,7 +86,7 @@ function Formulaires() {
             id="input-search"
             label="Recherche"
             value={search}
-            onChange={(e) => setSearch(e.currentTarget.value)}
+            onChange={(e) => navigate({ search: { page: 1, search: e.currentTarget.value } })}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -72,7 +94,7 @@ function Formulaires() {
                 </InputAdornment>
               ),
               endAdornment: (
-                <IconButton onClick={() => setSearch("")}>
+                <IconButton onClick={() => navigate({ search: { page: 1, search: undefined } })}>
                   <ClearIcon />
                 </IconButton>
               ),
@@ -92,7 +114,13 @@ function Formulaires() {
           </TableHead>
           <TableBody>
             {data.map((form) => (
-              <TableRow key={form.id}>
+              <TableRow
+                key={form.id}
+                onDoubleClick={() => {
+                  setFormulaire(form.formulaire);
+                  setTest(true);
+                }}
+              >
                 <TableCell>{form.titre}</TableCell>
                 <TableCell>{form.version}</TableCell>
                 <TableCell>{formatDateTime(form.updatedAt)}</TableCell>
@@ -107,9 +135,23 @@ function Formulaires() {
           count={nbData}
           rowsPerPage={itemsPerPage}
           page={page !== undefined ? page - 1 : 0}
-          onPageChange={(_evt, newPage) => setPage(newPage + 1)}
+          onPageChange={(_evt, newPage) => navigate({ search: (prev) => ({ ...prev, page: newPage + 1 }) })}
         />
       </Box>
+      {
+        formulaire.trim() !== "" && (
+          <PlayTripetto
+            open={test}
+            onClose={() => setTest(false)}
+            form={JSON.parse(formulaire)}
+            onSubmit={() => {
+              setTest(false);
+              setFormulaire("");
+              return true;
+            }}
+      />
+        )
+      }
     </Paper>
   );
 }
