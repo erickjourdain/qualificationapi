@@ -19,6 +19,7 @@ import { Route as CloseImport } from './routes/close'
 import { Route as AuthImport } from './routes/_auth'
 import { Route as AuthIndexImport } from './routes/_auth/index'
 import { Route as AuthFormulairesImport } from './routes/_auth/formulaires'
+import { Route as AuthDocumentationImport } from './routes/_auth/documentation'
 import { Route as AuthAdminLayoutImport } from './routes/_auth/_adminLayout'
 import { Route as AuthOpportunitesIndexImport } from './routes/_auth/opportunites/index'
 import { Route as AuthOpportunitesNouvelleImport } from './routes/_auth/opportunites/nouvelle'
@@ -69,6 +70,11 @@ const AuthIndexRoute = AuthIndexImport.update({
 
 const AuthFormulairesRoute = AuthFormulairesImport.update({
   path: '/formulaires',
+  getParentRoute: () => AuthRoute,
+} as any)
+
+const AuthDocumentationRoute = AuthDocumentationImport.update({
+  path: '/documentation',
   getParentRoute: () => AuthRoute,
 } as any)
 
@@ -181,6 +187,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthAdminLayoutImport
       parentRoute: typeof AuthImport
     }
+    '/_auth/documentation': {
+      id: '/_auth/documentation'
+      path: '/documentation'
+      fullPath: '/documentation'
+      preLoaderRoute: typeof AuthDocumentationImport
+      parentRoute: typeof AuthImport
+    }
     '/_auth/formulaires': {
       id: '/_auth/formulaires'
       path: '/formulaires'
@@ -273,6 +286,7 @@ export const routeTree = rootRoute.addChildren({
       AuthAdminLayoutAdminRapportsIndexRoute,
       AuthAdminLayoutAdminUtilisateursIndexRoute,
     }),
+    AuthDocumentationRoute,
     AuthFormulairesRoute,
     AuthIndexRoute,
     AuthOpportunitesUuidRoute,
@@ -306,6 +320,7 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "_auth.tsx",
       "children": [
         "/_auth/_adminLayout",
+        "/_auth/documentation",
         "/_auth/formulaires",
         "/_auth/",
         "/_auth/opportunites/$uuid",
@@ -339,6 +354,10 @@ export const routeTree = rootRoute.addChildren({
         "/_auth/_adminLayout/admin/rapports/",
         "/_auth/_adminLayout/admin/utilisateurs/"
       ]
+    },
+    "/_auth/documentation": {
+      "filePath": "_auth/documentation.tsx",
+      "parent": "/_auth"
     },
     "/_auth/formulaires": {
       "filePath": "_auth/formulaires.tsx",

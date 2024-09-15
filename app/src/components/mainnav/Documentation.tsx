@@ -1,29 +1,30 @@
 import { useCallback } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { IconButton, Tooltip } from "@mui/material";
-import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+import ImportContactsIcon from '@mui/icons-material/ImportContacts';
 
-const Formulaires = () => {
+const Documentation = () => {
+
   // Chargement du Hook de navigation
   const navigate = useNavigate();
 
   // Navigation vers la page "/formulaires"
   const handleClick = useCallback(() => {
-    navigate({ to: "/formulaires" });
+    navigate({ to: "/documentation" });
   }, [navigate]);
 
   return (
-    <Tooltip title="liste des formulaires">
+    <Tooltip title="documentation">
       <IconButton
         size="large"
-        aria-label="formulaires"
-        onClick={handleClick}
+        aria-label="documentation"
         color="inherit"
+        onClick={handleClick}
       >
-        <ReceiptLongIcon />
+        <ImportContactsIcon />
       </IconButton>
     </Tooltip>
-  );
-};
+  )
+}
 
-export default Formulaires;
+export default Documentation;
