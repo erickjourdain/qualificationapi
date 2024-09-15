@@ -9,6 +9,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import SettingsIcon from "@mui/icons-material/Settings";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import DoneIcon from '@mui/icons-material/Done';
 import { selectedRunner } from "../atomState";
 import { isAdmin } from "../utils/auth";
@@ -38,6 +39,11 @@ const Settings = () => {
     setAnchorEl(null);
   };
 
+  const handleNavigForm = () => {
+    handleClose();
+    navigate("/formulaires");
+  }
+
   const handleNavigDoc = () => {
     handleClose();
     navigate("documentation");
@@ -55,7 +61,14 @@ const Settings = () => {
 
   return (
     <Box sx={{ display: { xs: "none", sm: "block" } }}>
-
+      <IconButton
+        size="large"
+        aria-label="formulaires"
+        color="inherit"
+        onClick={handleNavigForm}
+      >
+        <ReceiptLongIcon />
+      </IconButton>
       <IconButton
         size="large"
         aria-label="paramètres"

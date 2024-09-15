@@ -23,6 +23,7 @@ import Headers from "./pages/Headers";
 import AddHeader from "./pages/AddHeader";
 import Header from "./pages/Header";
 import Documentation from "./pages/Documentation";
+import Formulaires from "./pages/Formulaires";
 
 // création d'un instance de QueryClient
 const queryClient = new QueryClient({});
@@ -53,6 +54,10 @@ function App() {
         {
           path: "opportunite/:uuid",
           element: isLogged() ? <Header /> : <NotAllowed />,
+        },
+        {
+          path: "formulaires",
+          element: isLogged() ? <Formulaires /> : <NotAllowed />,
         },
         {
           path: "documentation",

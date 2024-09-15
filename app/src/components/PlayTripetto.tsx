@@ -25,11 +25,12 @@ type TripettoProps = {
   open: boolean;
   onClose: () => void;
   form: IDefinition;
+  titre?: string;
   data?: Export.IExportables;
   onSubmit?: (instance: Instance) => boolean;
 };
 
-const PlayTripetto = ({ open, onClose, form, data, onSubmit }: TripettoProps) => {
+const PlayTripetto = ({ open, onClose, form, titre, data, onSubmit }: TripettoProps) => {
   let runner: JSX.Element;
 
   // Chargement de l'état Atom du runner
@@ -87,7 +88,9 @@ const PlayTripetto = ({ open, onClose, form, data, onSubmit }: TripettoProps) =>
 
   return (
     <Dialog open={open} fullWidth maxWidth="md" onClose={onClose} scroll="paper" >
-      <DialogTitle>Formulaire Qualification</DialogTitle>
+      <DialogTitle>
+        {(!!titre) ? titre : "Formulaire Qualification"}
+      </DialogTitle>
       <DialogContent dividers>
         <DialogContentText sx={{ width: "90%" }}>{runner}</DialogContentText>
       </DialogContent>
