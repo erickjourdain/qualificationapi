@@ -26,6 +26,10 @@ export default defineConfig(function (_a) {
                     {
                         src: "node_modules/@tripetto/builder/fonts/",
                         dest: "."
+                    },
+                    {
+                        src: "src/public/documentation.pdf",
+                        dest: "./assets"
                     }
                 ]
             }),
@@ -38,7 +42,7 @@ export default defineConfig(function (_a) {
             })
         ],
         build: {
-            outDir: __dirname + "/public/assets",
+            outDir: __dirname + "/public",
         },
         define: {
             __APP_ENV__: JSON.stringify(env.APP_ENV),

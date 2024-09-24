@@ -16,7 +16,7 @@ else environnement = "production";
 const urlAPI: string= window.location.origin.includes("localhost") ? import.meta.env.VITE_API_URL 
   : `${window.location.origin}`;
 
-const apiAtom = atom<string>("");
+const apiAtom = atom<string>(urlAPI);
 const envAtom = atom<Environment>(environnement);
 const store = createStore();
 store.set(apiAtom, urlAPI);

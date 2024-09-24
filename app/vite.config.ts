@@ -28,6 +28,10 @@ export default defineConfig(({ mode }) => {
           {
             src: "node_modules/@tripetto/builder/fonts/",
             dest: "."
+          },
+          {
+            src: "src/public/documentation.pdf",
+            dest: "./assets"
           }
         ]
       }),

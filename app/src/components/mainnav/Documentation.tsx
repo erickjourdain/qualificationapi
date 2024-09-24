@@ -1,17 +1,14 @@
 import { useCallback } from "react";
-import { useNavigate } from "@tanstack/react-router";
 import { IconButton, Tooltip } from "@mui/material";
 import ImportContactsIcon from '@mui/icons-material/ImportContacts';
 
 const Documentation = () => {
 
-  // Chargement du Hook de navigation
-  const navigate = useNavigate();
-
   // Navigation vers la page "/formulaires"
   const handleClick = useCallback(() => {
-    navigate({ to: "/documentation" });
-  }, [navigate]);
+    const url = new URL(window.location.href);
+    window.open(`${url.protocol}//${url.host}/assets/documentation.pdf`, "documentation", "popup");
+  }, []);
 
   return (
     <Tooltip title="documentation">

@@ -54,6 +54,9 @@ src/main/resources/application-prod.yml
 /app/node_modules
 # Old App
 /app-old
+# Public directory
+/app/src/public/*
+/node_modules
 
 # Project specific
 /app/public/*
