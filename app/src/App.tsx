@@ -22,7 +22,6 @@ import AdminLayout from "./layout/AdminLayout";
 import Headers from "./pages/Headers";
 import AddHeader from "./pages/AddHeader";
 import Header from "./pages/Header";
-import Documentation from "./pages/Documentation";
 import Formulaires from "./pages/Formulaires";
 
 // création d'un instance de QueryClient
@@ -58,10 +57,6 @@ function App() {
         {
           path: "formulaires",
           element: isLogged() ? <Formulaires /> : <NotAllowed />,
-        },
-        {
-          path: "documentation",
-          element: isLogged() ? <Documentation /> : <NotAllowed />,
         },
         {
           path: "admin",

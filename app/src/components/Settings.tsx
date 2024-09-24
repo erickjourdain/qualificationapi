@@ -46,7 +46,8 @@ const Settings = () => {
 
   const handleNavigDoc = () => {
     handleClose();
-    navigate("documentation");
+    const url = new URL(window.location.href);
+    window.open(`${url.protocol}//${url.host}/assets/documentation.pdf`, "documentation", "popup");
   }
 
   const handleNavigAdmin = () => {

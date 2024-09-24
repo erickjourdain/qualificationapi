@@ -57,7 +57,10 @@ module.exports = (env) => {
         "process.env": JSON.stringify(dotenv.parsed),
       }),
       new copy({
-        patterns: [{ from: "node_modules/@tripetto/builder/fonts/", to: "." }],
+        patterns: [
+          { from: "node_modules/@tripetto/builder/fonts/", to: "." },
+          { from: "src/public/documentation.pdf", to: "./assets" },
+        ],
       }),
       new NodePolyfillPlugin(),
     ],
