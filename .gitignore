@@ -60,4 +60,4 @@ src/main/resources/application-prod.yml
 
 # production
 /app/.env.production
-node_modules
+/node_modules
