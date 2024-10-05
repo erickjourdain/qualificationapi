@@ -33,7 +33,8 @@ public class ProduitService {
 
   public Map<String, Object> addFieldsToProduit(Produit produit, String include)
       throws AppException {
-    Map<String, Object> user = new HashMap<>();
+    Map<String, Object> createur = new HashMap<>();
+    Map<String, Object> gestionnaire = new HashMap<>();
     Map<String, Object> opp = new HashMap<>();
     Map<String, Object> response = new HashMap<>();
 
@@ -44,26 +45,20 @@ public class ProduitService {
 
     // ajout du champ créateur
     if (fields.isEmpty() || fields.contains("createur")) {
-      // recherche du créateur de la réponse dans la base
-      User createur = userService.getUser(produit.getCreateur().getId());
-      user.clear();
-      user.put("id", createur.getId());
-      user.put("prenom", createur.getPrenom());
-      user.put("nom", createur.getNom());
-      // user.put("role", createur.getRole());
-      response.put("createur", user);
+      createur.clear();
+      createur.put("id", produit.getCreateur().getId());
+      createur.put("prenom", produit.getCreateur().getPrenom());
+      createur.put("nom", produit.getCreateur().getNom());
+      response.put("createur", createur);
     }
 
     // ajout du champ gestionnaire
     if (fields.isEmpty() || fields.contains("gestionnaire")) {
-      // recherche du gestionnaire courant dans la base
-      User gestionnaire = userService.getUser(produit.getGestionnaire().getId());
-      user.clear();
-      user.put("id", gestionnaire.getId());
-      user.put("prenom", gestionnaire.getPrenom());
-      user.put("nom", gestionnaire.getNom());
-      // user.put("role", gestionnaire.getRole());
-      response.put("gestionnaire", user);
+      gestionnaire.clear();
+      gestionnaire.put("id", produit.getGestionnaire().getId());
+      gestionnaire.put("prenom", produit.getGestionnaire().getPrenom());
+      gestionnaire.put("nom", produit.getGestionnaire().getNom());
+      response.put("gestionnaire", gestionnaire);
     }
 
     // ajout du champ opportunité
@@ -141,9 +136,13 @@ public class ProduitService {
    */
   public Produit updateProduit(Integer id, ProduitRequest request, UserDetails userDetails)
       throws AppException {
+    // récupération des informations sur l'utilisateur connecté
+    User gestionnaire = userService.getByLogin(userDetails.getUsername());
     // récupération de l'entité à modifier
     Produit produit = produitRepository.findById(id)
         .orElseThrow(() -> new AppException(404, "Impossible de trouver l'entity à modifier"));
+    // mise à jour gestionnaire
+    produit.setGestionnaire(gestionnaire);
     // mise à jour de la description
     Optional.ofNullable(request.getDescription())
         .ifPresent(res -> {

@@ -34,7 +34,8 @@ public class HeaderService {
 
   public Map<String, Object> addFieldsToHeader(Header header, String include)
       throws AppException {
-    Map<String, Object> user = new HashMap<>();
+    Map<String, Object> gestionnaire = new HashMap<>();
+    Map<String, Object> createur = new HashMap<>();
     Map<String, Object> response = new HashMap<>();
 
     // création de la liste des champs à retourner par la requête
@@ -44,26 +45,20 @@ public class HeaderService {
 
     // ajout du champ créateur
     if (fields.isEmpty() || fields.contains("createur")) {
-      // recherche du créateur de la réponse dans la base
-      User createur = userService.getUser(header.getCreateur().getId());
-      user.clear();
-      user.put("id", createur.getId());
-      user.put("prenom", createur.getPrenom());
-      user.put("nom", createur.getNom());
-      // user.put("role", createur.getRole());
-      response.put("createur", user);
+      gestionnaire.clear();
+      createur.put("id", header.getCreateur().getId());
+      createur.put("prenom", header.getCreateur().getPrenom());
+      createur.put("nom", header.getCreateur().getNom());
+      response.put("createur", createur);
     }
 
     // ajout du champ gestionnaire
     if (fields.isEmpty() || fields.contains("gestionnaire")) {
-      // recherche du gestionnaire courant dans la base
-      User gestionnaire = userService.getUser(header.getGestionnaire().getId());
-      user.clear();
-      user.put("id", gestionnaire.getId());
-      user.put("prenom", gestionnaire.getPrenom());
-      user.put("nom", gestionnaire.getNom());
-      // user.put("role", gestionnaire.getRole());
-      response.put("gestionnaire", user);
+      gestionnaire.clear();
+      gestionnaire.put("id", header.getGestionnaire().getId());
+      gestionnaire.put("prenom", header.getGestionnaire().getPrenom());
+      gestionnaire.put("nom", header.getGestionnaire().getNom());
+      response.put("gestionnaire", gestionnaire);
     }
 
     // ajout des différents champs à retourner en fonction de la demande exposée
@@ -150,6 +145,10 @@ public class HeaderService {
     // récupération de l'entité à modifier
     Header header = headerRepository.findById(id)
         .orElseThrow(() -> new AppException(404, "Impossible de trouver l'entete à modifier"));
+    // récupération des informations sur l'utilisateur connecté
+    User gestionnaire = userService.getByLogin(userDetails.getUsername());
+    // Mise à jour du gestionnaire
+    header.setGestionnaire(gestionnaire);
     // Mise à jour de l'opportunité
     Optional.ofNullable(request.getOpportunite())
         .ifPresent(res -> {

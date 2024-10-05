@@ -55,7 +55,7 @@ public class FormService {
       user.put("id", createur.getId());
       user.put("prenom", createur.getPrenom());
       user.put("nom", createur.getNom());
-      //user.put("role", createur.getRole());
+      response.put("createur", user);
     }
 
     // ajout des différents champs à retourner en fonction de la demande exposée
@@ -74,8 +74,6 @@ public class FormService {
       response.put("valide", form.getValide());
     if (fields.isEmpty() || fields.contains("slug"))
       response.put("slug", form.getSlug());
-    if (fields.isEmpty() || fields.contains("createur"))
-      response.put("createur", user);
     if (fields.isEmpty() || fields.contains("createdat"))
       response.put("createdAt", form.getCreatedAt());
     if (fields.isEmpty() || fields.contains("updatedat"))

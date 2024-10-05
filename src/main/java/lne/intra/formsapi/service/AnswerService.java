@@ -45,6 +45,8 @@ public class AnswerService {
    * @throws AppException
    */
   public Map<String, Object> addFieldsToAnswer(Answer answer, String include) throws AppException {
+    Map<String, Object> createur = new HashMap<>();
+    Map<String, Object> gestionnaire = new HashMap<>();
     Map<String, Object> user = new HashMap<>();
     Map<String, Object> form = new HashMap<>();
     Map<String, Object> response = new HashMap<>();
@@ -57,26 +59,20 @@ public class AnswerService {
 
     // ajout du champ créateur
     if (fields.isEmpty() || fields.contains("createur")) {
-      // recherche du créateur de la réponse dans la base
-      User createur = userService.getUser(answer.getCreateur().getId());
-      user.clear();
-      user.put("id", createur.getId());
-      user.put("prenom", createur.getPrenom());
-      user.put("nom", createur.getNom());
-      //user.put("role", createur.getRole());
-      response.put("createur", user);
+      createur.clear();
+      createur.put("id", answer.getCreateur().getId());
+      createur.put("prenom", answer.getCreateur().getPrenom());
+      createur.put("nom", answer.getCreateur().getNom());
+      response.put("createur", createur);
     }
 
     // ajout du champ gestionnaire
     if (fields.isEmpty() || fields.contains("gestionnaire")) {
-      // recherche du gestionnaire courant dans la base
-      User gestionnaire = userService.getUser(answer.getGestionnaire().getId());
-      user.clear();
-      user.put("id", gestionnaire.getId());
-      user.put("prenom", gestionnaire.getPrenom());
-      user.put("nom", gestionnaire.getNom());
-      //user.put("role", gestionnaire.getRole());
-      response.put("gestionnaire", user);
+      gestionnaire.clear();
+      gestionnaire.put("id", answer.getGestionnaire().getId());
+      gestionnaire.put("prenom", answer.getGestionnaire().getPrenom());
+      gestionnaire.put("nom", answer.getGestionnaire().getNom());
+      response.put("gestionnaire", gestionnaire);
     }
 
     // ajout du champ locked

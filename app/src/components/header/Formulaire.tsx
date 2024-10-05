@@ -36,7 +36,7 @@ const Formulaire = ({ header, onChange }: FormulaireProps) => {
   const { mutate } = useMutation({
     mutationFn: updateHeader,
     onSuccess: () => {
-      setAlerte({ severite: "success", message: "enregistrement du produit réalisé" });
+      setAlerte({ severite: "success", message: "mise à jour de l'opportunité réalisé" });
       setDisabled(true);
       onChange();
     },
