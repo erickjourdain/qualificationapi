@@ -11,6 +11,8 @@ import TableCell from "@mui/material/TableCell";
 import TablePagination from "@mui/material/TablePagination";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import Typography from "@mui/material/Typography";
@@ -81,6 +83,9 @@ const Utilisateurs = () => {
           <Typography variant="h5" gutterBottom>
             Utilisateurs
           </Typography>
+          <Button color="primary" variant="contained" startIcon={<AddCircleIcon />} onClick={() => navigate({ pathname: "user/ajouter" })}>
+            Nouvel Utilisateur
+          </Button>
           <Table aria-label="table-users">
             <TableHead>
               <TableRow>
@@ -92,7 +97,7 @@ const Utilisateurs = () => {
             </TableHead>
             <TableBody>
               {users.map((user) => (
-                <TableRow key={user.id} onDoubleClick={() => navigate({ pathname: `user/${user.slug}` })} sx={{ cursor: "pointer "}}>
+                <TableRow key={user.id} onDoubleClick={() => navigate({ pathname: `user/${user.slug}` })} sx={{ cursor: "pointer " }}>
                   <TableCell>{`${user.prenom} ${user.nom}`}</TableCell>
                   <TableCell>{user.role}</TableCell>
                   <TableCell>{icon(user.validated)}</TableCell>

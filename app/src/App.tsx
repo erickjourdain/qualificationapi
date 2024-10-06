@@ -23,6 +23,7 @@ import Headers from "./pages/Headers";
 import AddHeader from "./pages/AddHeader";
 import Header from "./pages/Header";
 import Formulaires from "./pages/Formulaires";
+import AddUser from "./pages/AddUser";
 
 // création d'un instance de QueryClient
 const queryClient = new QueryClient({});
@@ -69,6 +70,10 @@ function App() {
             {
               path: "user/:slug",
               element: <UserForm />,
+            },
+            {
+              path: "user/ajouter",
+              element: <AddUser />
             },
             {
               path: "form/:slug",

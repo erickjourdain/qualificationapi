@@ -55,7 +55,7 @@ const MainLayout = () => {
         <Toolbar />
         <Container maxWidth="lg" sx={{ mb: 4 }}>
           {
-            info && !!!matchRoutes([{ path: "/admin" }], location) && 
+            info && !!!matchRoutes([{ path: "/admin/*" }], location) && 
             <Alert severity="warning" variant="filled" sx={{ mb: 2 }} >{info}</Alert>
           }
           <Outlet />
